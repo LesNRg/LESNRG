@@ -10,10 +10,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Energy Consulting & Building Performance",
-  description:
-    "Leading energy consulting firm specializing in blower door testing, energy audits, and large commercial building performance solutions.",
-  keywords: "energy consulting, blower door testing, large building, energy audit, building performance",
+  title: "LES NRG | Building Performance Testing | Philadelphia, PA",
+  description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Philadelphia, PA.",
+  keywords: "blower door testing, HERS rating, energy audit, building performance, Philadelphia, passive house, energy star, code compliance",
+  metadataBase: new URL("https://www.lesnrg.com"),
+};
+
+const localBusinessSchema = {
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  name: "LES NRG",
+  description: "Building performance verification firm specializing in blower door testing, HERS ratings, energy audits, PHIUS verification, and Energy Star certification.",
+  url: "https://www.lesnrg.com",
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: "Philadelphia",
+    addressRegion: "PA",
+    addressCountry: "US",
+  },
+  areaServed: ["Pennsylvania", "New Jersey", "New York", "Delaware"],
+  sameAs: ["https://www.instagram.com/les.nrg"],
 };
 
 export default function RootLayout({
@@ -23,6 +39,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
+      </head>
       <body className={`${inter.variable} antialiased`}>
         <Navbar />
         <main>{children}</main>

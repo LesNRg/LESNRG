@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { Wind, CheckCircle, ArrowRight, Building2 } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Large Building Blower Door Testing | Commercial Air Leakage | LES NRG",
+  description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E779 & E1827 compliant. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
+  openGraph: {
+    title: "Large Building Blower Door Testing | LES NRG",
+    description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E779 & E1827 compliant.",
+    url: "https://www.lesnrg.com/large-building-blower-door-testing",
+    siteName: "LES NRG",
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 const standards = [
   {

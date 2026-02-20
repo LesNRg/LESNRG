@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -5,6 +6,18 @@ import {
   Shield, BarChart3, Home, Zap
 } from "lucide-react";
 
+export const metadata: Metadata = {
+  title: "PHIUS Passive House Verification | LES NRG | Philadelphia, PA",
+  description: "Independent PHIUS+ passive house verification and certification. Third-party inspections, airtightness testing, and full certification support from design through certificate. Philadelphia, PA.",
+  openGraph: {
+    title: "PHIUS Passive House Verification | LES NRG",
+    description: "Independent PHIUS+ passive house verification. Third-party inspections, airtightness testing, and full certification support.",
+    url: "https://www.lesnrg.com/phius-passive-house-verification",
+    siteName: "LES NRG",
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 const standards = [
   {

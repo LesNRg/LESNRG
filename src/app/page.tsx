@@ -1,42 +1,21 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, CheckCircle, Wind, ClipboardList, HomeIcon, BarChart2, Award, Wrench, Building2, Shield } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import AnimatedCounter from "@/components/AnimatedCounter";
 
-function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLDivElement>(null);
-  const started = useRef(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !started.current) {
-          started.current = true;
-          const steps = 50;
-          const increment = target / steps;
-          let current = 0;
-          const timer = setInterval(() => {
-            current += increment;
-            if (current >= target) {
-              setCount(target);
-              clearInterval(timer);
-            } else {
-              setCount(Math.floor(current));
-            }
-          }, 2000 / steps);
-        }
-      },
-      { threshold: 0.5 }
-    );
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [target]);
-
-  return <div ref={ref}>{count}{suffix}</div>;
-}
+export const metadata: Metadata = {
+  title: "LES NRG | Blower Door Testing, HERS Ratings & Building Performance | Philadelphia, PA",
+  description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Located in Philadelphia, PA — serving PA, NJ, NY, DE and beyond.",
+  openGraph: {
+    title: "LES NRG | Blower Door Testing & Building Performance | Philadelphia, PA",
+    description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings.",
+    url: "https://www.lesnrg.com",
+    siteName: "LES NRG",
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 const services = [
   {
@@ -113,7 +92,6 @@ export default function HomePage() {
     <div className="min-h-screen">
       {/* Hero — dark */}
       <section className="min-h-screen flex items-center pt-32 bg-[#111111] relative overflow-hidden">
-        {/* Hero background image */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3458%202.JPG"
@@ -125,7 +103,6 @@ export default function HomePage() {
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
-        {/* Subtle yellow glow */}
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#F5C500]/6 rounded-full blur-3xl pointer-events-none z-0" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-24 relative w-full z-10">
           <div className="max-w-3xl">

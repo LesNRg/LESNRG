@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { CheckCircle, ArrowRight, Award, FileText, Home } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Energy Star Multifamily Certification | LES NRG | Philadelphia, PA",
+  description: "Authorized Energy Star Multifamily New Construction and DOE Zero Energy Ready Home verification. 347+ certified units. NJ and PA rebate programs available. Serving PA, NJ, NY, DE.",
+  openGraph: {
+    title: "Energy Star Multifamily Certification | LES NRG",
+    description: "Authorized Energy Star Multifamily New Construction verification. 347+ certified units. NJ and PA rebate programs available.",
+    url: "https://www.lesnrg.com/energy-star-multifamily",
+    siteName: "LES NRG",
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 const programs = [
   {

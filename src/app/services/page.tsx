@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, CheckCircle, Wind, BarChart2, HomeIcon, ClipboardList, Award, Wrench, Scale } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Building Performance Testing Services | LES NRG | Philadelphia, PA",
+  description: "Blower door testing, HERS ratings, energy audits, duct blaster testing, PHIUS verification, Energy Star certification, and building science consulting. Serving PA, NJ, NY, DE and beyond.",
+  openGraph: {
+    title: "Building Performance Testing Services | LES NRG",
+    description: "Blower door testing, HERS ratings, energy audits, PHIUS verification, Energy Star certification, and building science consulting.",
+    url: "https://www.lesnrg.com/services",
+    siteName: "LES NRG",
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 const services = [
   {

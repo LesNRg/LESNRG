@@ -1,6 +1,20 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, CheckCircle } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "About LES NRG | Building Performance Experts | Philadelphia, PA",
+  description: "LES NRG is a Philadelphia-based building performance verification firm with 20+ years of experience. PHIUS Verifier, HERS Certified Rater, Energy Star Partner, and NJCEP Partner.",
+  openGraph: {
+    title: "About LES NRG | Building Performance Experts | Philadelphia, PA",
+    description: "20+ years of building performance expertise. PHIUS Verifier, HERS Certified Rater, and Energy Star Partner based in Philadelphia, PA.",
+    url: "https://www.lesnrg.com/about",
+    siteName: "LES NRG",
+    locale: "en_US",
+    type: "website",
+  },
+};
 
 const credentials = [
   "HERS Certified Rater (RESNET Accredited)",
