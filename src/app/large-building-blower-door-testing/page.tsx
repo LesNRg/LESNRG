@@ -129,7 +129,7 @@ export default function BlowerDoorTestingPage() {
             Large Building<br />Blower Door<br />Testing
           </h1>
           <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
-            Multi-fan air leakage testing for commercial and multifamily facilities of any size.
+            Multi-fan air leakage testing for new and existing commercial and multifamily facilities of any size.
             ASTM E779 and E1827 compliant.
           </p>
           <div className="flex flex-wrap gap-3">
