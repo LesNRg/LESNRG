@@ -119,7 +119,7 @@ export default function EnergyStarMultifamilyPage() {
             fill
             className="object-cover opacity-50"
             priority
-           
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
@@ -171,7 +171,7 @@ export default function EnergyStarMultifamilyPage() {
               "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_4864.JPG",
             ].map((src, i) => (
               <div key={i} className="relative rounded-lg overflow-hidden" style={{ height: "200px" }}>
-                <Image src={src} alt="Energy Star project" fill className="object-cover" />
+                <Image src={src} alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 33vw, 17vw" />
               </div>
             ))}
           </div>
@@ -398,25 +398,25 @@ export default function EnergyStarMultifamilyPage() {
         {/* Desktop bento */}
         <div className="hidden md:grid grid-cols-4 gap-3" style={{ gridTemplateRows: "280px 280px 280px" }}>
           <div className="col-span-2 row-span-2 relative rounded-xl overflow-hidden">
-            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3278.JPG" alt="Energy Star project" fill className="object-cover" />
+            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3278.JPG" alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
           </div>
           <div className="relative rounded-xl overflow-hidden">
-            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3654.JPG" alt="Energy Star project" fill className="object-cover" />
+            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3654.JPG" alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
           </div>
           <div className="relative rounded-xl overflow-hidden">
-            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3896.JPG" alt="Energy Star project" fill className="object-cover" />
+            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3896.JPG" alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
           </div>
           <div className="relative rounded-xl overflow-hidden">
-            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_5941.JPG" alt="Energy Star project" fill className="object-cover" />
+            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_5941.JPG" alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
           </div>
           <div className="relative rounded-xl overflow-hidden">
-            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_6661.JPG" alt="Energy Star project" fill className="object-cover" />
+            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_6661.JPG" alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
           </div>
           <div className="col-span-2 relative rounded-xl overflow-hidden">
-            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7750.JPG" alt="Energy Star project" fill className="object-cover" />
+            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7750.JPG" alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
           </div>
           <div className="col-span-2 relative rounded-xl overflow-hidden">
-            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7911.JPG" alt="Energy Star project" fill className="object-cover" />
+            <Image src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7911.JPG" alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
           </div>
         </div>
         {/* Mobile grid */}
@@ -430,7 +430,7 @@ export default function EnergyStarMultifamilyPage() {
             "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7750.JPG",
           ].map((src, i) => (
             <div key={i} className="relative rounded-xl overflow-hidden aspect-square">
-              <Image src={src} alt="Energy Star project" fill className="object-cover" />
+              <Image src={src} alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 33vw, 17vw" />
             </div>
           ))}
         </div>

@@ -115,7 +115,7 @@ export default function BlowerDoorTestingPage() {
             fill
             className="object-cover opacity-50"
             priority
-           
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
@@ -176,7 +176,7 @@ export default function BlowerDoorTestingPage() {
               alt="Large building blower door testing setup"
               fill
               className="object-cover"
-             
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
         </div>
@@ -203,7 +203,7 @@ export default function BlowerDoorTestingPage() {
               alt="Large commercial building exterior"
               fill
               className="object-cover"
-             
+              sizes="(max-width: 768px) 100vw, 50vw"
             />
           </div>
         </div>

@@ -128,7 +128,7 @@ export default function PhiusVerificationPage() {
             fill
             className="object-cover opacity-50"
             priority
-           
+            sizes="100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
@@ -178,7 +178,7 @@ export default function PhiusVerificationPage() {
               "/new%20website%20photo/passive%20house/IMG_9177.JPG",
             ].map((src, i) => (
               <div key={i} className="relative rounded-lg overflow-hidden" style={{ height: "200px" }}>
-                <Image src={src} alt="Passive house project" fill className="object-cover" />
+                <Image src={src} alt="Passive house project" fill className="object-cover" sizes="(max-width: 640px) 33vw, 20vw" />
               </div>
             ))}
           </div>
