@@ -111,8 +111,7 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              New Construction, Existing Buildings &{" "}
-              <span className="text-[#F5C500]">Code Verification</span>
+              New Construction, <span className="text-[#F5C500]">Existing Buildings</span> & Code Verification
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-10 max-w-xl">
               Blower door testing, HERS ratings, energy audits, and program certification for new construction and existing buildings — keeping projects code-compliant from conception to final sign-off.
