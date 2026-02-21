@@ -20,7 +20,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-28 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/mis/IMG_9075.JPG"
@@ -44,7 +44,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-16">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Info */}
           <div className="lg:col-span-1 space-y-6">

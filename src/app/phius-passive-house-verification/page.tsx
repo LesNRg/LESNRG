@@ -120,7 +120,7 @@ export default function PhiusVerificationPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-28 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/passive%20house/IMG_9656.JPG"
@@ -186,7 +186,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Why PHIUS */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">The Standard</span>
@@ -243,7 +243,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Standards */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">Compliance</span>
@@ -263,7 +263,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Process */}
-      <section id="process" className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section id="process" className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="mb-12">
           <span className="section-label">How It Works</span>
           <h2 className="section-title">Our Verification Process</h2>
@@ -283,7 +283,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Metrics */}
-      <section className="bg-[#F5C500] py-20">
+      <section className="bg-[#F5C500] py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="text-[10px] font-bold tracking-[0.14em] uppercase text-[#111111]/50 block mb-2">What We Measure</span>
@@ -301,7 +301,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Building Types */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="mb-12">
           <span className="section-label">Project Types</span>
           <h2 className="section-title">Buildings We Certify</h2>
@@ -322,7 +322,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Deliverables */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
@@ -380,7 +380,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Credentials Callout */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div>
           <div>
             <span className="section-label">Why Us</span>
@@ -416,7 +416,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* FAQ */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">FAQ</span>
@@ -434,7 +434,7 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#F5C500]">
+      <section className="py-8 bg-[#F5C500]">
         <div className="max-w-3xl mx-auto px-5 text-center">
           <h2 className="font-black text-[#111111] mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.025em" }}>
             Ready to Certify Your Project?

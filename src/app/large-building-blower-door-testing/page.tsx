@@ -47,8 +47,8 @@ const process = [
   },
   {
     step: "02",
-    title: "Building Preparation",
-    desc: "Seal intentional openings — HVAC dampers, exhaust fans — and establish safe test zones.",
+    title: "Contract & Building Preparation",
+    desc: "Once the scope is agreed upon, we execute a contract and coordinate with the project team to prepare the building for testing. This includes sealing intentional openings — HVAC dampers, exhaust fans, and penetrations — and establishing safe test zones.",
   },
   {
     step: "03",
@@ -107,7 +107,7 @@ export default function BlowerDoorTestingPage() {
     <div className="min-h-screen pt-32">
 
       {/* Hero */}
-      <section className="bg-[#111111] py-28 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_6661.JPG"
@@ -145,7 +145,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* New Construction */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <div>
             <span className="section-label">New Construction</span>
@@ -203,7 +203,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Existing Buildings */}
-      <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-20">
+      <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">Existing Buildings</span>
@@ -243,7 +243,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Overview */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <div>
             <span className="section-label">The Challenge</span>
@@ -281,7 +281,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Building Types */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <div>
             <span className="section-label">Facility Types</span>
@@ -308,7 +308,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Process */}
-      <section id="process" className="bg-[#111111] border-y border-white/8 py-20">
+      <section id="process" className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">How It Works</span>
@@ -330,7 +330,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Deliverables */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div>
@@ -370,7 +370,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Standards */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">Compliance</span>
@@ -390,7 +390,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Unit Compartmentalization */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="mb-10">
           <span className="section-label">2021 IECC § R402.4.1.2</span>
           <h2 className="section-title mb-4">Multifamily Unit Compartmentalization Testing</h2>
@@ -455,7 +455,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="mb-10">
           <span className="section-label">FAQ</span>
           <h2 className="section-title">Common Questions</h2>
@@ -471,7 +471,7 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#F5C500]">
+      <section className="py-8 bg-[#F5C500]">
         <div className="max-w-3xl mx-auto px-5 text-center">
           <h2 className="font-black text-[#111111] mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.025em" }}>
             Ready to Schedule Your Test?

@@ -104,7 +104,7 @@ export default function HomePage() {
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#F5C500]/6 rounded-full blur-3xl pointer-events-none z-0" />
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-24 relative w-full z-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10 relative w-full z-10">
           <div className="max-w-3xl">
             <span className="section-label">Located in Philadelphia, PA</span>
             <h1
@@ -138,7 +138,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats — yellow bar */}
-      <section className="bg-[#F5C500] py-12">
+      <section className="bg-[#F5C500] py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {stats.map((stat) => (
@@ -154,7 +154,7 @@ export default function HomePage() {
       </section>
 
       {/* Quote */}
-      <section className="py-16 bg-[#f9f9f7] border-b border-[#e4e4de]">
+      <section className="py-10 bg-[#f9f9f7] border-b border-[#e4e4de]">
         <div className="max-w-3xl mx-auto px-5 sm:px-8 xl:px-12 text-center">
           <div className="w-8 h-1 bg-[#F5C500] rounded-full mx-auto mb-6" />
           <blockquote className="text-2xl font-semibold text-[#111111] leading-snug mb-4" style={{ letterSpacing: "-0.01em" }}>
@@ -165,7 +165,7 @@ export default function HomePage() {
       </section>
 
       {/* Services */}
-      <section className="py-24 bg-white">
+      <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">What We Do</span>
@@ -189,7 +189,7 @@ export default function HomePage() {
       </section>
 
       {/* Specialized Services */}
-      <section className="py-16 bg-[#111111] border-y border-white/8">
+      <section className="py-10 bg-[#111111] border-y border-white/8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">Specialized Programs</span>
@@ -216,7 +216,7 @@ export default function HomePage() {
       </section>
 
       {/* About Callout — dark */}
-      <section className="bg-[#111111] py-20 border-y border-white/8">
+      <section className="bg-[#111111] py-8 border-y border-white/8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-2 gap-14 items-center">
             <div>
@@ -279,7 +279,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA — yellow */}
-      <section className="py-20 bg-[#F5C500]">
+      <section className="py-8 bg-[#F5C500]">
         <div className="max-w-3xl mx-auto px-5 text-center">
           <h2 className="font-black text-[#111111] mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.025em" }}>
             Ready to Start Your Project?

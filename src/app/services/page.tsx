@@ -109,7 +109,7 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-28 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/mis/IMG_2507%202.JPG"
@@ -135,7 +135,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Services */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-16">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
         <div className="space-y-5">
           {services.map((s) => (
             <div key={s.title} className="card">
@@ -182,7 +182,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Large Building CTA */}
-      <section className="bg-[#111111] border-y border-white/8 py-16">
+      <section className="bg-[#111111] border-y border-white/8 py-10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
             <div>
@@ -207,7 +207,7 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#F5C500]">
+      <section className="py-8 bg-[#F5C500]">
         <div className="max-w-3xl mx-auto px-5 text-center">
           <h2 className="font-black text-[#111111] mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.025em" }}>
             Have a Project in Mind?

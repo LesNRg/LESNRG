@@ -65,7 +65,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-28 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/mis/IMG_8984.JPG"
@@ -92,7 +92,7 @@ export default function AboutPage() {
       </section>
 
       {/* Track Record */}
-      <section className="bg-[#F5C500] py-12">
+      <section className="bg-[#F5C500] py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {trackRecord.map((s) => (
@@ -106,7 +106,7 @@ export default function AboutPage() {
       </section>
 
       {/* What We Do */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="mb-10">
           <span className="section-label">What We Do</span>
           <h2 className="section-title mb-5">Comprehensive Building Performance Services</h2>
@@ -143,7 +143,7 @@ export default function AboutPage() {
       </section>
 
       {/* Our Approach */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
@@ -174,7 +174,8 @@ export default function AboutPage() {
                 alt="Neil Goldman, LES NRG founder"
                 fill
                 className="object-cover"
-               
+                style={{ objectPosition: "20% 15%" }}
+
               />
             </div>
           </div>
@@ -182,7 +183,7 @@ export default function AboutPage() {
       </section>
 
       {/* Credentials */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">Credentials</span>
@@ -221,7 +222,7 @@ export default function AboutPage() {
       </section>
 
       {/* Community Highlights */}
-      <section className="bg-[#111111] border-y border-white/8 py-16">
+      <section className="bg-[#111111] border-y border-white/8 py-10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">Industry Involvement</span>
@@ -242,7 +243,7 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#F5C500]">
+      <section className="py-8 bg-[#F5C500]">
         <div className="max-w-3xl mx-auto px-5 text-center">
           <h2 className="font-black text-[#111111] mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.025em" }}>
             Ready to Work Together?

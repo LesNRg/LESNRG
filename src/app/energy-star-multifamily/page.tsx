@@ -111,7 +111,7 @@ export default function EnergyStarMultifamilyPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-28 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1634.JPG"
@@ -179,7 +179,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* What is Energy Star MFNC */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">The Program</span>
@@ -214,7 +214,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Feature cards */}
-      <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-16">
+      <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-3 gap-5">
             {[
@@ -251,7 +251,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* DOE ZERH */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">DOE Program</span>
@@ -302,7 +302,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* NJ & PA Rebates */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">Incentives</span>
@@ -348,7 +348,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Standards */}
-      <section className="py-20">
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">Compliance</span>
@@ -368,7 +368,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Process */}
-      <section id="process" className="bg-[#111111] border-y border-white/8 py-20">
+      <section id="process" className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">How It Works</span>
@@ -390,7 +390,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Photo Collage */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-16">
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
         <div className="mb-8">
           <span className="section-label">Our Work</span>
           <h2 className="section-title">In the Field</h2>
@@ -437,7 +437,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Deliverables */}
-      <section className="py-20">
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
@@ -507,7 +507,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Why Us */}
-      <section className="bg-[#111111] border-y border-white/8 py-20">
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
@@ -545,7 +545,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20">
+      <section className="py-8">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">FAQ</span>
@@ -563,7 +563,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-[#F5C500]">
+      <section className="py-8 bg-[#F5C500]">
         <div className="max-w-3xl mx-auto px-5 text-center">
           <h2 className="font-black text-[#111111] mb-4" style={{ fontSize: "clamp(1.75rem, 4vw, 2.5rem)", letterSpacing: "-0.025em" }}>
             Ready to Certify Your Project?
