@@ -42,8 +42,8 @@ const standards = [
 const process = [
   {
     step: "01",
-    title: "Pre-Test Assessment",
-    desc: "Review drawings and mechanical systems to develop a test plan and fan array configuration.",
+    title: "Site Walk & Test Plan",
+    desc: "We walk the building with the project team — reviewing drawings, mechanical systems, and envelope details — then deliver a comprehensive testing plan covering fan array configuration, access points, preparation requirements, and scheduling.",
   },
   {
     step: "02",
