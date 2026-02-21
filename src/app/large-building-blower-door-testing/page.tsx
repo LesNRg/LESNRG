@@ -144,6 +144,104 @@ export default function BlowerDoorTestingPage() {
         </div>
       </section>
 
+      {/* New Construction */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
+        <div className="grid md:grid-cols-2 gap-12 items-start">
+          <div>
+            <span className="section-label">New Construction</span>
+            <h2 className="section-title mb-5">2021 IECC Compliance Testing</h2>
+            <p className="text-[#6b6b62] leading-relaxed mb-4">
+              The 2021 International Energy Conservation Code (IECC) establishes mandatory air leakage testing
+              requirements for new large commercial buildings. Under Section C402.5, buildings exceeding
+              25,000 sq ft of conditioned floor area must demonstrate a maximum whole-building air leakage
+              rate of <strong className="text-[#111111]">0.40 CFM75 per square foot</strong> of gross above-grade wall area,
+              tested at 75 Pascals per ASTM E779 or ASTM E1827.
+            </p>
+            <p className="text-[#6b6b62] leading-relaxed mb-6">
+              For attached multifamily buildings up to three stories, Section R402.4.1.2 requires individual
+              unit compartmentalization testing at 50 Pa with a maximum of 0.3 CFM50/ft² of unit enclosure area.
+              Sampling is not permitted — every unit must pass independently.
+            </p>
+            <ul className="space-y-2">
+              {[
+                "Whole-building testing per ASTM E779 / ASTM E1827",
+                "Unit compartmentalization per 2021 IECC § R402.4.1.2",
+                "ASHRAE 90.1 compliance for commercial construction",
+                "Signed engineering report accepted by AHJ",
+              ].map((item) => (
+                <li key={item} className="flex items-center gap-2 text-[#6b6b62] text-sm">
+                  <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-[#111111] rounded-2xl p-8">
+            <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-3 py-1.5 mb-6">
+              <span className="text-[#F5C500] font-bold text-sm">2021 IECC § C402.5</span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-6">
+              {[
+                { label: "Max Leakage", value: "0.40 CFM75/ft²", sub: "Gross above-grade wall area" },
+                { label: "Test Pressure", value: "75 Pa", sub: "Commercial buildings" },
+                { label: "Threshold", value: "> 25,000 ft²", sub: "Conditioned floor area" },
+                { label: "Test Methods", value: "E779 / E1827", sub: "ASTM compliant" },
+              ].map((item) => (
+                <div key={item.label} className="bg-white/5 rounded-xl p-4 text-center">
+                  <div className="text-white/40 text-xs uppercase tracking-wider mb-1.5">{item.label}</div>
+                  <div className="text-[#F5C500] font-black text-lg mb-0.5" style={{ letterSpacing: "-0.02em" }}>{item.value}</div>
+                  <div className="text-white/30 text-xs">{item.sub}</div>
+                </div>
+              ))}
+            </div>
+            <p className="text-white/30 text-xs leading-relaxed">
+              Many states and municipalities have adopted the 2021 IECC or equivalent. We verify the applicable
+              code for your jurisdiction and deliver a report that satisfies your Authority Having Jurisdiction (AHJ).
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Existing Buildings */}
+      <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-20">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="mb-10">
+            <span className="section-label">Existing Buildings</span>
+            <h2 className="section-title mb-4">Why Test an Existing Building?</h2>
+            <p className="text-[#6b6b62] leading-relaxed max-w-2xl">
+              Air leakage testing is not just a code checkbox for new construction — it is one of the most
+              effective diagnostic tools available for identifying performance problems in existing buildings.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[
+              {
+                title: "Energy Conservation",
+                desc: "Uncontrolled air infiltration is responsible for 25–40% of heating and cooling loads in commercial buildings. A blower door test quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements — and measurable proof of savings afterward.",
+              },
+              {
+                title: "Moisture & Mold",
+                desc: "Air movement through the building envelope carries moisture into wall cavities and interstitial spaces. In cold climates this leads to condensation, rot, and mold growth that is often invisible until structural damage has occurred. Pressurization testing locates the breach before it becomes a costly repair.",
+              },
+              {
+                title: "Indoor Air Quality",
+                desc: "Uncontrolled infiltration introduces unconditioned, unfiltered outside air — along with pollutants, allergens, and vehicle exhaust — directly into occupied spaces. Identifying and sealing major air pathways improves occupant health and reduces the load on mechanical ventilation systems.",
+              },
+              {
+                title: "Renovation & Re-Commissioning",
+                desc: "After a major renovation, addition, or mechanical system upgrade, a post-construction blower door test confirms that the work performed actually improved the envelope. It also supports LEED, ENERGY STAR, and local incentive programs that require verified performance documentation.",
+              },
+            ].map((item) => (
+              <div key={item.title} className="card">
+                <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
+                <h3 className="text-[#111111] font-bold mb-2">{item.title}</h3>
+                <p className="text-[#6b6b62] text-sm leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Overview */}
       <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-20">
         <div className="grid md:grid-cols-2 gap-12 items-start">
