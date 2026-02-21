@@ -128,7 +128,7 @@ export default function PhiusVerificationPage() {
             fill
             className="object-cover opacity-50"
             priority
-            unoptimized
+           
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
@@ -141,7 +141,7 @@ export default function PhiusVerificationPage() {
               width={120}
               height={48}
               style={{ height: 48, width: "auto" }}
-              unoptimized
+             
             />
           </div>
           <div className="flex items-center gap-2 mb-4">
@@ -178,7 +178,7 @@ export default function PhiusVerificationPage() {
               "/new%20website%20photo/passive%20house/IMG_9177.JPG",
             ].map((src, i) => (
               <div key={i} className="relative rounded-lg overflow-hidden" style={{ height: "200px" }}>
-                <Image src={src} alt="Passive house project" fill className="object-cover" unoptimized />
+                <Image src={src} alt="Passive house project" fill className="object-cover" />
               </div>
             ))}
           </div>

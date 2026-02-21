@@ -117,7 +117,7 @@ export default function ServicesPage() {
             fill
             className="object-cover opacity-50"
             priority
-            unoptimized
+           
           />
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
@@ -175,7 +175,7 @@ export default function ServicesPage() {
             "/new%20website%20photo/mis/IMG_9094.JPG",
           ].map((src, i) => (
             <div key={i} className="relative overflow-hidden">
-              <Image src={src} alt="LES NRG field work" fill className="object-cover" unoptimized />
+              <Image src={src} alt="LES NRG field work" fill className="object-cover" />
             </div>
           ))}
         </div>
