@@ -151,35 +151,62 @@ export default function BlowerDoorTestingPage() {
             <span className="section-label">New Construction</span>
             <h2 className="section-title mb-5">2021 IECC Compliance Testing</h2>
             <p className="text-[#6b6b62] leading-relaxed mb-4">
-              The 2021 International Energy Conservation Code (IECC) establishes mandatory air leakage testing
-              requirements for new large commercial buildings. Under Section C402.5, buildings exceeding
-              25,000 sq ft of conditioned floor area must demonstrate a maximum whole-building air leakage
-              rate of <strong className="text-[#111111]">0.40 CFM75 per square foot</strong> of gross above-grade wall area,
-              tested at 75 Pascals per ASTM E779 or ASTM E1827.
+              The{" "}
+              <a href="https://codes.iccsafe.org/content/IECC2021P2" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                2021 International Energy Conservation Code (IECC)
+              </a>{" "}
+              establishes mandatory air leakage testing requirements for new large commercial buildings. Under{" "}
+              <a href="https://codes.iccsafe.org/content/IECC2021P2/chapter-4-ce-commercial-energy-efficiency" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                Section C402.5
+              </a>
+              , buildings exceeding 25,000 sq ft of conditioned floor area must demonstrate a maximum whole-building
+              air leakage rate of <strong className="text-[#111111]">0.40 CFM75 per square foot</strong> of gross
+              above-grade wall area, tested at 75 Pascals per{" "}
+              <a href="https://www.astm.org/e0779-19.html" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                ASTM E779
+              </a>{" "}
+              or{" "}
+              <a href="https://www.astm.org/e1827-11r17.html" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                ASTM E1827
+              </a>
+              .
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-6">
-              For attached multifamily buildings up to three stories, Section R402.4.1.2 requires individual
-              unit compartmentalization testing at 50 Pa with a maximum of 0.3 CFM50/ft² of unit enclosure area.
-              Sampling is not permitted — every unit must pass independently.
+              For attached multifamily buildings up to three stories,{" "}
+              <a href="https://codes.iccsafe.org/content/IECC2021P2/chapter-4-re-residential-energy-efficiency" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                Section R402.4.1.2
+              </a>{" "}
+              requires individual unit compartmentalization testing at 50 Pa with a maximum of 0.3 CFM50/ft²
+              of unit enclosure area. Sampling is not permitted — every unit must pass independently.
             </p>
             <ul className="space-y-2">
-              {[
-                "Whole-building testing per ASTM E779 / ASTM E1827",
-                "Unit compartmentalization per 2021 IECC § R402.4.1.2",
-                "ASHRAE 90.1 compliance for commercial construction",
-                "Signed engineering report accepted by AHJ",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-[#6b6b62] text-sm">
-                  <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
-                  {item}
-                </li>
-              ))}
+              <li className="flex items-center gap-2 text-[#6b6b62] text-sm">
+                <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
+                Whole-building testing per{" "}
+                <a href="https://www.astm.org/e0779-19.html" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">ASTM E779</a>
+                {" "}/{" "}
+                <a href="https://www.astm.org/e1827-11r17.html" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">ASTM E1827</a>
+              </li>
+              <li className="flex items-center gap-2 text-[#6b6b62] text-sm">
+                <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
+                Unit compartmentalization per{" "}
+                <a href="https://codes.iccsafe.org/content/IECC2021P2/chapter-4-re-residential-energy-efficiency" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">2021 IECC § R402.4.1.2</a>
+              </li>
+              <li className="flex items-center gap-2 text-[#6b6b62] text-sm">
+                <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
+                <a href="https://www.ashrae.org/technical-resources/bookstore/ashrae-standard-90-1" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">ASHRAE 90.1</a>
+                {" "}compliance for commercial construction
+              </li>
+              <li className="flex items-center gap-2 text-[#6b6b62] text-sm">
+                <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
+                Signed engineering report accepted by AHJ
+              </li>
             </ul>
           </div>
           <div className="bg-[#111111] rounded-2xl p-8">
-            <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-3 py-1.5 mb-6">
-              <span className="text-[#F5C500] font-bold text-sm">2021 IECC § C402.5</span>
-            </div>
+            <a href="https://codes.iccsafe.org/content/IECC2021P2/chapter-4-ce-commercial-energy-efficiency" target="_blank" rel="noopener noreferrer" className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-3 py-1.5 mb-6 hover:bg-[#F5C500]/25 transition-colors">
+              <span className="text-[#F5C500] font-bold text-sm">2021 IECC § C402.5 ↗</span>
+            </a>
             <div className="grid grid-cols-2 gap-4 mb-6">
               {[
                 { label: "Max Leakage", value: "0.40 CFM75/ft²", sub: "Gross above-grade wall area" },
@@ -214,30 +241,57 @@ export default function BlowerDoorTestingPage() {
             </p>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              {
-                title: "Energy Conservation",
-                desc: "Uncontrolled air infiltration is responsible for 25–40% of heating and cooling loads in commercial buildings. A blower door test quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements — and measurable proof of savings afterward.",
-              },
-              {
-                title: "Moisture & Mold",
-                desc: "Air movement through the building envelope carries moisture into wall cavities and interstitial spaces. In cold climates this leads to condensation, rot, and mold growth that is often invisible until structural damage has occurred. Pressurization testing locates the breach before it becomes a costly repair.",
-              },
-              {
-                title: "Indoor Air Quality",
-                desc: "Uncontrolled infiltration introduces unconditioned, unfiltered outside air — along with pollutants, allergens, and vehicle exhaust — directly into occupied spaces. Identifying and sealing major air pathways improves occupant health and reduces the load on mechanical ventilation systems.",
-              },
-              {
-                title: "Renovation & Re-Commissioning",
-                desc: "After a major renovation, addition, or mechanical system upgrade, a post-construction blower door test confirms that the work performed actually improved the envelope. It also supports LEED, ENERGY STAR, and local incentive programs that require verified performance documentation.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="card">
-                <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
-                <h3 className="text-[#111111] font-bold mb-2">{item.title}</h3>
-                <p className="text-[#6b6b62] text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
+            <div className="card">
+              <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
+              <h3 className="text-[#111111] font-bold mb-2">Energy Conservation</h3>
+              <p className="text-[#6b6b62] text-sm leading-relaxed mb-4">
+                Uncontrolled air infiltration accounts for 25–40% of heating and cooling loads in commercial buildings.
+                A blower door test quantifies the exact leakage rate, giving owners a clear baseline before investing
+                in envelope improvements — and measurable proof of savings afterward.
+              </p>
+              <a href="https://www.energy.gov/eere/buildings/air-sealing" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[#111111] underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                DOE: Air Sealing ↗
+              </a>
+            </div>
+            <div className="card">
+              <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
+              <h3 className="text-[#111111] font-bold mb-2">Moisture & Mold</h3>
+              <p className="text-[#6b6b62] text-sm leading-relaxed mb-4">
+                Air movement through the building envelope carries moisture into wall cavities and interstitial spaces.
+                In cold climates this leads to condensation, rot, and mold growth that is often invisible until
+                structural damage has occurred. Pressurization testing locates the breach before it becomes a costly repair.
+              </p>
+              <a href="https://www.epa.gov/mold/mold-and-moisture" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[#111111] underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                EPA: Mold & Moisture ↗
+              </a>
+            </div>
+            <div className="card">
+              <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
+              <h3 className="text-[#111111] font-bold mb-2">Indoor Air Quality</h3>
+              <p className="text-[#6b6b62] text-sm leading-relaxed mb-4">
+                Uncontrolled infiltration introduces unconditioned, unfiltered outside air — along with pollutants,
+                allergens, and vehicle exhaust — directly into occupied spaces. Identifying and sealing major air
+                pathways improves occupant health and reduces the load on mechanical ventilation systems.
+              </p>
+              <a href="https://www.epa.gov/indoor-air-quality-iaq" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[#111111] underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                EPA: Indoor Air Quality ↗
+              </a>
+            </div>
+            <div className="card">
+              <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
+              <h3 className="text-[#111111] font-bold mb-2">Renovation & Re-Commissioning</h3>
+              <p className="text-[#6b6b62] text-sm leading-relaxed mb-4">
+                After a major renovation, addition, or mechanical system upgrade, a post-construction blower door
+                test confirms that the work performed actually improved the envelope. It also supports{" "}
+                <a href="https://www.usgbc.org/leed" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">LEED</a>
+                ,{" "}
+                <a href="https://www.energystar.gov/buildings" target="_blank" rel="noopener noreferrer" className="text-[#111111] font-medium underline underline-offset-2 hover:text-[#F5C500] transition-colors">ENERGY STAR</a>
+                , and local incentive programs that require verified performance documentation.
+              </p>
+              <a href="https://www.ashrae.org/technical-resources/bookstore/guideline-0-the-commissioning-process" target="_blank" rel="noopener noreferrer" className="text-xs font-semibold text-[#111111] underline underline-offset-2 hover:text-[#F5C500] transition-colors">
+                ASHRAE: Commissioning ↗
+              </a>
+            </div>
           </div>
         </div>
       </section>
