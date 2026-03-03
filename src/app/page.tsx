@@ -121,19 +121,12 @@ export default function HomePage() {
           <div className="max-w-3xl">
             <span className="section-label">Located in Philadelphia, PA</span>
             <h1
-              className="font-black mb-6 leading-tight"
-              style={{
-                fontSize: "clamp(2.5rem, 6vw, 4.25rem)",
-                letterSpacing: "-0.03em",
-                background: "linear-gradient(to bottom, #FFFFFF 20%, #FAE280 60%, #F5C500 100%)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-                backgroundClip: "text",
-              }}
+              className="font-black text-white mb-6 leading-tight"
+              style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              <span className="sm:whitespace-nowrap">Consulting, Inspecting & Testing</span><br />
-              <span>to improve buildings Performance,</span><br />
-              <span>Comfort & Durability.</span>
+              <span className="sm:whitespace-nowrap text-[#FFFFFF]">Consulting, Inspecting & Testing</span><br />
+              <span className="text-[#FAE280]">to improve buildings Performance,</span><br />
+              <span className="text-[#F5C500]">Comfort & Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
               Building testing isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
