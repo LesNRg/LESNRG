@@ -128,7 +128,7 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              Testing & Inspecting to Improve <span className="text-[#F5C500]">Performance, Comfort & Durability.</span>
+              Consulting, Inspecting & Testing to Improve <span className="text-[#F5C500]">Performance, Comfort & Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
               Building testing isn&apos;t what we do — it&apos;s who we are. New or existing, commercial or residential, small or large — we bring the same relentless precision and passion to every envelope we pressurize.
@@ -177,8 +177,6 @@ export default function HomePage() {
       <section className="py-10 bg-[#111111] border-y border-white/8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
-            <span className="section-label">Programs</span>
-            <h2 className="section-title !text-white">Focused Services</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {specializedPages.map((page) => (
