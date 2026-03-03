@@ -39,27 +39,25 @@ export default function BigFans() {
     <section className="bg-[#111111] border-y border-white/8 py-20">
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <span className="section-label">Our Philosophy</span>
-        <div className="mt-6 mb-16">
-          <p
-            className="text-white/45 font-semibold mb-4"
-            style={{ fontSize: "clamp(1.125rem, 2.5vw, 1.5rem)", letterSpacing: "-0.01em" }}
+        <div className="mt-6 mb-16 flex items-baseline gap-4 flex-wrap">
+          <span
+            className="text-white/45 font-semibold whitespace-nowrap"
+            style={{ fontSize: "clamp(1.5rem, 3.5vw, 2.25rem)", letterSpacing: "-0.01em" }}
           >
             We&apos;re big fans of
-          </p>
-          <div className="relative overflow-hidden" style={{ height: "clamp(3.75rem, 8vw, 6rem)" }}>
-            <span
-              className={`${caveat.className} text-[#F5C500] absolute bottom-0 left-0 border-b-2 border-[#F5C500]/35 pb-1`}
-              style={{
-                fontSize: "clamp(3rem, 7vw, 5.5rem)",
-                lineHeight: 1,
-                opacity: visible ? 1 : 0,
-                transform: visible ? "translateY(0)" : "translateY(10px)",
-                transition: "opacity 350ms ease, transform 350ms ease",
-              }}
-            >
-              {fanItems[current]}
-            </span>
-          </div>
+          </span>
+          <span
+            className={`${caveat.className} text-[#F5C500] border-b-2 border-[#F5C500]/35 pb-0.5`}
+            style={{
+              fontSize: "clamp(2rem, 5vw, 4rem)",
+              lineHeight: 1.1,
+              opacity: visible ? 1 : 0,
+              transform: visible ? "translateY(0)" : "translateY(8px)",
+              transition: "opacity 350ms ease, transform 350ms ease",
+            }}
+          >
+            {fanItems[current]}
+          </span>
         </div>
         <p className={`${caveat.className} text-[#F5C500]/50 text-3xl`}>
           After all, we&apos;re Big Fans.
