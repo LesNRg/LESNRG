@@ -128,9 +128,9 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              <span className="sm:whitespace-nowrap text-[#FFFFFF]">Consulting, Inspecting & Testing</span><br />
-              <span className="text-[#FAE280]">to improve buildings&apos; Performance,</span><br />
-              <span className="text-[#F5C500]">Comfort & Durability.</span>
+              <span className="text-white">Consulting, Inspecting &</span><br />
+              <span className="text-white/70">Testing to improve buildings&apos;</span><br />
+              <span className="text-[#F5C500]">Performance, Comfort & Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
               Building testing isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
