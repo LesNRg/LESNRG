@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Caveat } from "next/font/google";
 import { ArrowRight, CheckCircle, Wind, ClipboardList, HomeIcon, BarChart2, Award, Wrench, Building2, Shield } from "lucide-react";
 import AnimatedCounter from "@/components/AnimatedCounter";
-
-const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
+import BigFans from "@/components/BigFans";
 
 export const metadata: Metadata = {
   title: "LES NRG | Blower Door Testing, HERS Ratings & Building Performance | Philadelphia, PA",
@@ -66,12 +64,6 @@ const stats = [
   { value: 20, suffix: "+", label: "Years of Experience" },
 ];
 
-const highlights = [
-  { title: "Contributing Author", desc: "Passive House Rowhouse Manual, a key reference for high-performance urban residential construction." },
-  { title: "Founding Member", desc: "Greater Philadelphia Passive House Association, advancing passive building standards in the region." },
-  { title: "Construction Advisor", desc: "Philadelphia Habitat for Humanity, applying energy efficiency expertise to affordable housing projects." },
-  { title: "Conference Speaker", desc: "Presented at the New Gravity Conference 2020 on building performance verification topics." },
-];
 
 const credentials = [
   "HERS Certified Rater (RESNET Accredited)",
@@ -107,20 +99,6 @@ const specializedPages = [
   },
 ];
 
-const fanItems = [
-  "sustainability",
-  "energy efficiency",
-  "Passive House",
-  "PHIUS certification",
-  "tight envelopes",
-  "building science",
-  "fresh air",
-  "lower utility bills",
-  "honest data",
-  "buildings that perform",
-  "blower door testing",
-  "the science behind it all",
-];
 
 export default function HomePage() {
   return (
@@ -313,51 +291,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Industry Involvement */}
-      <section className="bg-[#111111] border-y border-white/8 py-10">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <div className="mb-10">
-            <span className="section-label">Industry Involvement</span>
-            <h2 className="text-white font-bold text-2xl" style={{ letterSpacing: "-0.02em" }}>
-              Active in the Building Science Community
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {highlights.map((h) => (
-              <div key={h.title} className="card-dark">
-                <div className="w-1 h-6 bg-[#F5C500] rounded-full mb-3" />
-                <h3 className="text-white font-bold mb-2">{h.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed">{h.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* We're Big Fans */}
-      <section className="bg-[#111111] border-y border-white/8 py-16">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <div className="mb-12">
-            <span className="section-label">Our Philosophy</span>
-            <h2 className="font-black text-white" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", letterSpacing: "-0.03em" }}>
-              We&apos;re Big Fans.
-            </h2>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-x-16">
-            {fanItems.map((item) => (
-              <div key={item} className="flex items-baseline gap-4 py-5 border-b border-white/8">
-                <span className="text-white/35 text-sm shrink-0 whitespace-nowrap">We&apos;re big fans of</span>
-                <span className={`${caveat.className} text-[#F5C500] text-[1.875rem] leading-none border-b-2 border-[#F5C500]/30 pb-0.5`}>
-                  {item}
-                </span>
-              </div>
-            ))}
-          </div>
-          <p className={`${caveat.className} text-[#F5C500] text-4xl mt-14`}>
-            After all, we&apos;re Big Fans.
-          </p>
-        </div>
-      </section>
+      <BigFans />
 
       {/* CTA — yellow */}
       <section className="py-8 bg-[#F5C500]">
