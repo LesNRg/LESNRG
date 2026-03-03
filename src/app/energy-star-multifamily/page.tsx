@@ -23,11 +23,11 @@ const programs = [
   },
   {
     name: "DOE Zero Energy Ready Home",
-    desc: "Formerly known as ZERH — the DOE has rebranded and expanded the program nationally. Requires Energy Star as a prerequisite and adds high-performance envelopes, efficient mechanical systems, and solar-ready provisions.",
+    desc: "Formerly known as ZERH. The DOE has rebranded and expanded the program nationally. Requires Energy Star as a prerequisite and adds high-performance envelopes, efficient mechanical systems, and solar-ready provisions.",
   },
   {
     name: "Indoor airPlus",
-    desc: "EPA program for superior indoor air quality — low-VOC materials, radon mitigation, enhanced filtration, and controlled ventilation. Can be layered onto Energy Star and DOE ZERH projects.",
+    desc: "EPA program for superior indoor air quality: low-VOC materials, radon mitigation, enhanced filtration, and controlled ventilation. Can be layered onto Energy Star and DOE ZERH projects.",
   },
   {
     name: "RESNET / HERS",
@@ -39,7 +39,7 @@ const process = [
   {
     step: "01",
     title: "Program Registration",
-    desc: "We register your project with Energy Star and, if applicable, DOE Zero Energy Ready Home — establishing compliance requirements and documentation upfront.",
+    desc: "We register your project with Energy Star and, if applicable, DOE Zero Energy Ready Home, establishing compliance requirements and documentation upfront.",
   },
   {
     step: "02",
@@ -49,12 +49,12 @@ const process = [
   {
     step: "03",
     title: "Thermal Enclosure Verification",
-    desc: "On-site inspection of insulation installation, air barrier continuity, and window and door installation — required for both Energy Star and DOE ZERH.",
+    desc: "On-site inspection of insulation installation, air barrier continuity, and window and door installation, required for both Energy Star and DOE ZERH.",
   },
   {
     step: "04",
     title: "HVAC & Ventilation Verification",
-    desc: "Verification of mechanical system installation and commissioning — HVAC sizing, duct tightness, ventilation rates, and distribution system performance.",
+    desc: "Verification of mechanical system installation and commissioning, including HVAC sizing, duct tightness, ventilation rates, and distribution system performance.",
   },
   {
     step: "05",
@@ -64,7 +64,7 @@ const process = [
   {
     step: "06",
     title: "Certification Submission",
-    desc: "We compile all checklists, test reports, and supporting documentation and submit on your behalf — coordinating with Energy Star and DOE through certificate issuance.",
+    desc: "We compile all checklists, test reports, and supporting documentation and submit on your behalf, coordinating with Energy Star and DOE through certificate issuance.",
   },
 ];
 
@@ -86,8 +86,8 @@ const faqs = [
     a: "Energy Star Multifamily New Construction version 2 became required for projects with permits issued on or after January 1, 2025. The update introduced stricter airtightness requirements in colder climate zones, updated verification protocols, and improved alignment with DOE Zero Energy Ready Home. Projects that registered under v1 prior to the deadline may continue on that version.",
   },
   {
-    q: "What is the DOE Zero Energy Ready Home program — and what happened to ZERH?",
-    a: "The DOE Zero Energy Ready Home program is the current name for what was previously called ZERH (Zero Energy Ready Home). The DOE rebranded and expanded the program in 2024 as part of a national rollout. The requirements are largely the same — Energy Star certification as a prerequisite, a high-performance envelope, efficient mechanical systems, and solar-ready provisions — but the updated program includes improved documentation and expanded recognition across all climate zones.",
+    q: "What is the DOE Zero Energy Ready Home program, and what happened to ZERH?",
+    a: "The DOE Zero Energy Ready Home program is the current name for what was previously called ZERH (Zero Energy Ready Home). The DOE rebranded and expanded the program in 2024 as part of a national rollout. The requirements are largely the same: Energy Star certification as a prerequisite, a high-performance envelope, efficient mechanical systems, and solar-ready provisions. The updated program includes improved documentation and expanded recognition across all climate zones.",
   },
   {
     q: "Do we need a HERS Rater, or can any third party verify?",
@@ -95,15 +95,15 @@ const faqs = [
   },
   {
     q: "Can Energy Star and DOE ZERH be certified simultaneously?",
-    a: "Yes — and we recommend it. DOE Zero Energy Ready Home requires Energy Star as a prerequisite, so the field verification, testing, and documentation overlap significantly. Pursuing both programs together adds minimal overhead while substantially increasing the market value and recognition of the project.",
+    a: "Yes, and we recommend it. DOE Zero Energy Ready Home requires Energy Star as a prerequisite, so the field verification, testing, and documentation overlap significantly. Pursuing both programs together adds minimal overhead while substantially increasing the market value and recognition of the project.",
   },
   {
     q: "What airtightness is required for multifamily units under Energy Star?",
-    a: "Energy Star MFNC requires individual unit compartmentalization testing. The 2021 IECC (§ R402.4.1.2) sets a maximum of 0.3 CFM50 per square foot of unit enclosure area at 50 Pa for buildings up to three stories. Each dwelling unit must pass independently — sampling is not permitted.",
+    a: "Energy Star MFNC requires individual unit compartmentalization testing. The 2021 IECC (§ R402.4.1.2) sets a maximum of 0.3 CFM50 per square foot of unit enclosure area at 50 Pa for buildings up to three stories. Each dwelling unit must pass independently. Sampling is not permitted.",
   },
   {
     q: "When should we bring you onto the project?",
-    a: "As early as possible — ideally during design development. Early engagement allows us to confirm program requirements, review the energy model for feasibility, and identify potential field verification challenges before construction locks in details that are costly to change.",
+    a: "As early as possible, ideally during design development. Early engagement allows us to confirm program requirements, review the energy model for feasibility, and identify potential field verification challenges before construction locks in details that are costly to change.",
   },
 ];
 
@@ -137,7 +137,7 @@ export default function EnergyStarMultifamilyPage() {
             Energy Star<br />Certification
           </h1>
           <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
-            From conception to completion — energy model to final blower test — we are there every step of the way.
+            From conception to completion, from energy model to final blower test, we are there every step of the way.
           </p>
           <div className="flex flex-wrap gap-3 mb-10">
             <Link href="/contact" className="btn-primary">
@@ -166,7 +166,7 @@ export default function EnergyStarMultifamilyPage() {
             <p className="text-[#6b6b62] leading-relaxed mb-5">
               Energy Star is the EPA&apos;s nationally recognized certification program for energy-efficient
               buildings. To earn the label, a home or multifamily building must be independently verified
-              by a credentialed third party — confirming it was designed and built to perform meaningfully
+              by a credentialed third party, confirming it was designed and built to perform meaningfully
               beyond code minimum.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
@@ -175,7 +175,7 @@ export default function EnergyStarMultifamilyPage() {
               lenders increasingly expect.
             </p>
             <p className="text-[#9a9a90] text-sm leading-relaxed">
-              Energy Star is also a prerequisite for DOE Zero Energy Ready Home — making it a natural
+              Energy Star is also a prerequisite for DOE Zero Energy Ready Home, making it a natural
               entry point for projects pursuing multiple high-performance designations.
             </p>
           </div>
@@ -203,12 +203,12 @@ export default function EnergyStarMultifamilyPage() {
               {
                 icon: <Home size={18} className="text-[#F5C500]" />,
                 title: "Multi-Program Alignment",
-                desc: "Energy Star certification is a prerequisite for DOE Zero Energy Ready Home and aligns with Indoor airPlus — reducing total documentation overhead when pursuing multiple programs.",
+                desc: "Energy Star certification is a prerequisite for DOE Zero Energy Ready Home and aligns with Indoor airPlus, reducing total documentation overhead when pursuing multiple programs.",
               },
               {
                 icon: <FileText size={18} className="text-[#F5C500]" />,
                 title: "From Design to Certificate",
-                desc: "We manage program registration, design review, field verification, testing, and documentation — from initial plans through final certificate issuance.",
+                desc: "We manage program registration, design review, field verification, testing, and documentation from initial plans through final certificate issuance.",
               },
             ].map((item) => (
               <div key={item.title} className="card">
@@ -254,11 +254,11 @@ export default function EnergyStarMultifamilyPage() {
             <p className="text-[#6b6b62] leading-relaxed mb-5">
               Energy Star for New Homes applies to single-family and low-rise multifamily buildings up to
               three stories. Certification requires a HERS Rater to verify insulation, air sealing,
-              windows, HVAC, and ventilation — and to conduct blower door and duct leakage testing.
+              windows, HVAC, and ventilation, and to conduct blower door and duct leakage testing.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
               We handle registration, all required field inspections, testing, and documentation from
-              design through final certificate — coordinating directly with the EPA on your behalf.
+              design through final certificate, coordinating directly with the EPA on your behalf.
             </p>
             <p className="text-[#9a9a90] text-sm leading-relaxed">
               Energy Star for New Homes is a prerequisite for DOE Zero Energy Ready Home, Indoor airPlus,
@@ -298,7 +298,7 @@ export default function EnergyStarMultifamilyPage() {
               <h2 className="section-title mb-5">Energy Star Multifamily New Construction</h2>
               <p className="text-[#6b6b62] leading-relaxed mb-5">
                 Energy Star Multifamily New Construction (MFNC) covers buildings four stories and above.
-                Version 2 — required for permits issued on or after January 1, 2025 — introduced stricter
+                Version 2, required for permits issued on or after January 1, 2025, introduced stricter
                 airtightness requirements and updated verification protocols.
               </p>
               <p className="text-[#6b6b62] leading-relaxed mb-5">
@@ -480,13 +480,13 @@ export default function EnergyStarMultifamilyPage() {
               <h2 className="section-title mb-5">What&apos;s Included</h2>
               <p className="text-[#6b6b62] text-sm leading-relaxed mb-8">
                 We manage every deliverable required for Energy Star MFNC and DOE Zero Energy Ready Home
-                certification — from design review through final certificate.
+                certification, from design review through final certificate.
               </p>
               <ul className="space-y-3">
                 {[
                   "Project registration with EPA and DOE programs",
                   "Energy model review and verification",
-                  "Thermal Enclosure System (TES) checklist — all site visits",
+                  "Thermal Enclosure System (TES) checklist for all site visits",
                   "HVAC System Quality Installation (ACCA Manual J/S/D) verification",
                   "Ventilation system commissioning and airflow verification",
                   "Unit compartmentalization blower door testing",
@@ -554,7 +554,7 @@ export default function EnergyStarMultifamilyPage() {
                 certification requirements and the practical realities of getting buildings built right.
               </p>
               <p className="text-white/50 leading-relaxed">
-                We work with builders and developers to coordinate program documentation efficiently —
+                We work with builders and developers to coordinate program documentation efficiently,
                 so certification doesn&apos;t slow down your project.
               </p>
             </div>
@@ -567,7 +567,7 @@ export default function EnergyStarMultifamilyPage() {
                 "PHIUS Certified Verifier",
                 "Indoor airPlus Verifier",
                 "M.S. Construction Management",
-                "Founding Member — Greater Philadelphia Passive House Association",
+                "Founding Member, Greater Philadelphia Passive House Association",
               ].map((cred) => (
                 <div key={cred} className="flex items-center gap-3">
                   <CheckCircle size={14} className="text-[#F5C500] shrink-0" />

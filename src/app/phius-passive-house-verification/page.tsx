@@ -22,11 +22,11 @@ export const metadata: Metadata = {
 const standards = [
   {
     name: "PHIUS+ 2021",
-    desc: "The current PHIUS standard sets climate-specific heating and cooling load limits and source energy budgets — the most rigorous residential energy standard available in North America.",
+    desc: "The current PHIUS standard sets climate-specific heating and cooling load limits and source energy budgets, the most rigorous residential energy standard available in North America.",
   },
   {
     name: "ASTM E779",
-    desc: "Blower door airtightness testing protocol required as part of PHIUS certification. PHIUS targets 0.06 CFM50/ft² of enclosure area — far tighter than code minimum.",
+    desc: "Blower door airtightness testing protocol required as part of PHIUS certification. PHIUS targets 0.06 CFM50/ft² of enclosure area, far tighter than code minimum.",
   },
   {
     name: "ASHRAE 62.2",
@@ -72,9 +72,9 @@ const process = [
 ];
 
 const metrics = [
-  { label: "0.06 CFM50/ft²", desc: "PHIUS airtightness target — roughly 5× tighter than IECC code minimum for residential" },
+  { label: "0.06 CFM50/ft²", desc: "PHIUS airtightness target, roughly 5 times tighter than IECC code minimum for residential" },
   { label: "Heating Demand", desc: "Climate-specific annual heating load limit in kBtu/ft²·yr set by the PHIUS+ 2021 standard" },
-  { label: "Cooling Demand", desc: "Annual cooling load limit accounting for latent loads — especially critical in humid climates" },
+  { label: "Cooling Demand", desc: "Annual cooling load limit accounting for latent loads, especially critical in humid climates" },
   { label: "Source Energy", desc: "Total annual source energy budget in kBtu/ft²·yr ensuring overall building efficiency, not just envelope" },
 ];
 
@@ -92,11 +92,11 @@ const buildingTypes = [
 const faqs = [
   {
     q: "What is a PHIUS Verifier and why do I need one?",
-    a: "A PHIUS Certified Verifier is an independent third-party professional trained and credentialed by PHIUS to inspect and certify that a building meets the PHIUS+ standard. Certification cannot be self-reported — an approved verifier must conduct site inspections and airtightness testing and submit documentation directly to PHIUS.",
+    a: "A PHIUS Certified Verifier is an independent third-party professional trained and credentialed by PHIUS to inspect and certify that a building meets the PHIUS+ standard. Certification cannot be self-reported. An approved verifier must conduct site inspections and airtightness testing and submit documentation directly to PHIUS.",
   },
   {
     q: "When should I bring a verifier onto the project?",
-    a: "As early as possible — ideally during design development. Early engagement allows us to review the energy model and construction details before they are locked in, catching potential compliance gaps before they become expensive field problems.",
+    a: "As early as possible, ideally during design development. Early engagement allows us to review the energy model and construction details before they are locked in, catching potential compliance gaps before they become expensive field problems.",
   },
   {
     q: "How many site visits are required?",
@@ -181,7 +181,7 @@ export default function PhiusVerificationPage() {
             <p className="text-[#6b6b62] leading-relaxed mb-5">
               PHIUS+ 2021 is the most rigorous building energy standard available in North America.
               Unlike code minimum compliance or even Energy Star, PHIUS sets climate-specific limits on
-              annual heating and cooling demand, peak loads, and total source energy — not just prescriptive
+              annual heating and cooling demand, peak loads, and total source energy, not just prescriptive
               measures like insulation R-values.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
@@ -191,7 +191,7 @@ export default function PhiusVerificationPage() {
             </p>
             <p className="text-[#9a9a90] text-sm leading-relaxed">
               Third-party verification is mandatory. PHIUS requires an approved, credentialed verifier to
-              conduct all inspections and submit documentation — no self-certification is permitted.
+              conduct all inspections and submit documentation. No self-certification is permitted.
             </p>
           </div>
           <div className="space-y-4">
@@ -199,7 +199,7 @@ export default function PhiusVerificationPage() {
               {
                 icon: <Thermometer size={18} className="text-[#F5C500]" />,
                 title: "Climate-Specific Performance Targets",
-                desc: "PHIUS sets heating and cooling demand limits specific to your project's climate zone — not one-size-fits-all thresholds that over-specify in mild climates and under-specify in cold ones.",
+                desc: "PHIUS sets heating and cooling demand limits specific to your project's climate zone, not one-size-fits-all thresholds that over-specify in mild climates and under-specify in cold ones.",
               },
               {
                 icon: <Shield size={18} className="text-[#F5C500]" />,
@@ -209,7 +209,7 @@ export default function PhiusVerificationPage() {
               {
                 icon: <Zap size={18} className="text-[#F5C500]" />,
                 title: "Multi-Program Alignment",
-                desc: "PHIUS certification can simultaneously satisfy Energy Star, DOE Zero Energy Ready Home, and Indoor airPlus — reducing total documentation burden across programs.",
+                desc: "PHIUS certification can simultaneously satisfy Energy Star, DOE Zero Energy Ready Home, and Indoor airPlus, reducing total documentation burden across programs.",
               },
             ].map((item) => (
               <div key={item.title} className="card">
@@ -391,7 +391,7 @@ export default function PhiusVerificationPage() {
             <p className="text-[#6b6b62] leading-relaxed mb-5">
               Over 20 years of involvement in passive house and high-performance construction.
               Founding member of the Greater Philadelphia Passive House Association and contributing
-              author to the Passive House Rowhouse Manual — a reference guide for one of the most challenging
+              author to the Passive House Rowhouse Manual, a reference guide for one of the most challenging
               building typologies in the region.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-8">
@@ -402,10 +402,10 @@ export default function PhiusVerificationPage() {
               {[
                 "PHIUS Certified Verifier",
                 "HERS Certified Rater (RESNET)",
-                "Founding Member — Greater Philadelphia Passive House Association",
-                "Contributing Author — Passive House Rowhouse Manual",
-                "Construction Advisor — Philadelphia Habitat for Humanity",
-                "Speaker — New Gravity Conference 2020",
+                "Founding Member, Greater Philadelphia Passive House Association",
+                "Contributing Author, Passive House Rowhouse Manual",
+                "Construction Advisor, Philadelphia Habitat for Humanity",
+                "Speaker, New Gravity Conference 2020",
                 "M.S. Construction Management",
               ].map((cred) => (
                 <div key={cred} className="flex items-center gap-3">

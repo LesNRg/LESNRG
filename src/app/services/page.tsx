@@ -82,7 +82,7 @@ const services = [
   {
     icon: <Wrench size={28} className="text-[#F5C500]" />,
     title: "Consulting",
-    desc: "Building science and construction consulting to help project teams make informed decisions early — where influence on project outcomes is greatest.",
+    desc: "Building science and construction consulting to help project teams make informed decisions early, where influence on project outcomes is greatest.",
     details: [
       "Building science guidance",
       "Construction means & methods",
@@ -208,7 +208,7 @@ export default function ServicesPage() {
                 Large Building Blower Door Testing
               </h3>
               <p className="text-white/50 text-sm max-w-xl">
-                Multi-fan air leakage testing for commercial and industrial facilities — warehouses, manufacturing plants,
+                Multi-fan air leakage testing for commercial and industrial facilities including warehouses, manufacturing plants,
                 schools, and large multifamily buildings. ASTM E779 and E1827 compliant.
               </p>
             </div>

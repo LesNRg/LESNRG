@@ -6,7 +6,7 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 
 export const metadata: Metadata = {
   title: "LES NRG | Blower Door Testing, HERS Ratings & Building Performance | Philadelphia, PA",
-  description: "Expert blower door testing, envelope integrity testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Located in Philadelphia, PA — serving PA, NJ, NY, DE and beyond.",
+  description: "Expert blower door testing, envelope integrity testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Located in Philadelphia, PA, serving PA, NJ, NY, DE and beyond.",
   openGraph: {
     title: "LES NRG | Blower Door Testing & Building Performance | Philadelphia, PA",
     description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings.",
@@ -45,13 +45,13 @@ const services = [
   {
     icon: <Award size={22} className="text-[#F5C500]" />,
     title: "Building Standard Certification",
-    desc: "Third-party verification and certification support across the full spectrum — from code compliance to Energy Star, HERS, and Passive House.",
+    desc: "Third-party verification and certification support across the full spectrum, from code compliance to Energy Star, HERS, and Passive House.",
     href: "/services",
   },
   {
     icon: <Wrench size={22} className="text-[#F5C500]" />,
     title: "Building Science Consulting",
-    desc: "Investigating building problems at their source — condensation, moisture intrusion, air quality issues, and more — with data-driven diagnostics and actionable solutions.",
+    desc: "Investigating building problems at their source: condensation, moisture intrusion, air quality issues, and more. We use data-driven diagnostics to deliver actionable solutions.",
     href: "/services",
   },
 ];
@@ -64,9 +64,9 @@ const stats = [
 ];
 
 const highlights = [
-  { title: "Contributing Author", desc: "Passive House Rowhouse Manual — a key reference for high-performance urban residential construction." },
-  { title: "Founding Member", desc: "Greater Philadelphia Passive House Association — advancing passive building standards in the region." },
-  { title: "Construction Advisor", desc: "Philadelphia Habitat for Humanity — applying energy efficiency expertise to affordable housing projects." },
+  { title: "Contributing Author", desc: "Passive House Rowhouse Manual, a key reference for high-performance urban residential construction." },
+  { title: "Founding Member", desc: "Greater Philadelphia Passive House Association, advancing passive building standards in the region." },
+  { title: "Construction Advisor", desc: "Philadelphia Habitat for Humanity, applying energy efficiency expertise to affordable housing projects." },
   { title: "Conference Speaker", desc: "Presented at the New Gravity Conference 2020 on building performance verification topics." },
 ];
 
@@ -135,7 +135,7 @@ export default function HomePage() {
               <span className="text-[#F5C500]">Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
-              Building testing isn&apos;t what we do — it&apos;s who we are. New or existing, commercial or residential, small or large — we bring the same relentless precision and passion to every envelope we pressurize.
+              Building testing isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
             </p>
             <p className="text-[#F5C500] text-2xl font-bold mb-10" style={{ letterSpacing: "-0.02em" }}>
               We&apos;re Big Fans.
@@ -233,7 +233,7 @@ export default function HomePage() {
           <h2 className="section-title !text-white mb-5">Engaged Early. Present Throughout.</h2>
           <div className="grid md:grid-cols-2 gap-10">
             <p className="text-white/50 leading-relaxed">
-              Most verification and testing happens at the end of construction — a pass/fail check
+              Most verification and testing happens at the end of construction, a pass/fail check
               after all the decisions have been made. We work differently. Early engagement means we
               review plans, flag potential performance issues, and help teams make better choices
               before they become expensive corrections.
@@ -241,7 +241,7 @@ export default function HomePage() {
             <p className="text-white/50 leading-relaxed">
               Whether you&apos;re a builder targeting Energy Star or PHIUS certification, a homeowner
               seeking an honest energy assessment, or a developer navigating code and incentive
-              requirements — we provide clear, technically rigorous guidance every step of the way.
+              requirements. We provide clear, technically rigorous guidance every step of the way.
             </p>
           </div>
         </div>

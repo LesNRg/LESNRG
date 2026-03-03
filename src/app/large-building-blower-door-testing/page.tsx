@@ -35,7 +35,7 @@ const standards = [
   },
   {
     name: "2021 IECC R402.4.1.2",
-    desc: "Requires individual unit compartmentalization testing for attached multifamily dwellings — max 0.3 CFM50/ft² at 50 Pa.",
+    desc: "Requires individual unit compartmentalization testing for attached multifamily dwellings, max 0.3 CFM50/ft² at 50 Pa.",
   },
 ];
 
@@ -43,12 +43,12 @@ const process = [
   {
     step: "01",
     title: "Site Walk & Test Plan",
-    desc: "We walk the building with the project team — reviewing drawings, mechanical systems, and envelope details — then deliver a comprehensive testing plan covering fan array configuration, access points, preparation requirements, and scheduling.",
+    desc: "We walk the building with the project team, reviewing drawings, mechanical systems, and envelope details, then deliver a comprehensive testing plan covering fan array configuration, access points, preparation requirements, and scheduling.",
   },
   {
     step: "02",
     title: "Contract & Building Preparation",
-    desc: "Once the scope is agreed upon, we execute a contract and coordinate with the project team to prepare the building for testing. This includes sealing intentional openings — HVAC dampers, exhaust fans, and penetrations — and establishing safe test zones.",
+    desc: "Once the scope is agreed upon, we execute a contract and coordinate with the project team to prepare the building for testing. This includes sealing intentional openings including HVAC dampers, exhaust fans, and penetrations, and establishing safe test zones.",
   },
   {
     step: "03",
@@ -63,7 +63,7 @@ const process = [
   {
     step: "05",
     title: "Leak Survey",
-    desc: "Systematic envelope survey under pressure — optionally combined with IR thermography.",
+    desc: "Systematic envelope survey under pressure, optionally combined with IR thermography.",
   },
   {
     step: "06",
@@ -86,7 +86,7 @@ const buildingTypes = [
 const faqs = [
   {
     q: "Can you perform unit compartmentalization testing for multifamily buildings?",
-    a: "Yes. The 2021 IECC (Section R402.4.1.2) requires each dwelling unit in attached multifamily buildings up to three stories to pass an individual compartmentalization test at 50 Pa. The limit is 0.3 CFM50 per square foot of unit enclosure area — all floors, ceilings, and walls surrounding the unit. We test each unit individually and deliver per-unit results for code compliance.",
+    a: "Yes. The 2021 IECC (Section R402.4.1.2) requires each dwelling unit in attached multifamily buildings up to three stories to pass an individual compartmentalization test at 50 Pa. The limit is 0.3 CFM50 per square foot of unit enclosure area, including all floors, ceilings, and walls surrounding the unit. We test each unit individually and deliver per-unit results for code compliance.",
   },
   {
     q: "How long does testing take?",
@@ -160,7 +160,7 @@ export default function BlowerDoorTestingPage() {
             <p className="text-[#6b6b62] leading-relaxed mb-6">
               For attached multifamily buildings up to three stories, Section R402.4.1.2 requires individual
               unit compartmentalization testing at 50 Pa with a maximum of 0.3 CFM50/ft² of unit enclosure area.
-              Sampling is not permitted — every unit must pass independently.
+              Sampling is not permitted. Every unit must pass independently.
             </p>
             <ul className="space-y-2">
               {[
@@ -209,7 +209,7 @@ export default function BlowerDoorTestingPage() {
             <span className="section-label">Existing Buildings</span>
             <h2 className="section-title mb-4">Why Test an Existing Building?</h2>
             <p className="text-[#6b6b62] leading-relaxed max-w-2xl">
-              Air leakage testing is not just a code checkbox for new construction — it is one of the most
+              Air leakage testing is not just a code checkbox for new construction. It is one of the most
               effective diagnostic tools available for identifying performance problems in existing buildings.
             </p>
           </div>
@@ -217,7 +217,7 @@ export default function BlowerDoorTestingPage() {
             {[
               {
                 title: "Energy Conservation",
-                desc: "Uncontrolled air infiltration accounts for 25–40% of heating and cooling loads in commercial buildings. Whole building blower door testing quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements — and measurable proof of savings afterward.",
+                desc: "Uncontrolled air infiltration accounts for 25–40% of heating and cooling loads in commercial buildings. Whole building blower door testing quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements and measurable proof of savings afterward.",
               },
               {
                 title: "Moisture & Mold",
@@ -225,7 +225,7 @@ export default function BlowerDoorTestingPage() {
               },
               {
                 title: "Indoor Air Quality",
-                desc: "Uncontrolled infiltration introduces unconditioned, unfiltered outside air — along with pollutants, allergens, and vehicle exhaust — directly into occupied spaces. Identifying and sealing major air pathways improves occupant health and reduces the load on mechanical ventilation systems.",
+                desc: "Uncontrolled infiltration introduces unconditioned, unfiltered outside air including pollutants, allergens, and vehicle exhaust, directly into occupied spaces. Identifying and sealing major air pathways improves occupant health and reduces the load on mechanical ventilation systems.",
               },
               {
                 title: "Renovation & Re-Commissioning",
@@ -251,7 +251,7 @@ export default function BlowerDoorTestingPage() {
             <p className="text-[#6b6b62] leading-relaxed mb-6">
               A standard residential blower door produces 2,000–5,000 CFM. A large commercial building may
               require 50,000–200,000+ CFM to reach the 50 Pascal differential required by ASTM E779.
-              We deploy arrays of 2–20+ calibrated fans synchronized through centralized data acquisition —
+              We deploy arrays of 2–20+ calibrated fans synchronized through centralized data acquisition,
               accurate and code-compliant on facilities of any size.
             </p>
             <ul className="space-y-2">
@@ -407,7 +407,7 @@ export default function BlowerDoorTestingPage() {
             <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-3 py-1.5">
               <span className="text-[#F5C500] font-bold text-sm">2021 IECC § R402.4.1.2</span>
             </div>
-            <span className="text-white/30 text-sm">Residential Energy Efficiency — Air Leakage Testing</span>
+            <span className="text-white/30 text-sm">Residential Energy Efficiency, Air Leakage Testing</span>
           </div>
           <div className="grid sm:grid-cols-3 gap-4">
             {[
@@ -428,7 +428,7 @@ export default function BlowerDoorTestingPage() {
           <div className="card">
             <h3 className="text-[#111111] font-bold mb-2">Unit Enclosure Area</h3>
             <p className="text-[#6b6b62] text-sm leading-relaxed">
-              Leakage is measured against the combined surface area of all six bounding surfaces — floors,
+              Leakage is measured against the combined surface area of all six bounding surfaces, including floors,
               ceilings, exterior walls, and party walls shared with adjacent units, corridors, or stairwells.
               This surface-area metric is better suited to multifamily geometry than ACH50, which penalizes
               units with little exterior exposure.

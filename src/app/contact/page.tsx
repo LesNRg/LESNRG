@@ -5,7 +5,7 @@ import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {
   title: "Contact LES NRG | Building Performance Testing | Philadelphia, PA",
-  description: "Get in touch with LES NRG for blower door testing, HERS ratings, energy audits, and program certification. Located in Philadelphia, PA — response within one business day.",
+  description: "Get in touch with LES NRG for blower door testing, HERS ratings, energy audits, and program certification. Located in Philadelphia, PA, with response within one business day.",
   openGraph: {
     title: "Contact LES NRG | Philadelphia, PA",
     description: "Get in touch for blower door testing, HERS ratings, energy audits, and program certification. Response within one business day.",
@@ -91,7 +91,7 @@ export default function ContactPage() {
             <div className="card">
               <h3 className="text-[#111111] font-semibold text-sm mb-3">Service Area</h3>
               <p className="text-[#6b6b62] text-sm leading-relaxed mb-3">
-                Located in Philadelphia, PA — we travel wherever buildings are.
+                Located in Philadelphia, PA. We travel wherever buildings are.
                 We regularly serve clients throughout Pennsylvania, New Jersey, New York, Delaware,
                 and beyond. No project is too far.
               </p>

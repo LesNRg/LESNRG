@@ -109,8 +109,8 @@ export default function ContactForm() {
           <label className="text-[#6b6b62] text-xs font-medium mb-1.5 block">Project Type</label>
           <select name="projectType" value={form.projectType} onChange={handleChange} className="input-field">
             <option value="">Select...</option>
-            <option>New Construction — Single Family</option>
-            <option>New Construction — Multifamily</option>
+            <option>New Construction, Single Family</option>
+            <option>New Construction, Multifamily</option>
             <option>Existing Home</option>
             <option>Commercial Building</option>
             <option>Large / Industrial Building</option>
@@ -121,7 +121,7 @@ export default function ContactForm() {
 
       <div>
         <label className="text-[#6b6b62] text-xs font-medium mb-1.5 block">Project Details *</label>
-        <textarea name="message" required rows={5} placeholder="Tell us about your project — location, size, timeline, and any specific goals or questions..." value={form.message} onChange={handleChange} className="input-field resize-none" />
+        <textarea name="message" required rows={5} placeholder="Tell us about your project: location, size, timeline, and any specific goals or questions..." value={form.message} onChange={handleChange} className="input-field resize-none" />
       </div>
 
       {error && (
