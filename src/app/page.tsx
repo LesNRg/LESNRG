@@ -177,6 +177,39 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* We're Big Fans */}
+      <section className="bg-[#111111] border-y border-white/8 py-12">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <h2 className="font-black text-[#F5C500] mb-10" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", letterSpacing: "-0.03em" }}>
+            We&apos;re Big Fans.
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+            {[
+              "tight, efficient buildings. We have the equipment to prove yours is one.",
+              "saving energy. Not just talking about it, but actually measuring it, finding the leaks, and fixing the problem at the source.",
+              "fresh air in the right places, and stopping the air that\u2019s sneaking in where it shouldn\u2019t be.",
+              "lower utility bills. Every gap we find is money staying in your pocket, month after month.",
+              "doing things right. Blower door testing doesn\u2019t lie. Neither do we.",
+              "healthy buildings. Uncontrolled air leaks don\u2019t just waste energy, they bring in moisture, allergens, and outdoor pollutants.",
+              "the building science behind it all. This isn\u2019t guesswork. It\u2019s pressure diagnostics, and we love what the numbers tell us.",
+              "builders and contractors who care enough to test, not just assume.",
+              "code compliance done the easy way. We handle the testing, you get the certificate.",
+            ].map((text, i) => (
+              <div key={i} className="card-dark">
+                <p className="text-white/60 text-sm leading-relaxed">
+                  <span className="text-white font-semibold">We&apos;re big fans of </span>
+                  {text}
+                </p>
+              </div>
+            ))}
+          </div>
+          <div className="border-t border-white/8 pt-8">
+            <p className="text-white/50 text-lg mb-3">If your building has air leaks, we&apos;ll find them.</p>
+            <p className="text-[#F5C500] font-black text-2xl" style={{ letterSpacing: "-0.02em" }}>After all, we&apos;re Big Fans.</p>
+          </div>
+        </div>
+      </section>
+
       {/* Focused Services */}
       <section className="py-10 bg-[#111111] border-y border-white/8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
