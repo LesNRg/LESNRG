@@ -20,7 +20,7 @@ const services = [
   {
     icon: <Wind size={28} className="text-[#F5C500]" />,
     title: "Blower Door Testing for Code Compliance",
-    desc: "We measure building airtightness to minimize heat loss and ensure code adherence. Testing is scheduled at convenient times with prompt report delivery.",
+    desc: "We measure building airtightness through envelope integrity testing to minimize heat loss and ensure code adherence. Testing is scheduled at convenient times with prompt report delivery.",
     details: [
       "ASTM E779 & E1827 compliant",
       "Residential and light commercial",

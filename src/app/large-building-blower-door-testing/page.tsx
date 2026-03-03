@@ -5,7 +5,7 @@ import { Wind, CheckCircle, ArrowRight, Building2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Large Building Blower Door Testing | Commercial Air Leakage | LES NRG",
-  description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E779 & E1827 compliant. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
+  description: "Whole building blower door testing for commercial and industrial facilities. Multi-fan arrays for ASTM E779 & E1827 compliance. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
   openGraph: {
     title: "Large Building Blower Door Testing | LES NRG",
     description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E779 & E1827 compliant.",
@@ -217,7 +217,7 @@ export default function BlowerDoorTestingPage() {
             {[
               {
                 title: "Energy Conservation",
-                desc: "Uncontrolled air infiltration accounts for 25–40% of heating and cooling loads in commercial buildings. A blower door test quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements — and measurable proof of savings afterward.",
+                desc: "Uncontrolled air infiltration accounts for 25–40% of heating and cooling loads in commercial buildings. Whole building blower door testing quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements — and measurable proof of savings afterward.",
               },
               {
                 title: "Moisture & Mold",

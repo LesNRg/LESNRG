@@ -12,7 +12,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "LES NRG | Building Performance Testing | Philadelphia, PA",
   description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Philadelphia, PA.",
-  keywords: "blower door testing, HERS rating, energy audit, building performance, Philadelphia, passive house, energy star, code compliance",
+  keywords: "blower door testing, HERS rating, energy audit, building performance, Philadelphia, passive house, energy star, code compliance, envelope integrity testing, whole building blower door testing",
   metadataBase: new URL("https://www.lesnrg.com"),
 };
 

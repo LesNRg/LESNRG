@@ -6,7 +6,7 @@ import AnimatedCounter from "@/components/AnimatedCounter";
 
 export const metadata: Metadata = {
   title: "LES NRG | Blower Door Testing, HERS Ratings & Building Performance | Philadelphia, PA",
-  description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Located in Philadelphia, PA — serving PA, NJ, NY, DE and beyond.",
+  description: "Expert blower door testing, envelope integrity testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Located in Philadelphia, PA — serving PA, NJ, NY, DE and beyond.",
   openGraph: {
     title: "LES NRG | Blower Door Testing & Building Performance | Philadelphia, PA",
     description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings.",
@@ -128,7 +128,11 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              Consulting, Inspecting & Testing to Improve <span className="text-[#F5C500]">Performance, Comfort & Durability.</span>
+              <span className="whitespace-nowrap text-[#FFFFFF]">Consulting, Inspecting & Testing</span><br />
+              <span className="text-[#FCF0BF]">to Improve</span><br />
+              <span className="text-[#FAE280]">Performance,</span><br />
+              <span className="text-[#F7D440]">Comfort &</span><br />
+              <span className="text-[#F5C500]">Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
               Building testing isn&apos;t what we do — it&apos;s who we are. New or existing, commercial or residential, small or large — we bring the same relentless precision and passion to every envelope we pressurize.
@@ -283,6 +287,7 @@ export default function HomePage() {
               { src: "/logos/PHIUS.avif", alt: "PHIUS", height: 56 },
               { src: "/logos/logo-epa-airplus.png", alt: "Indoor airPlus", height: 56 },
               { src: "/logos/ZERH Logo.avif", alt: "DOE Zero Energy Ready Home", height: 64 },
+              { src: "/logos/ABAA_540.png", alt: "ABAA Member", height: 56 },
             ].map((logo) => (
               <div key={logo.alt} className="bg-[#f5f5f0] rounded-xl p-4 flex items-center justify-center">
                 <Image src={logo.src} alt={logo.alt} height={logo.height} width={130} style={{ height: logo.height, width: "auto", maxWidth: 110 }} />
