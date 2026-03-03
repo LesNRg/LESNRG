@@ -129,7 +129,7 @@ export default function HomePage() {
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
               <span className="sm:whitespace-nowrap text-[#FFFFFF]">Consulting, Inspecting & Testing</span><br />
-              <span className="text-[#FCF0BF]">to improve buildings</span><br />
+              <span className="text-[#FCF0BF]">to improve buildings&apos;</span><br />
               <span className="text-[#FAE280]">Performance,</span><br />
               <span className="text-[#F7D440]">Comfort &</span><br />
               <span className="text-[#F5C500]">Durability.</span>
