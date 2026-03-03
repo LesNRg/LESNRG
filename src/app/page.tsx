@@ -44,14 +44,14 @@ const services = [
   },
   {
     icon: <Award size={22} className="text-[#F5C500]" />,
-    title: "Program Compliance",
-    desc: "Certification support for Energy Star for New Homes, Indoor airPlus, Zero Energy Ready Homes, and PHIUS (Passive House Institute US).",
+    title: "Building Standard Certification",
+    desc: "Third-party verification and certification support across the full spectrum — from code compliance to Energy Star, HERS, and Passive House.",
     href: "/services",
   },
   {
     icon: <Wrench size={22} className="text-[#F5C500]" />,
-    title: "Consulting",
-    desc: "Building science guidance and construction consulting to optimize efficiency, timelines, and sustainable construction practices.",
+    title: "Building Science Consulting",
+    desc: "Investigating building problems at their source — condensation, moisture intrusion, air quality issues, and more — with data-driven diagnostics and actionable solutions.",
     href: "/services",
   },
 ];
@@ -111,10 +111,13 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              New Construction, <span className="text-[#F5C500]">Existing Buildings</span> & Code Verification
+              Testing & Inspecting to Improve <span className="text-[#F5C500]">Performance, Comfort & Durability.</span>
             </h1>
-            <p className="text-white/55 text-xl leading-relaxed mb-10 max-w-xl">
-              Blower door testing, HERS ratings, energy audits, and program certification for new construction and existing buildings — keeping projects code-compliant from conception to final sign-off.
+            <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
+              Building testing isn&apos;t what we do — it&apos;s who we are. New or existing, commercial or residential, small or large — we bring the same relentless precision and passion to every envelope we pressurize.
+            </p>
+            <p className="text-[#F5C500] text-2xl font-bold mb-10" style={{ letterSpacing: "-0.02em" }}>
+              We Are Big Fans.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/services" className="btn-primary">
@@ -126,7 +129,7 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="mt-12 flex flex-wrap gap-5">
-              {["HERS Certified Rater", "PHIUS Verifier", "Energy Star Partner"].map((badge) => (
+              {["HERS Certified Rater", "PHIUS Verifier", "Energy Star Partner", "ABAA Member"].map((badge) => (
                 <div key={badge} className="flex items-center gap-1.5 text-white/40 text-sm">
                   <CheckCircle size={13} className="text-[#F5C500]/70" />
                   {badge}
@@ -153,18 +156,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Quote */}
-      <section className="py-10 bg-[#f9f9f7] border-b border-[#e4e4de]">
-        <div className="max-w-3xl mx-auto px-5 sm:px-8 xl:px-12 text-center">
-          <div className="w-8 h-1 bg-[#F5C500] rounded-full mx-auto mb-6" />
-          <blockquote className="text-2xl font-semibold text-[#111111] leading-snug mb-4" style={{ letterSpacing: "-0.01em" }}>
-            &ldquo;Bringing us onboard early in the project holds significant benefits, as it allows us to have a greater influence on the project&rsquo;s overall success.&rdquo;
-          </blockquote>
-          <cite className="text-[#9a9a90] text-sm not-italic">— Neil Goldman, Founder</cite>
-        </div>
-      </section>
-
-      {/* Services */}
+{/* Services */}
       <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
@@ -193,7 +185,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">Specialized Programs</span>
-            <h2 className="section-title text-white">In-Depth Services</h2>
+            <h2 className="section-title !text-white">In-Depth Services</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {specializedPages.map((page) => (
@@ -221,18 +213,13 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 gap-14 items-center">
             <div>
               <span className="section-label">About Us</span>
-              <h2 className="section-title text-white mb-5">
+              <h2 className="section-title !text-white mb-5">
                 Built on 20+ Years of Building Science
               </h2>
-              <p className="text-white/50 leading-relaxed mb-5">
+              <p className="text-white/50 leading-relaxed mb-8">
                 Founded by Neil Goldman — a building performance expert with a Master&apos;s degree in
                 Construction Management and over 20 years of experience — bringing deep technical
                 expertise to every project.
-              </p>
-              <p className="text-white/50 leading-relaxed mb-8">
-                Neil is a contributing author to the Passive House Rowhouse Manual, a founding member
-                of the Greater Philadelphia Passive House Association, and a long-standing advisor to
-                Philadelphia Habitat for Humanity.
               </p>
               <Link href="/about" className="btn-primary">
                 Learn More

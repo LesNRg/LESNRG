@@ -306,7 +306,7 @@ export default function EnergyStarMultifamilyPage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">Incentives</span>
-            <h2 className="section-title text-white">New Jersey & Pennsylvania Rebates</h2>
+            <h2 className="section-title !text-white">New Jersey & Pennsylvania Rebates</h2>
             <p className="text-white/40 text-sm leading-relaxed mt-3 max-w-2xl">
               Energy Star certification unlocks access to rebate programs in both NJ and PA.
               As an NJCEP Partner, we help clients identify and qualify for applicable incentives as part of the certification process.
@@ -372,7 +372,7 @@ export default function EnergyStarMultifamilyPage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">How It Works</span>
-            <h2 className="section-title text-white">Our Verification Process</h2>
+            <h2 className="section-title !text-white">Our Verification Process</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {process.map((step) => (
@@ -512,7 +512,7 @@ export default function EnergyStarMultifamilyPage() {
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div>
               <span className="section-label">Why Us</span>
-              <h2 className="section-title text-white mb-5">Experience Across Multifamily Programs</h2>
+              <h2 className="section-title !text-white mb-5">Experience Across Multifamily Programs</h2>
               <p className="text-white/50 leading-relaxed mb-5">
                 We have certified over 347 Energy Star units and 25 PHIUS-certified units. With a Master&apos;s degree in
                 Construction Management and deep experience in multifamily construction, we understand both the

@@ -247,7 +247,7 @@ export default function PhiusVerificationPage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">Compliance</span>
-            <h2 className="section-title text-white">Standards & Programs</h2>
+            <h2 className="section-title !text-white">Standards & Programs</h2>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">
             {standards.map((s) => (
@@ -327,7 +327,7 @@ export default function PhiusVerificationPage() {
           <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
               <span className="section-label">Deliverables</span>
-              <h2 className="section-title text-white mb-5">What&apos;s Included</h2>
+              <h2 className="section-title !text-white mb-5">What&apos;s Included</h2>
               <p className="text-white/40 text-sm leading-relaxed mb-8">
                 We handle every deliverable required for PHIUS certification, from initial design review through final certificate submission.
               </p>
@@ -420,7 +420,7 @@ export default function PhiusVerificationPage() {
         <div className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">FAQ</span>
-            <h2 className="section-title text-white">Common Questions</h2>
+            <h2 className="section-title !text-white">Common Questions</h2>
           </div>
           <div className="space-y-4">
             {faqs.map((faq) => (

@@ -148,7 +148,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
               <span className="section-label">Our Approach</span>
-              <h2 className="section-title text-white mb-5">Engaged Early. Present Throughout.</h2>
+              <h2 className="section-title !text-white mb-5">Engaged Early. Present Throughout.</h2>
               <p className="text-white/50 leading-relaxed mb-5">
                 Most verification and testing happens at the end of construction — a pass/fail check
                 after all the decisions have been made. We work differently. Early engagement means we

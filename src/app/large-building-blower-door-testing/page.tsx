@@ -312,7 +312,7 @@ export default function BlowerDoorTestingPage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">How It Works</span>
-            <h2 className="section-title text-white">Our Testing Process</h2>
+            <h2 className="section-title !text-white">Our Testing Process</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
             {process.map((step) => (
@@ -335,7 +335,7 @@ export default function BlowerDoorTestingPage() {
           <div className="grid md:grid-cols-2 gap-12 items-start">
             <div>
               <span className="section-label">Deliverables</span>
-              <h2 className="section-title text-white mb-5">What You Receive</h2>
+              <h2 className="section-title !text-white mb-5">What You Receive</h2>
               <p className="text-white/40 text-sm leading-relaxed mb-8">
                 Engineering report delivered within 5 business days of on-site testing.
               </p>
@@ -374,7 +374,7 @@ export default function BlowerDoorTestingPage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">Compliance</span>
-            <h2 className="section-title text-white">Testing Standards</h2>
+            <h2 className="section-title !text-white">Testing Standards</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {standards.map((s) => (
