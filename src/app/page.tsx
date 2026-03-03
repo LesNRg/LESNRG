@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
+import { Caveat } from "next/font/google";
 import { ArrowRight, CheckCircle, Wind, ClipboardList, HomeIcon, BarChart2, Award, Wrench, Building2, Shield } from "lucide-react";
 import AnimatedCounter from "@/components/AnimatedCounter";
+
+const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
 export const metadata: Metadata = {
   title: "LES NRG | Blower Door Testing, HERS Ratings & Building Performance | Philadelphia, PA",
@@ -104,6 +107,21 @@ const specializedPages = [
   },
 ];
 
+const fanItems = [
+  "sustainability",
+  "energy efficiency",
+  "Passive House",
+  "PHIUS certification",
+  "tight envelopes",
+  "building science",
+  "fresh air",
+  "lower utility bills",
+  "honest data",
+  "buildings that perform",
+  "blower door testing",
+  "the science behind it all",
+];
+
 export default function HomePage() {
   return (
     <div className="min-h-screen">
@@ -128,9 +146,9 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              <span className="text-white">Consulting, Inspecting &</span><br />
-              <span className="text-white/70">Testing to improve buildings&apos;</span><br />
-              <span className="text-[#F5C500]">Performance, Comfort & Durability.</span>
+              <span className="sm:whitespace-nowrap text-[#FFFFFF]">Consulting, Inspecting & Testing</span><br />
+              <span className="text-[#FAE280]">to improve buildings&apos; Performance,</span><br />
+              <span className="text-[#F5C500]">Comfort & Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
               Building testing isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
@@ -171,39 +189,6 @@ export default function HomePage() {
                 <div className="text-[#111111]/60 text-sm font-medium">{stat.label}</div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* We're Big Fans */}
-      <section className="bg-[#111111] border-y border-white/8 py-12">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <h2 className="font-black text-[#F5C500] mb-10" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", letterSpacing: "-0.03em" }}>
-            We&apos;re Big Fans.
-          </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
-            {[
-              "tight, efficient buildings. We have the equipment to prove yours is one.",
-              "saving energy. Not just talking about it, but actually measuring it, finding the leaks, and fixing the problem at the source.",
-              "fresh air in the right places, and stopping the air that\u2019s sneaking in where it shouldn\u2019t be.",
-              "lower utility bills. Every gap we find is money staying in your pocket, month after month.",
-              "doing things right. Blower door testing doesn\u2019t lie. Neither do we.",
-              "healthy buildings. Uncontrolled air leaks don\u2019t just waste energy, they bring in moisture, allergens, and outdoor pollutants.",
-              "the building science behind it all. This isn\u2019t guesswork. It\u2019s pressure diagnostics, and we love what the numbers tell us.",
-              "builders and contractors who care enough to test, not just assume.",
-              "code compliance done the easy way. We handle the testing, you get the certificate.",
-            ].map((text, i) => (
-              <div key={i} className="card-dark">
-                <p className="text-white/60 text-sm leading-relaxed">
-                  <span className="text-white font-semibold">We&apos;re big fans of </span>
-                  {text}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="border-t border-white/8 pt-8">
-            <p className="text-white/50 text-lg mb-3">If your building has air leaks, we&apos;ll find them.</p>
-            <p className="text-[#F5C500] font-black text-2xl" style={{ letterSpacing: "-0.02em" }}>After all, we&apos;re Big Fans.</p>
           </div>
         </div>
       </section>
@@ -346,6 +331,31 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* We're Big Fans */}
+      <section className="bg-[#111111] border-y border-white/8 py-16">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="mb-12">
+            <span className="section-label">Our Philosophy</span>
+            <h2 className="font-black text-white" style={{ fontSize: "clamp(2rem, 5vw, 3rem)", letterSpacing: "-0.03em" }}>
+              We&apos;re Big Fans.
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-x-16">
+            {fanItems.map((item) => (
+              <div key={item} className="flex items-baseline gap-4 py-5 border-b border-white/8">
+                <span className="text-white/35 text-sm shrink-0 whitespace-nowrap">We&apos;re big fans of</span>
+                <span className={`${caveat.className} text-[#F5C500] text-[1.875rem] leading-none border-b-2 border-[#F5C500]/30 pb-0.5`}>
+                  {item}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className={`${caveat.className} text-[#F5C500] text-4xl mt-14`}>
+            After all, we&apos;re Big Fans.
+          </p>
         </div>
       </section>
 
