@@ -138,7 +138,7 @@ export default function HomePage() {
               Building testing isn&apos;t what we do — it&apos;s who we are. New or existing, commercial or residential, small or large — we bring the same relentless precision and passion to every envelope we pressurize.
             </p>
             <p className="text-[#F5C500] text-2xl font-bold mb-10" style={{ letterSpacing: "-0.02em" }}>
-              We Are Big Fans.
+              We&apos;re Big Fans.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/services" className="btn-primary">

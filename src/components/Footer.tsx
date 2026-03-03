@@ -46,7 +46,7 @@ export default function Footer() {
             <ArrowUp size={12} />
             Back to Top
           </button>
-          <p className="text-[#F5C500] font-bold text-sm tracking-wide">We Are Big Fans.</p>
+          <p className="text-[#F5C500] font-bold text-sm tracking-wide">We&apos;re Big Fans.</p>
           <p className="text-white/25 text-xs text-center">
             &copy; {new Date().getFullYear()} All Rights Reserved
           </p>
