@@ -20,7 +20,7 @@ const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
   name: "LES NRG",
-  description: "Building performance verification firm specializing in blower door testing, HERS ratings, energy audits, PHIUS verification, and Energy Star certification.",
+  description: "Building performance verification firm focused on blower door testing, HERS ratings, energy audits, PHIUS verification, and Energy Star certification.",
   url: "https://www.lesnrg.com",
   address: {
     "@type": "PostalAddress",

@@ -111,7 +111,7 @@ export default function EnergyStarMultifamilyPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1634.JPG"
@@ -125,18 +125,21 @@ export default function EnergyStarMultifamilyPage() {
         </div>
         <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-[#F5C500]/5 rounded-full blur-3xl pointer-events-none translate-x-1/3 -translate-y-1/2 z-0" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 relative z-10">
-          <div className="flex items-center gap-2 mb-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Award size={13} className="text-[#F5C500]" />
             <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">Energy Star Partner</span>
           </div>
-
-          <h1 className="font-black text-white mb-5 leading-tight" style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.03em" }}>
-            Energy Star Multifamily<br />Certification
+          <div className="flex items-center gap-2 mb-4">
+            <Award size={13} className="text-[#F5C500]" />
+            <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">HERS Rater</span>
+          </div>
+          <h1 className="font-black text-white leading-tight mb-5" style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.03em" }}>
+            Energy Star<br />Certification
           </h1>
           <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
-            Third-party verification and certification support for Energy Star Multifamily New Construction
-            and DOE Zero Energy Ready Home.
+            From conception to completion — energy model to final blower test — we are there every step of the way.
           </p>
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 mb-10">
             <Link href="/contact" className="btn-primary">
               Start Your Project
               <ArrowRight size={16} />
@@ -145,69 +148,43 @@ export default function EnergyStarMultifamilyPage() {
               See Our Process
             </a>
           </div>
-
-          {/* Key specs */}
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-10">
-            {[
-              { value: "347+", label: "Energy Star Units Certified" },
-              { value: "20+ yrs", label: "Experience" },
-              { value: "4,000+", label: "Blower Door Tests" },
-            ].map((s) => (
-              <div key={s.label} className="stat-card-dark">
-                <div className="text-xl font-bold text-[#F5C500] mb-1" style={{ letterSpacing: "-0.02em" }}>{s.value}</div>
-                <div className="text-white/30 text-xs">{s.label}</div>
-              </div>
-            ))}
+          <div className="flex items-center gap-5">
+            <Image src="/logos/RESNET_HERS_Rater_Vertical_Logo_RGB_Web_Use.avif" alt="RESNET HERS Rater" width={70} height={70} className="object-contain" />
+            <Image src="/logos/logo-energy-star.png" alt="Energy Star Partner" width={70} height={70} className="object-contain" />
+            <Image src="/logos/ZERH Logo.avif" alt="DOE Zero Energy Ready Home" width={70} height={70} className="object-contain" />
           </div>
 
-          {/* Photo strip */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 mt-6">
-            {[
-              "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1342.JPG",
-              "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1381.JPG",
-              "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1737.JPG",
-              "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3195.JPG",
-              "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3445.JPG",
-              "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_4864.JPG",
-            ].map((src, i) => (
-              <div key={i} className="relative rounded-lg overflow-hidden" style={{ height: "200px" }}>
-                <Image src={src} alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 33vw, 17vw" />
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
-      {/* What is Energy Star MFNC */}
+      {/* What is Energy Star */}
       <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">The Program</span>
-            <h2 className="section-title mb-5">Energy Star Multifamily New Construction</h2>
+            <h2 className="section-title mb-5">What is Energy Star Certification?</h2>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
-              Energy Star Multifamily New Construction (MFNC) is the EPA&apos;s certification program for
-              energy-efficient multifamily buildings. It requires third-party verification to confirm that
-              the building is designed and built to meet performance targets that go meaningfully beyond
-              code minimum.
+              Energy Star is the EPA&apos;s nationally recognized certification program for energy-efficient
+              buildings. To earn the label, a home or multifamily building must be independently verified
+              by a credentialed third party — confirming it was designed and built to perform meaningfully
+              beyond code minimum.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
-              Version 2 of the program — required for permits issued on or after January 1, 2025 —
-              introduced stricter airtightness requirements and updated verification protocols. Buildings
-              pursuing Energy Star MFNC must be verified by an approved HERS Rater or Multifamily Rating
-              Organization (MRO).
+              Certification adds measurable market value, qualifies projects for utility rebates and green
+              financing, and demonstrates a commitment to quality construction that buyers, renters, and
+              lenders increasingly expect.
             </p>
             <p className="text-[#9a9a90] text-sm leading-relaxed">
-              Energy Star is also a prerequisite for DOE Zero Energy Ready Home certification — making
-              it a natural entry point for projects pursuing multiple high-performance designations.
+              Energy Star is also a prerequisite for DOE Zero Energy Ready Home — making it a natural
+              entry point for projects pursuing multiple high-performance designations.
             </p>
           </div>
           <div className="relative rounded-2xl overflow-hidden aspect-[3/2]">
             <Image
               src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3202.JPG"
-              alt="Energy Star multifamily building verification"
+              alt="Energy Star building verification"
               fill
               className="object-cover"
-             
             />
           </div>
         </div>
@@ -250,45 +227,103 @@ export default function EnergyStarMultifamilyPage() {
         </div>
       </section>
 
-      {/* DOE ZERH */}
+      {/* Photo Strip */}
+      <section>
+        <div className="grid grid-cols-3 sm:grid-cols-6" style={{ height: "320px" }}>
+          {[
+            "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1342.JPG",
+            "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1381.JPG",
+            "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1737.JPG",
+            "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3195.JPG",
+            "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3445.JPG",
+            "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_4864.JPG",
+          ].map((src, i) => (
+            <div key={i} className="relative overflow-hidden">
+              <Image src={src} alt="Energy Star project" fill className="object-cover" sizes="(max-width: 640px) 33vw, 17vw" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Energy Star for New Homes */}
       <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
-            <span className="section-label">DOE Program</span>
-            <h2 className="section-title mb-5">DOE Zero Energy Ready Home</h2>
+            <span className="section-label">Single Family & Low-Rise</span>
+            <h2 className="section-title mb-5">Energy Star for New Homes</h2>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
-              The DOE Zero Energy Ready Home program — formerly known as ZERH — was rebranded and expanded
-              by the Department of Energy as part of a broader national initiative. The program recognizes
-              buildings that go beyond Energy Star to deliver a high-performance envelope, efficient
-              mechanical systems, and solar-readiness.
+              Energy Star for New Homes applies to single-family and low-rise multifamily buildings up to
+              three stories. Certification requires a HERS Rater to verify insulation, air sealing,
+              windows, HVAC, and ventilation — and to conduct blower door and duct leakage testing.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
-              Energy Star certification is a prerequisite. Projects that pursue DOE Zero Energy Ready Home
-              alongside Energy Star MFNC leverage the same field verification and documentation with
-              minimal additional overhead.
+              We handle registration, all required field inspections, testing, and documentation from
+              design through final certificate — coordinating directly with the EPA on your behalf.
             </p>
             <p className="text-[#9a9a90] text-sm leading-relaxed">
-              DOE Zero Energy Ready Home is recognized by many utility incentive programs, green mortgage
-              products, and municipal sustainability commitments — adding market value beyond the certification itself.
+              Energy Star for New Homes is a prerequisite for DOE Zero Energy Ready Home, Indoor airPlus,
+              and many utility rebate programs in NJ and PA.
             </p>
           </div>
-          <div className="space-y-4">
+          <div className="bg-[#111111] rounded-2xl p-6">
+            <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-2.5 py-1 mb-6">
+              <span className="text-[#F5C500] font-bold text-xs">Energy Star for New Homes</span>
+            </div>
+            <ul className="space-y-3">
+              {[
+                "Single-family and low-rise multifamily (1–3 stories)",
+                "HERS Rater verification required",
+                "Blower door & duct leakage testing",
+                "Thermal enclosure inspection",
+                "HVAC & ventilation verification",
+                "EPA program registration & submission",
+                "Prerequisite for DOE Zero Energy Ready Home",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5 text-white/50 text-sm">
+                  <CheckCircle size={13} className="text-[#F5C500] mt-0.5 shrink-0" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Energy Star Multifamily */}
+      <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="grid md:grid-cols-2 gap-16 items-start">
+            <div>
+              <span className="section-label">Mid-Rise & High-Rise</span>
+              <h2 className="section-title mb-5">Energy Star Multifamily New Construction</h2>
+              <p className="text-[#6b6b62] leading-relaxed mb-5">
+                Energy Star Multifamily New Construction (MFNC) covers buildings four stories and above.
+                Version 2 — required for permits issued on or after January 1, 2025 — introduced stricter
+                airtightness requirements and updated verification protocols.
+              </p>
+              <p className="text-[#6b6b62] leading-relaxed mb-5">
+                Verification must be performed by an accredited HERS Rater or an approved Multifamily
+                Rating Organization (MRO). We work regularly with MROs on larger projects and manage
+                all documentation through to final certificate issuance.
+              </p>
+              <p className="text-[#9a9a90] text-sm leading-relaxed">
+                With 347+ certified units, we know what it takes to get multifamily projects across
+                the finish line efficiently.
+              </p>
+            </div>
             <div className="bg-[#111111] rounded-2xl p-6">
-              <div className="flex items-center gap-2 mb-6">
-                <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-2.5 py-1">
-                  <span className="text-[#F5C500] font-bold text-xs">DOE Zero Energy Ready Home</span>
-                </div>
-                <span className="text-white/20 text-xs">formerly ZERH</span>
+              <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-2.5 py-1 mb-6">
+                <span className="text-[#F5C500] font-bold text-xs">Energy Star MFNC v2</span>
               </div>
               <ul className="space-y-3">
                 {[
-                  "Energy Star certification required as prerequisite",
-                  "High-performance thermal envelope",
-                  "Efficient mechanical and water heating systems",
-                  "Solar-ready provisions (conduit, panel capacity)",
-                  "Indoor airPlus certification recommended",
+                  "Mid-rise & high-rise multifamily (4+ stories)",
                   "HERS Rater or MRO verification required",
-                  "Recognized by utility incentive programs",
+                  "Unit compartmentalization blower door testing",
+                  "Whole-building airtightness testing",
+                  "HVAC & ventilation commissioning",
+                  "Thermal enclosure verification",
+                  "Required for permits issued Jan 1, 2025+",
                 ].map((item) => (
                   <li key={item} className="flex items-start gap-2.5 text-white/50 text-sm">
                     <CheckCircle size={13} className="text-[#F5C500] mt-0.5 shrink-0" />

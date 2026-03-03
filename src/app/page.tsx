@@ -63,13 +63,30 @@ const stats = [
   { value: 20, suffix: "+", label: "Years of Experience" },
 ];
 
+const highlights = [
+  { title: "Contributing Author", desc: "Passive House Rowhouse Manual — a key reference for high-performance urban residential construction." },
+  { title: "Founding Member", desc: "Greater Philadelphia Passive House Association — advancing passive building standards in the region." },
+  { title: "Construction Advisor", desc: "Philadelphia Habitat for Humanity — applying energy efficiency expertise to affordable housing projects." },
+  { title: "Conference Speaker", desc: "Presented at the New Gravity Conference 2020 on building performance verification topics." },
+];
+
+const credentials = [
+  "HERS Certified Rater (RESNET Accredited)",
+  "PHIUS Verifier (Passive House Institute US)",
+  "Energy Star for New Homes Partner",
+  "NJCEP Partner (New Jersey Clean Energy Program)",
+  "Indoor airPlus Verifier",
+  "Zero Energy Ready Homes Verifier",
+  "Master's Degree in Construction Management",
+];
+
 const specializedPages = [
   {
     icon: <Building2 size={22} className="text-[#F5C500]" />,
     title: "Large Building Testing",
     desc: "Multi-fan blower door testing for commercial and industrial facilities. ASTM E779 & E1827 compliant.",
     href: "/large-building-blower-door-testing",
-    label: "Specialized Service",
+    label: "Commercial Testing",
   },
   {
     icon: <Shield size={22} className="text-[#F5C500]" />,
@@ -156,7 +173,34 @@ export default function HomePage() {
         </div>
       </section>
 
-{/* Services */}
+      {/* Focused Services */}
+      <section className="py-10 bg-[#111111] border-y border-white/8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="mb-10">
+            <span className="section-label">Programs</span>
+            <h2 className="section-title !text-white">Focused Services</h2>
+          </div>
+          <div className="grid md:grid-cols-3 gap-5">
+            {specializedPages.map((page) => (
+              <Link key={page.href} href={page.href} className="card-dark group">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-9 h-9 rounded-lg bg-[#F5C500]/10 flex items-center justify-center">
+                    {page.icon}
+                  </div>
+                  <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">{page.label}</span>
+                </div>
+                <h3 className="text-white font-bold mb-2">{page.title}</h3>
+                <p className="text-white/40 text-sm leading-relaxed mb-4">{page.desc}</p>
+                <div className="flex items-center gap-1 text-[#F5C500] text-sm font-semibold group-hover:gap-2 transition-all">
+                  Learn more <ArrowRight size={14} />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services */}
       <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
@@ -180,69 +224,23 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Specialized Services */}
-      <section className="py-10 bg-[#111111] border-y border-white/8">
+      {/* Our Approach */}
+      <section className="bg-[#111111] border-y border-white/8 py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <div className="mb-10">
-            <span className="section-label">Specialized Programs</span>
-            <h2 className="section-title !text-white">In-Depth Services</h2>
-          </div>
-          <div className="grid md:grid-cols-3 gap-5">
-            {specializedPages.map((page) => (
-              <Link key={page.href} href={page.href} className="card-dark group">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-9 h-9 rounded-lg bg-[#F5C500]/10 flex items-center justify-center">
-                    {page.icon}
-                  </div>
-                  <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">{page.label}</span>
-                </div>
-                <h3 className="text-white font-bold mb-2">{page.title}</h3>
-                <p className="text-white/40 text-sm leading-relaxed mb-4">{page.desc}</p>
-                <div className="flex items-center gap-1 text-[#F5C500] text-sm font-semibold group-hover:gap-2 transition-all">
-                  Learn more <ArrowRight size={14} />
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* About Callout — dark */}
-      <section className="bg-[#111111] py-8 border-y border-white/8">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <div className="grid md:grid-cols-2 gap-14 items-center">
-            <div>
-              <span className="section-label">About Us</span>
-              <h2 className="section-title !text-white mb-5">
-                Built on 20+ Years of Building Science
-              </h2>
-              <p className="text-white/50 leading-relaxed mb-8">
-                Founded by Neil Goldman — a building performance expert with a Master&apos;s degree in
-                Construction Management and over 20 years of experience — bringing deep technical
-                expertise to every project.
-              </p>
-              <Link href="/about" className="btn-primary">
-                Learn More
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-            <div className="space-y-3">
-              {[
-                { title: "PHIUS Verifier", desc: "Passive House Institute US certified — one of a select group of verifiers in the country." },
-                { title: "HERS Certified Rater", desc: "Accredited to perform official Home Energy Rating System assessments for new and existing homes." },
-                { title: "Energy Star Partner", desc: "Authorized to certify homes under the Energy Star for New Homes and related programs." },
-              ].map((item) => (
-                <div key={item.title} className="card-dark">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle size={15} className="text-[#F5C500] mt-0.5 shrink-0" />
-                    <div>
-                      <div className="text-white font-semibold text-sm mb-0.5">{item.title}</div>
-                      <div className="text-white/40 text-xs leading-relaxed">{item.desc}</div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+          <span className="section-label">Our Approach</span>
+          <h2 className="section-title !text-white mb-5">Engaged Early. Present Throughout.</h2>
+          <div className="grid md:grid-cols-2 gap-10">
+            <p className="text-white/50 leading-relaxed">
+              Most verification and testing happens at the end of construction — a pass/fail check
+              after all the decisions have been made. We work differently. Early engagement means we
+              review plans, flag potential performance issues, and help teams make better choices
+              before they become expensive corrections.
+            </p>
+            <p className="text-white/50 leading-relaxed">
+              Whether you&apos;re a builder targeting Energy Star or PHIUS certification, a homeowner
+              seeking an honest energy assessment, or a developer navigating code and incentive
+              requirements — we provide clear, technically rigorous guidance every step of the way.
+            </p>
           </div>
         </div>
       </section>
@@ -262,6 +260,58 @@ export default function HomePage() {
               <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="(max-width: 640px) 33vw, 17vw" />
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Credentials */}
+      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+        <div className="grid md:grid-cols-2 gap-16 items-start">
+          <div>
+            <span className="section-label">Credentials</span>
+            <h2 className="section-title mb-5">Accreditations & Certifications</h2>
+            <ul className="space-y-3">
+              {credentials.map((c) => (
+                <li key={c} className="flex items-start gap-2.5 text-[#6b6b62] text-sm">
+                  <CheckCircle size={13} className="text-[#F5C500] mt-0.5 shrink-0" />
+                  {c}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="grid grid-cols-3 gap-4">
+            {[
+              { src: "/logos/RESNET_HERS_Rater_Vertical_Logo_RGB_Web_Use.avif", alt: "RESNET", height: 56 },
+              { src: "/logos/logo-energy-star.png", alt: "Energy Star", height: 64 },
+              { src: "/logos/PHIUS.avif", alt: "PHIUS", height: 56 },
+              { src: "/logos/logo-epa-airplus.png", alt: "Indoor airPlus", height: 56 },
+              { src: "/logos/ZERH Logo.avif", alt: "DOE Zero Energy Ready Home", height: 64 },
+            ].map((logo) => (
+              <div key={logo.alt} className="bg-[#f5f5f0] rounded-xl p-4 flex items-center justify-center">
+                <Image src={logo.src} alt={logo.alt} height={logo.height} width={130} style={{ height: logo.height, width: "auto", maxWidth: 110 }} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Industry Involvement */}
+      <section className="bg-[#111111] border-y border-white/8 py-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="mb-10">
+            <span className="section-label">Industry Involvement</span>
+            <h2 className="text-white font-bold text-2xl" style={{ letterSpacing: "-0.02em" }}>
+              Active in the Building Science Community
+            </h2>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {highlights.map((h) => (
+              <div key={h.title} className="card-dark">
+                <div className="w-1 h-6 bg-[#F5C500] rounded-full mb-3" />
+                <h3 className="text-white font-bold mb-2">{h.title}</h3>
+                <p className="text-white/40 text-sm leading-relaxed">{h.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

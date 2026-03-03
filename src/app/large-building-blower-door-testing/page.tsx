@@ -107,7 +107,7 @@ export default function BlowerDoorTestingPage() {
     <div className="min-h-screen pt-32">
 
       {/* Hero */}
-      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_6661.JPG"
@@ -123,7 +123,7 @@ export default function BlowerDoorTestingPage() {
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 relative z-10">
           <div className="flex items-center gap-2 mb-4">
             <Wind size={13} className="text-[#F5C500]" />
-            <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">Specialized Service</span>
+            <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">Commercial Testing</span>
           </div>
           <h1 className="font-black text-white mb-5 leading-tight" style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.03em" }}>
             Large Building<br />Blower Door<br />Testing
@@ -247,7 +247,7 @@ export default function BlowerDoorTestingPage() {
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <div>
             <span className="section-label">The Challenge</span>
-            <h2 className="section-title mb-5">Specialized Equipment for Large Volumes</h2>
+            <h2 className="section-title mb-5">Purpose-Built Equipment for Large Volumes</h2>
             <p className="text-[#6b6b62] leading-relaxed mb-6">
               A standard residential blower door produces 2,000–5,000 CFM. A large commercial building may
               require 50,000–200,000+ CFM to reach the 50 Pascal differential required by ASTM E779.

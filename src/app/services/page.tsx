@@ -109,7 +109,7 @@ export default function ServicesPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/mis/IMG_2507%202.JPG"
@@ -127,15 +127,24 @@ export default function ServicesPage() {
           <h1 className="font-black text-white mb-5 leading-tight" style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.03em" }}>
             Services
           </h1>
-          <p className="text-white/50 text-xl max-w-xl leading-relaxed">
+          <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
             A full range of energy efficiency, performance verification, and consulting services
             for residential and commercial buildings.
           </p>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/contact" className="btn-primary">
+              Get in Touch
+              <ArrowRight size={16} />
+            </Link>
+            <a href="#services" className="btn-outline-yellow">
+              View Services
+            </a>
+          </div>
         </div>
       </section>
 
       {/* Services */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
+      <section id="services" className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
         <div className="space-y-5">
           {services.map((s) => (
             <div key={s.title} className="card">
@@ -167,15 +176,20 @@ export default function ServicesPage() {
 
       {/* Photo Strip */}
       <section>
-        <div className="grid grid-cols-2 sm:grid-cols-4" style={{ height: "320px" }}>
+        <div className="grid grid-cols-3 sm:grid-cols-9" style={{ height: "320px" }}>
           {[
             "/new%20website%20photo/mis/IMG_8966.JPG",
             "/new%20website%20photo/mis/IMG_8986.JPG",
             "/new%20website%20photo/mis/IMG_9091.JPG",
             "/new%20website%20photo/mis/IMG_9094.JPG",
+            "/new%20website%20photo/mis/IMG_5429.JPG",
+            "/new%20website%20photo/mis/IMG_5762.JPG",
+            "/new%20website%20photo/mis/IMG_6094.JPG",
+            "/new%20website%20photo/mis/IMG_8452.JPEG",
+            "/new%20website%20photo/mis/IMG_8830.JPG",
           ].map((src, i) => (
             <div key={i} className="relative overflow-hidden">
-              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" />
+              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="(max-width: 640px) 33vw, 11vw" />
             </div>
           ))}
         </div>
@@ -188,7 +202,7 @@ export default function ServicesPage() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <Wind size={14} className="text-[#F5C500]" />
-                <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">Specialized Service</span>
+                <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">Commercial Testing</span>
               </div>
               <h3 className="text-white font-bold text-2xl mb-2" style={{ letterSpacing: "-0.02em" }}>
                 Large Building Blower Door Testing

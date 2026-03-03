@@ -20,7 +20,7 @@ export default function ContactPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/mis/IMG_9075.JPG"
@@ -38,7 +38,7 @@ export default function ContactPage() {
           <h1 className="font-black text-white mb-5 leading-tight" style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.03em" }}>
             Contact
           </h1>
-          <p className="text-white/50 text-xl max-w-xl leading-relaxed">
+          <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
             Tell us about your project and we&apos;ll get back to you within one business day.
           </p>
         </div>

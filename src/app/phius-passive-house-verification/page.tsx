@@ -120,7 +120,7 @@ export default function PhiusVerificationPage() {
   return (
     <div className="min-h-screen pt-32">
       {/* Hero */}
-      <section className="bg-[#111111] py-8 border-b border-white/8 relative overflow-hidden">
+      <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
           <Image
             src="/new%20website%20photo/passive%20house/IMG_9656.JPG"
@@ -168,20 +168,6 @@ export default function PhiusVerificationPage() {
             </a>
           </div>
 
-          {/* Photo strip */}
-          <div className="grid grid-cols-3 sm:grid-cols-5 gap-2 mt-10">
-            {[
-              "/new%20website%20photo/passive%20house/IMG_1607.JPG",
-              "/new%20website%20photo/passive%20house/IMG_2850.JPG",
-              "/new%20website%20photo/passive%20house/IMG_3209.JPG",
-              "/new%20website%20photo/passive%20house/IMG_9164.JPG",
-              "/new%20website%20photo/passive%20house/IMG_9177.JPG",
-            ].map((src, i) => (
-              <div key={i} className="relative rounded-lg overflow-hidden" style={{ height: "200px" }}>
-                <Image src={src} alt="Passive house project" fill className="object-cover" sizes="(max-width: 640px) 33vw, 20vw" />
-              </div>
-            ))}
-          </div>
         </div>
       </section>
 
@@ -199,7 +185,7 @@ export default function PhiusVerificationPage() {
               measures like insulation R-values.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-5">
-              The result is a building that uses 60–80% less energy than code minimum, maintains
+              The result is a building that uses 60–80% <strong>LES NRG</strong> than code minimum, maintains
               exceptional comfort without oversized mechanical systems, and outperforms conventional
               construction in resilience, indoor air quality, and long-term durability.
             </p>
@@ -239,6 +225,23 @@ export default function PhiusVerificationPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Photo Strip */}
+      <section>
+        <div className="grid grid-cols-3 sm:grid-cols-5" style={{ height: "320px" }}>
+          {[
+            "/new%20website%20photo/passive%20house/IMG_1607.JPG",
+            "/new%20website%20photo/passive%20house/IMG_2850.JPG",
+            "/new%20website%20photo/passive%20house/IMG_3209.JPG",
+            "/new%20website%20photo/passive%20house/IMG_9164.JPG",
+            "/new%20website%20photo/passive%20house/IMG_9177.JPG",
+          ].map((src, i) => (
+            <div key={i} className="relative overflow-hidden">
+              <Image src={src} alt="Passive house project" fill className="object-cover" sizes="(max-width: 640px) 33vw, 20vw" />
+            </div>
+          ))}
         </div>
       </section>
 

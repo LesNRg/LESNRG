@@ -7,7 +7,6 @@ import { Menu, X } from "lucide-react";
 
 const navLinks = [
   { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
   { href: "/services", label: "Services" },
   { href: "/large-building-blower-door-testing", label: "Large Building Testing" },
   { href: "/energy-star-multifamily", label: "Energy Star Certification" },
