@@ -129,7 +129,7 @@ export default function HomePage() {
               <span style={{ color: "#FAE280" }}>to improve buildings Performance,</span><br />
               <span style={{ color: "#F5C500" }}>Comfort & Durability.</span>
             </h1>
-            <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
+            <p className="text-white/55 text-xl leading-relaxed mb-12 max-w-xl">
               Building testing isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
             </p>
             <HeroBigFans />
