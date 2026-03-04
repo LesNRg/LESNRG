@@ -41,6 +41,7 @@ export default function HeroBigFans() {
           transform: visible ? "translateY(0)" : "translateY(6px)",
           transition: "opacity 350ms ease, transform 350ms ease",
           display: "inline-block",
+          color: "#FFFFFF",
         }}
       >
         of {fanItems[current]}.
