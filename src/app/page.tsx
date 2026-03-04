@@ -125,8 +125,9 @@ export default function HomePage() {
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
               <span className="sm:whitespace-nowrap" style={{ color: "#FFFFFF" }}>Consulting, Inspecting & Testing</span><br />
-              <span style={{ color: "#FAE280" }}>to improve buildings Performance,</span><br />
-              <span style={{ color: "#F5C500" }}>Comfort & Durability.</span>
+              <span style={{ color: "#FCF0BF" }}>to improve buildings</span><br />
+              <span style={{ color: "#FAE280" }}>Performance, Comfort</span><br />
+              <span style={{ color: "#F5C500" }}>&amp; Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-12 max-w-xl">
               Building science isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
