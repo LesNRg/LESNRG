@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 
 const fanItems = [
-  "energy star!",
+  "Energy Star!",
   "testing and verification",
   "efficiency",
   "phius certification",
@@ -13,7 +13,7 @@ const fanItems = [
   "lower utility bills",
   "blower door testing",
   "philadelphia",
-  "hvac systems that work",
+  "HVAC systems that work",
   "passive house",
   "quality control",
   "good design",
@@ -28,7 +28,7 @@ const fanItems = [
   "preconstruction meetings",
   "less energy",
   "the beatles",
-  "hvac design",
+  "HVAC design",
   "energy recovery",
 ];
 
