@@ -34,7 +34,7 @@ export default function HeroBigFans() {
 
   return (
     <p className="text-[#F5C500] text-2xl font-bold mb-10" style={{ letterSpacing: "-0.02em" }}>
-      We&apos;re big fans of{" "}
+      We&apos;re big fans.{" "}
       <span
         style={{
           opacity: visible ? 1 : 0,
@@ -43,7 +43,7 @@ export default function HeroBigFans() {
           display: "inline-block",
         }}
       >
-        {fanItems[current]}.
+        of {fanItems[current]}.
       </span>
     </p>
   );
