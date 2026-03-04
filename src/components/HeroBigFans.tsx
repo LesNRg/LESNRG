@@ -63,7 +63,7 @@ export default function HeroBigFans() {
         We&apos;re big fans.
       </p>
       <p className="text-white text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>
-        of&nbsp;&nbsp;
+        of{" "}
         <span style={{
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(6px)",
