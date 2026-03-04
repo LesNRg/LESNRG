@@ -16,6 +16,7 @@ const fanItems = [
   "blower door testing",
   "the science behind it all",
   "Philly",
+  "HVAC systems that work",
 ];
 
 export default function HeroBigFans() {
