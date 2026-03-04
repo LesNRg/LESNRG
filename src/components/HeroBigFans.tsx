@@ -53,7 +53,7 @@ export default function HeroBigFans() {
         setCurrent((prev) => (prev + 1) % items.length);
         setVisible(true);
       }, 350);
-    }, 2800);
+    }, 3220);
     return () => clearInterval(timer);
   }, []);
 
