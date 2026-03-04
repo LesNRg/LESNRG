@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowRight, CheckCircle, Wind, ClipboardList, HomeIcon, BarChart2, Award, Wrench, Building2, Shield } from "lucide-react";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import BigFans from "@/components/BigFans";
+import HeroBigFans from "@/components/HeroBigFans";
 
 export const metadata: Metadata = {
   title: "LES NRG | Blower Door Testing, HERS Ratings & Building Performance | Philadelphia, PA",
@@ -124,20 +125,14 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              <span className="sm:whitespace-nowrap">
-                <span style={{ color: "#FFFFFF" }}>Consulting, Inspecting </span><span style={{ color: "#FCF0BF" }}>& Testing</span>
-              </span><br />
-              <span>
-                <span style={{ color: "#FAE280" }}>to improve </span><span style={{ color: "#F7D440" }}>buildings Performance,</span>
-              </span><br />
+              <span className="sm:whitespace-nowrap" style={{ color: "#FFFFFF" }}>Consulting, Inspecting & Testing</span><br />
+              <span style={{ color: "#FCF0BF" }}>to improve buildings Performance,</span><br />
               <span style={{ color: "#F5C500" }}>Comfort & Durability.</span>
             </h1>
             <p className="text-white/55 text-xl leading-relaxed mb-4 max-w-xl">
               Building testing isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
             </p>
-            <p className="text-[#F5C500] text-2xl font-bold mb-10" style={{ letterSpacing: "-0.02em" }}>
-              We&apos;re Big Fans.
-            </p>
+            <HeroBigFans />
             <div className="flex flex-wrap gap-3">
               <Link href="/services" className="btn-primary">
                 Our Services
