@@ -1,9 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Caveat } from "next/font/google";
-
-const caveat = Caveat({ subsets: ["latin"], weight: ["700"] });
 
 const fanItems = [
   "sustainability",
@@ -36,22 +33,18 @@ export default function HeroBigFans() {
   }, []);
 
   return (
-    <div className="mb-10 flex items-baseline gap-3 flex-wrap">
-      <span className="text-white/45 font-semibold whitespace-nowrap text-base">
-        We&apos;re big fans of
-      </span>
+    <p className="text-[#F5C500] text-2xl font-bold mb-10" style={{ letterSpacing: "-0.02em" }}>
+      We&apos;re big fans of{" "}
       <span
-        className={`${caveat.className} text-[#F5C500] border-b-2 border-[#F5C500]/35 pb-0.5`}
         style={{
-          fontSize: "1.75rem",
-          lineHeight: 1.1,
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(6px)",
           transition: "opacity 350ms ease, transform 350ms ease",
+          display: "inline-block",
         }}
       >
-        {fanItems[current]}
+        {fanItems[current]}.
       </span>
-    </div>
+    </p>
   );
 }
