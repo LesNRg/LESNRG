@@ -33,19 +33,21 @@ export default function HeroBigFans() {
   }, []);
 
   return (
-    <p className="text-[#F5C500] text-2xl font-bold mb-10" style={{ letterSpacing: "-0.02em" }}>
-      We&apos;re big fans.{" "}
-      <span
+    <div className="mb-10">
+      <p className="text-[#F5C500] text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>
+        We&apos;re big fans.
+      </p>
+      <p
+        className="text-white text-2xl font-bold"
         style={{
+          letterSpacing: "-0.02em",
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(6px)",
           transition: "opacity 350ms ease, transform 350ms ease",
-          display: "inline-block",
-          color: "#FFFFFF",
         }}
       >
         of {fanItems[current]}.
-      </span>
-    </p>
+      </p>
+    </div>
   );
 }

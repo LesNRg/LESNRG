@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, CheckCircle, Wind, ClipboardList, HomeIcon, BarChart2, Award, Wrench, Building2, Shield } from "lucide-react";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import BigFans from "@/components/BigFans";
 import HeroBigFans from "@/components/HeroBigFans";
 
 export const metadata: Metadata = {
@@ -290,7 +289,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <BigFans />
 
       {/* CTA — yellow */}
       <section className="py-8 bg-[#F5C500]">
