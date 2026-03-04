@@ -3,33 +3,33 @@
 import { useState, useEffect } from "react";
 
 const fanItems = [
-  "Energy Star!",
-  "Testing and verification",
-  "Efficiency",
-  "PHIUS certification",
-  "Tight envelopes",
-  "Building science",
-  "Fresh air",
-  "Lower utility bills",
-  "Blower door testing",
-  "Philadelphia",
-  "HVAC systems that work",
-  "Passive House",
-  "Quality control",
-  "Good design",
-  "Vapor control layers",
-  "Tape",
-  "Indoor air quality",
-  "Enjoying where you live",
-  "Big Fans",
-  "Pulik",
-  "Duct leakage testing",
-  "Little fans",
-  "Preconstruction meetings",
-  "Less Energy",
-  "The Beatles",
-  "HVAC Design",
-  "Energy Recovery",
+  "energy star!",
+  "testing and verification",
+  "efficiency",
+  "phius certification",
+  "tight envelopes",
+  "building science",
+  "fresh air",
+  "lower utility bills",
+  "blower door testing",
+  "philadelphia",
+  "hvac systems that work",
+  "passive house",
+  "quality control",
+  "good design",
+  "vapor control layers",
+  "tape",
+  "indoor air quality",
+  "enjoying where you live",
+  "big fans",
+  "pulik",
+  "duct leakage testing",
+  "little fans",
+  "preconstruction meetings",
+  "less energy",
+  "the beatles",
+  "hvac design",
+  "energy recovery",
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -70,7 +70,7 @@ export default function HeroBigFans() {
           transition: "opacity 350ms ease, transform 350ms ease",
           display: "inline-block",
         }}>
-          {items[current]}.
+          {items[current]}
         </span>
       </p>
     </div>
