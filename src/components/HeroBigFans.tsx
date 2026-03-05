@@ -30,6 +30,7 @@ const fanItems = [
   "the beatles",
   "HVAC design",
   "energy recovery",
+  "thermal imaging",
 ];
 
 function shuffle<T>(arr: T[]): T[] {
