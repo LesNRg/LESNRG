@@ -71,7 +71,7 @@ export default function HeroBigFans() {
           transition: "opacity 350ms ease, transform 350ms ease",
           display: "inline-block",
         }}>
-          {items[current]}
+          {items[current]}.
         </span>
       </p>
     </div>
