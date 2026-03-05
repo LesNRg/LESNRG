@@ -6,7 +6,7 @@ const fanItems = [
   "Energy Star!",
   "testing and verification",
   "efficiency",
-  "phius certification",
+  "PHIUS certification",
   "tight envelopes",
   "building science",
   "fresh air",
@@ -60,7 +60,7 @@ export default function HeroBigFans() {
   return (
     <div className="mb-10">
       <p className="text-[#F5C500] text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>
-        We&apos;re big fans.
+        We&apos;re big fans
       </p>
       <p className="text-white text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>
         of{" "}
@@ -70,7 +70,7 @@ export default function HeroBigFans() {
           transition: "opacity 350ms ease, transform 350ms ease",
           display: "inline-block",
         }}>
-          {items[current]}.
+          {items[current]}
         </span>
       </p>
     </div>
