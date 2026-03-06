@@ -1,0 +1,2252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <title>LES NRG — Beta Test</title>
+  <style>
+    @font-face {
+      font-family: 'Peddana';
+      src: url('../my-website/lesnrg/public/fonts/peddana-regular.ttf');
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: monospace;
+    }
+    #game-wrap {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+    }
+    #game-col {
+      display: flex;
+      flex-direction: column;
+    }
+    #game { display: block; border: 2px solid #F5C500; }
+    .ruler-h {
+      display: block;
+      width: 800px;
+      height: 24px;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      flex-shrink: 0;
+    }
+    .ruler-v {
+      display: block;
+      width: 36px;
+      height: 1080px;
+      background: #111;
+      border: 1px solid #2a2a2a;
+      margin-top: 28px; /* align with game canvas (24px ruler + 2px border + 2px border) */
+      flex-shrink: 0;
+    }
+    #controls {
+      color: #ffffff33;
+      font-size: 12px;
+      margin-top: 10px;
+      letter-spacing: 0.08em;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrap">
+    <div id="game-col">
+      <canvas id="game" width="800" height="700"></canvas>
+    </div>
+  </div>
+  <div id="controls">ARROW KEYS or WASD to move &nbsp;|&nbsp; SPACE or UP to jump</div>
+
+  <script>
+    const canvas = document.getElementById('game');
+    let ctx      = canvas.getContext('2d');
+
+    // ─── Logo blade image (real SVG path from navbar) ─────────────────────────
+    const imgBlades = new Image();
+    imgBlades.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" viewBox="8.511 8.511 82.977 82.977">' +
+      '<path d="M65.663 31.972c-0.431 1.082-2.916 6.376-6.887 11.376-1.854 2.335-4.236 4.094-6.037 5.222-0.153-0.331-0.353-0.628-0.596-0.891 1.85-2.367 4.409-6.216 5.24-10.302 1.82-6.495-0.103-12.741-0.895-14.089-1.195-3.259-4.372-4.667-6.383-3.377-2.025 1.29-2.585 4.068-1.761 6.367 0.461 1.07 2.446 6.569 3.174 12.911 0.325 2.829-0.061 5.623-0.511 7.672-0.359-0.157-0.752-0.245-1.162-0.269-0.392-2.977-1.319-7.293-3.531-10.638-3.309-5.88-9.083-8.934-10.596-9.329-3.152-1.456-6.393-0.209-6.901 2.126-0.52 2.344 1.048 4.703 3.256 5.746 1.084 0.43 6.376 2.917 11.377 6.886 2.093 1.662 3.72 3.746 4.847 5.457-0.41 0.174-0.78 0.427-1.09 0.737-2.387-1.794-5.96-4.032-9.728-4.799-6.498-1.82-12.74 0.1-14.089 0.894-3.26 1.196-4.667 4.371-3.377 6.383 1.289 2.026 4.066 2.585 6.365 1.762 1.071-0.461 6.57-2.447 12.914-3.177 2.56-0.292 5.09-0.003 7.069 0.389-0.092 0.309-0.157 0.628-0.157 0.967 0 0.131 0.025 0.253 0.039 0.378-2.95 0.425-7.011 1.373-10.186 3.471-5.881 3.309-8.937 9.08-9.329 10.598-1.459 3.149-0.208 6.393 2.126 6.901 2.343 0.52 4.703-1.048 5.745-3.258 0.431-1.081 2.916-6.376 6.887-11.376 1.62-2.04 3.644-3.641 5.331-4.764 0.25 0.36 0.567 0.67 0.935 0.912-1.808 2.387-4.095 6.001-4.874 9.822-1.82 6.495 0.103 12.74 0.898 14.083 1.195 3.263 4.37 4.672 6.381 3.382 2.026-1.292 2.585-4.069 1.759-6.367-0.46-1.07-2.446-6.57-3.174-12.913-0.314-2.74 0.039-5.453 0.47-7.485 0.139 0.019 0.275 0.042 0.42 0.042 0.264 0 0.52-0.033 0.767-0.092 0.382 2.979 1.303 7.376 3.551 10.77 3.307 5.881 9.08 8.936 10.593 9.327 3.152 1.462 6.392 0.211 6.904-2.126 0.517-2.343-1.051-4.7-3.26-5.745-1.081-0.428-6.374-2.916-11.375-6.886-2.289-1.818-4.02-4.14-5.151-5.927 0.289-0.213 0.543-0.467 0.752-0.759 2.36 1.854 6.247 4.453 10.368 5.292 6.498 1.82 12.741-0.1 14.089-0.895 3.259-1.195 4.668-4.372 3.378-6.384-1.291-2.023-4.068-2.583-6.367-1.759-1.069 0.461-6.569 2.447-12.913 3.174-2.992 0.345-5.946-0.108-8.021-0.591 0.067-0.265 0.113-0.539 0.113-0.827 0-0.064-0.017-0.122-0.019-0.188 2.975-0.349 7.621-1.258 11.163-3.598 5.882-3.31 8.937-9.083 9.329-10.598 1.461-3.149 0.21-6.392-2.126-6.901C69.065 28.195 66.707 29.762 65.663 31.972z" fill="#F5C500"/>' +
+      '</svg>'
+    );
+
+    const CW = canvas.width;   // 800
+    const CH = canvas.height;  // 700
+
+    // ─── World dimensions ────────────────────────────────────────────────────
+    const WORLD_W = 800;
+    const WORLD_H = 1080;   // game world height (viewport scrolls)
+
+    const VERSION = 'v4.8';
+
+    // ─── Constants ───────────────────────────────────────────────────────────
+    const SPEED             = 10;
+    const JUMP_FORCE        = -28;   // first jump  (2× height)
+    const DOUBLE_JUMP_FORCE = -33;   // second jump (2× height)
+    const WALL_JUMP_VX      =  16;   // horizontal kick off wall
+    const WALL_BOOST_FRAMES =  12;   // frames the kick overrides input
+    const GRAVITY_UP = 3.92;
+    const GRAVITY_DN = 3.92;
+
+    let tick = 0; // global frame counter for animations
+
+    // (gradients are now created inline in drawMechanicals — runs once during buildBG)
+
+    // ─── Logo bounds (shared by drawLogo + platform collision) ───────────────
+    const LOGO_H  = 120;
+    const LOGO_SC = LOGO_H / 140;
+    const LOGO_BX = CW / 2 - 40 * LOGO_SC;
+    const LOGO_BY = 980;  // visual bottom at y=1075
+    const LOGO_FAN_Y = LOGO_BY + 20 * LOGO_SC;  // top of fan square
+    const LOGO_W  = 270 * LOGO_SC;               // full logo width
+
+    // ─── Row home level layout ────────────────────────────────────────────────
+    const WALL_L  = 40;   // left brick wall inner edge
+    const WALL_R  = 760;  // right brick wall inner edge
+    const F1      = 795;  // basement ceiling / 1st floor surface
+    const F2      = 532;  // 1st ceiling / 2nd floor surface
+    const F3      = 269;  // 2nd ceiling / 3rd floor
+    const FH      = 34;   // floor band thickness (framed floor depth)
+
+    // ─── Camera ──────────────────────────────────────────────────────────────
+    const cam = { y: 0 }; // camera y offset (world units from top)
+
+    // ─── Offscreen canvas for static background (drawn once at startup) ───────
+    const bgCanvas = document.createElement('canvas');
+    bgCanvas.width  = WORLD_W;
+    bgCanvas.height = WORLD_H;
+    const bgCtx = bgCanvas.getContext('2d');
+    let bgBuilt = false;
+
+    // ─── Player ──────────────────────────────────────────────────────────────
+    const player = {
+      x: WALL_L + 30,
+      y: 1000,  // start in basement
+      w: 28, h: 38,
+      vx: 0, vy: 0,
+      onGround: false,
+      facing: 1,
+      frame: 0,
+      jumpsLeft: 2,
+      wallKickVx: 0,
+      wallKickTimer: 0,
+      groundPlatform: null,
+    };
+
+    // ─── Platforms ─────────────────────────────────────────────────────────────
+    // Floor bands (F1/F2/F3) are background-only — not in collision list.
+    // Gritty jumps between visible yellow platforms instead.
+    const platforms = [
+      // Basement concrete slab — invisible ground (player spawns here)
+      { x: 0, y: 1058, w: 800, h: 22, invisible: true },
+
+      // ── Basement platforms ──────────────────────────────────────────────────
+      { x: 400, y:  900, w: 160, h: 12 },   // basement center
+
+      // ── 1st floor platforms ─────────────────────────────────────────────────
+      { x:  55, y:  790, w: 150, h: 12 },   // left lower
+      { x: 520, y:  760, w:  64, h: 12 },   // right lower
+      { x: 240, y:  660, w: 140, h: 12 },   // center upper
+
+      // ── 2nd floor platforms ─────────────────────────────────────────────────
+      { x: 150, y:  560, w:  75, h: 12, slippery: true },   // left lower — icy
+      { x: 559, y:  490, w:  82, h: 12 },   // right lower — crib width
+      { x: 325, y:  400, w: 150, h: 12 },   // center upper
+
+      // ── 3rd floor platforms ─────────────────────────────────────────────────
+      { x:  55, y:  270, w: 150, h: 12 },   // left lower
+      { x: 520, y:  230, w: 160, h: 12 },   // right lower
+      { x: 300, y:  145, w: 140, h: 12 },   // center upper
+
+      // ── Win platform ────────────────────────────────────────────────────────
+      { x: 610, y: 58, w: 67, h: 14 },
+
+    ];
+
+    // ─── Solid obstacles (full 4-direction collision) ─────────────────────────
+    const solidObstacles = [
+      { x: 108, y: 973, w: 40, h: 85 },   // hot water heater
+      { x: 656, y: 978, w: 90, h: 80 },   // furnace
+    ];
+
+    // ─── Lives & Air Leaks ───────────────────────────────────────────────────
+    let gameOver = false;
+    let gameWon  = false;
+    const leaks = [];
+    let leakTimer = 0;
+    const LEAK_INTERVAL = 37; // frames between spawns (~0.6s)
+
+    // Wall crack positions [y, fromLeft] — shared by drawing + air emitters + spawn zones
+    const WALL_CRACKS = [
+      { y: 343, fromLeft: true  },   // left wall,  2nd floor upper section
+      { y: 626, fromLeft: true  },   // left wall,  2nd floor lower section
+      { y: 343, fromLeft: false },   // right wall, 2nd floor upper section
+      { y: 626, fromLeft: false },   // right wall, 2nd floor lower section
+    ];
+
+    // Random top-or-bottom edge per window, chosen once at load [topY, botY, useTop]
+    const WIN_EDGES = [
+      [115,       195,        Math.random() < 0.5],  // left  3rd floor window  [0]
+      [380,       460,        Math.random() < 0.5],  // left  2nd floor window  [1]
+      [380,       460,        Math.random() < 0.5],  // right 2nd floor window  [2]
+      [F1+FH+8,  F1+FH+56,  Math.random() < 0.5],  // left  basement glass block [3]
+      [F1+FH+8,  F1+FH+56,  Math.random() < 0.5],  // right basement glass block [4]
+    ];
+    const we = i => WIN_EDGES[i][2] ? WIN_EDGES[i][0] : WIN_EDGES[i][1];
+
+    // Spawn zones — big leaks enter from both sides at every floor [minY, maxY, fromLeft]
+    const spawnZones = [
+      // 3rd floor (both sides)
+      [50,       269,          true ],
+      [50,       269,          false],
+      // 2nd floor (both sides)
+      [269+FH,   532,          true ],
+      [269+FH,   532,          false],
+      // 1st floor (both sides)
+      [532+FH,   795,          true ],
+      [532+FH,   795,          false],
+      // Basement (both sides)
+      [795+FH,   1058,         true ],
+      [795+FH,   1058,         false],
+      // Wall cracks (narrow y range — tight to crack center)
+      ...WALL_CRACKS.map(c => [c.y - 10, c.y + 10, c.fromLeft]),
+    ];
+
+    function spawnLeak() {
+      const zone     = spawnZones[Math.floor(Math.random() * spawnZones.length)];
+      const fromLeft = zone[2];
+      const spawnY   = zone[0] + Math.random() * (zone[1] - zone[0]);
+      leaks.push({
+        x:     fromLeft ? -90 : WORLD_W + 10,
+        y:     spawnY,
+        w:     88,
+        h:     44,
+        vx:    fromLeft ? 20 : -20,
+        vy:    0,
+        angle: fromLeft ? 0 : Math.PI,
+      });
+    }
+
+    function resetPlayer() {
+      player.x  = WALL_L + 30;
+      player.y  = 1000;
+      player.vx = 0;
+      player.vy = 0;
+      player.jumpsLeft = 2;
+      player.wallKickVx = 0;
+      player.wallKickTimer = 0;
+      player.groundPlatform = null;
+      leaks.length = 0;
+      leakTimer = 0;
+    }
+
+    // ─── Input ───────────────────────────────────────────────────────────────
+    const keys = {};
+    window.addEventListener('keydown', e => { keys[e.code] = true;  e.preventDefault(); });
+    window.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+    const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
+    const wantsRight = () => keys['ArrowRight'] || keys['KeyD'];
+    const wantsJump  = () => keys['ArrowUp'] || keys['KeyW'] || keys['Space'];
+
+    let jumpHeld = false;
+
+    // ─── AABB overlap ─────────────────────────────────────────────────────────
+    function overlaps(ax, ay, aw, ah, bx, by, bw, bh) {
+      return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+    }
+
+    // ─── Update ───────────────────────────────────────────────────────────────
+    function update() {
+      // Detect wall contact (airborne only)
+      const onWallLeft  = !player.onGround && player.x <= WALL_L;
+      const onWallRight = !player.onGround && player.x >= WALL_R - player.w;
+
+      // Horizontal — instant on ground, momentum in air (slippery = slow accel + high carry)
+      const onIce = player.onGround && player.groundPlatform && player.groundPlatform.slippery;
+      if (player.onGround) {
+        if (onIce) {
+          if (wantsLeft())       { player.vx = Math.max(player.vx - 1.2, -SPEED); player.facing = -1; }
+          else if (wantsRight()) { player.vx = Math.min(player.vx + 1.2,  SPEED); player.facing =  1; }
+          else { player.vx *= 0.97; }  // barely slows down — slides
+        } else {
+          player.vx = 0;
+          if (wantsLeft())  { player.vx = -SPEED; player.facing = -1; }
+          if (wantsRight()) { player.vx =  SPEED; player.facing =  1; }
+        }
+      } else {
+        if (wantsLeft())  { player.vx = Math.max(player.vx - 2.5, -SPEED); player.facing = -1; }
+        else if (wantsRight()) { player.vx = Math.min(player.vx + 2.5,  SPEED); player.facing =  1; }
+        else { player.vx *= 0.88; } // coast to a stop with no input
+      }
+
+      // Jump (normal + double jump + wall jump)
+      if (wantsJump() && !jumpHeld) {
+        if (player.jumpsLeft > 0) {
+          player.vy = player.jumpsLeft === 1 ? DOUBLE_JUMP_FORCE : JUMP_FORCE;
+          player.onGround = false;
+          player.jumpsLeft--;
+        } else if (onWallLeft || onWallRight) {
+          player.vy          = JUMP_FORCE;
+          player.wallKickVx  = onWallLeft ? WALL_JUMP_VX : -WALL_JUMP_VX;
+          player.wallKickTimer = WALL_BOOST_FRAMES;
+          player.facing      = onWallLeft ? 1 : -1;
+          player.jumpsLeft   = 0;
+        }
+      }
+      jumpHeld = wantsJump();
+
+      // Wall kick overrides input for a short burst
+      if (player.wallKickTimer > 0) {
+        player.vx = player.wallKickVx;
+        player.wallKickTimer--;
+      }
+
+      // Gravity — heavier on way down (Mario feel)
+      const grav = player.vy > 0 ? GRAVITY_DN : GRAVITY_UP;
+      player.vy = Math.min(player.vy + grav, 18);
+
+      // Move X — clamp to world edges
+      player.x += player.vx;
+      player.x = Math.max(WALL_L, Math.min(WALL_R - player.w, player.x));
+
+      // Move Y
+      player.y += player.vy;
+      player.onGround = false;
+      player.groundPlatform = null;
+
+      for (const p of platforms) {
+        if (!overlaps(player.x, player.y, player.w, player.h, p.x, p.y, p.w, p.h)) continue;
+        if (player.vy > 0) {
+          const prevBottom = player.y - player.vy + player.h;
+          if (prevBottom <= p.y + 4) {
+            player.y        = p.y - player.h;
+            player.vy       = 0;
+            player.onGround = true;
+            player.groundPlatform = p;
+            player.jumpsLeft = 2;
+          }
+        } else if (player.vy < 0) {
+          player.y  = p.y + p.h;
+          player.vy = 0;
+        }
+      }
+
+      // Solid obstacles — full push-out (player can't walk through)
+      for (const obs of solidObstacles) {
+        if (!overlaps(player.x, player.y, player.w, player.h, obs.x, obs.y, obs.w, obs.h)) continue;
+        const oL = (player.x + player.w) - obs.x;
+        const oR = (obs.x + obs.w) - player.x;
+        const oT = (player.y + player.h) - obs.y;
+        const oB = (obs.y + obs.h) - player.y;
+        const minO = Math.min(oL, oR, oT, oB);
+        if (minO === oT) {
+          player.y = obs.y - player.h;
+          player.vy = 0;
+          player.onGround = true;
+          player.jumpsLeft = 2;
+        } else if (minO === oB) {
+          player.y = obs.y + obs.h;
+          player.vy = 0;
+        } else if (minO === oL) {
+          player.x = obs.x - player.w;
+        } else {
+          player.x = obs.x + obs.w;
+        }
+      }
+
+
+      // ── Pipe wind — pushes LES rightward when in airstream zone ──────────
+      const pipeWindY = F1 + FH + 126;
+      if (player.x < 650 &&
+          player.y + player.h > pipeWindY - 22 &&
+          player.y < pipeWindY + 22) {
+        player.x = Math.min(WALL_R - player.w, player.x + 0.9);
+      }
+
+      // Fall off bottom — lose a life
+      if (player.y > WORLD_H + 80) {
+        resetPlayer();
+      }
+
+      // Win condition — reach the top platform
+      if (player.y < 75 && player.onGround) {
+        gameWon = true;
+        return;
+      }
+
+      // Fan suck — pull LES toward fan, game over if he gets too close
+      const fanCX2 = LOGO_BX + 40 * LOGO_SC;
+      const fanCY2 = LOGO_FAN_Y + 40 * LOGO_SC;
+      const pdx = fanCX2 - (player.x + player.w / 2);
+      const pdy = fanCY2 - (player.y + player.h / 2);
+      const pDist = Math.sqrt(pdx * pdx + pdy * pdy);
+      if (pDist < 120) {
+        const pull = 0.18 * (1 - pDist / 120);
+        player.vx += (pdx / pDist) * pull;
+        player.vy += (pdy / pDist) * pull;
+      }
+      if (pDist < 22) {
+        gameOver = true;
+        return;
+      }
+
+      // ─── Big leaks — 7–12 on screen, more frequent near the top ─────────
+      const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
+      const dynInterval = Math.round(60 - heightFrac * 40); // 60 frames at bottom → 20 at top
+      leakTimer++;
+      if (leakTimer >= dynInterval && leaks.length < 12) {
+        spawnLeak();
+        leakTimer = 0;
+      }
+      // Keep minimum 7 on screen
+      if (leaks.length < 7) {
+        spawnLeak();
+      }
+
+      // Fan center — leaks get pulled toward it
+      const fanCX = LOGO_BX + 40 * LOGO_SC;
+      const fanCY = LOGO_FAN_Y + 40 * LOGO_SC;
+
+      for (let i = leaks.length - 1; i >= 0; i--) {
+        const lcx = leaks[i].x + leaks[i].w / 2;
+        const lcy = leaks[i].y + leaks[i].h / 2;
+        const dx   = fanCX - lcx;
+        const dy   = fanCY - lcy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        // Sucked into the fan — remove when inside the fan circle
+        if (dist < 26) {
+          leaks.splice(i, 1);
+          continue;
+        }
+
+        leaks[i].distToFan = dist;
+
+        // Drag + pull in both axes — spirals reliably into fan
+        leaks[i].vx *= 0.97;
+        leaks[i].vy *= 0.97;
+        leaks[i].vx += (dx / dist) * 0.28;
+        leaks[i].vy += (dy / dist) * 0.28;
+
+        const moveX = leaks[i].vx;
+        const moveY = leaks[i].vy;
+        leaks[i].x += moveX;
+        leaks[i].y += moveY;
+
+        // Smooth angle from actual velocity
+        const targetAngle = Math.atan2(moveY, moveX);
+        let da = targetAngle - leaks[i].angle;
+        while (da >  Math.PI) da -= Math.PI * 2;
+        while (da < -Math.PI) da += Math.PI * 2;
+        leaks[i].angle += da * 0.15;
+
+        // Remove when off screen
+        if (leaks[i].x > WORLD_W + 100 || leaks[i].x < -100) {
+          leaks.splice(i, 1);
+          continue;
+        }
+
+        // Push player in wind direction
+        if (overlaps(player.x, player.y, player.w, player.h,
+                     leaks[i].x, leaks[i].y, leaks[i].w, leaks[i].h)) {
+          player.x += moveX * 1.8;
+          player.x = Math.max(WALL_L, Math.min(WALL_R - player.w, player.x));
+        }
+      }
+
+      // Walk animation
+      if (player.vx !== 0) player.frame++;
+      tick++;
+
+      // ─── Camera follows player, clamped to world bounds ───────────────────
+      const targetCamY = player.y - CH * 0.55;
+      cam.y += (targetCamY - cam.y) * 0.1;                 // smooth follow
+      cam.y = Math.max(0, Math.min(WORLD_H - CH, cam.y));  // clamp
+    }
+
+    // ─── Draw ─────────────────────────────────────────────────────────────────
+
+    function drawBrickWall(x, y, w, h) {
+      const bH = 11, bW = 26, mV = 3, mH = 3;
+      ctx.fillStyle = '#6a2810';
+      ctx.fillRect(x, y, w, h);
+      for (let row = 0; row * (bH + mV) < h + bH; row++) {
+        const by = y + row * (bH + mV);
+        const odd = row % 2;
+        for (let col = -1; col * (bW + mH) < w + bW; col++) {
+          const bx = x + col * (bW + mH) + odd * ((bW + mH) / 2);
+          const shade = (row * 5 + col * 7) % 3;
+          ctx.fillStyle = shade === 0 ? '#9B4020' : shade === 1 ? '#8B3515' : '#7a2f12';
+          const rx = Math.max(bx, x), rw = Math.min(bx + bW, x + w) - rx;
+          const ry = Math.max(by + mV, y), rh2 = Math.min(by + bH + mV, y + h) - ry;
+          if (rw > 0 && rh2 > 0) ctx.fillRect(rx, ry, rw, rh2);
+        }
+      }
+    }
+
+    function drawStoneWall(x, y, w, h) {
+      // Dark mortar base
+      ctx.fillStyle = '#282826';
+      ctx.fillRect(x, y, w, h);
+      // Brown and white mineral speckles (deterministic per position)
+      for (let si = 0; si < 28; si++) {
+        const hx2 = ((si * 6301 + 982) * 1234567 % 1000) / 1000;
+        const hy2 = ((si * 7919 + 4321) * 9876543 % 1000) / 1000;
+        const sz  = ((si * 3137 + 111)  * 2345678 % 1000) / 1000;
+        const isBrown = si % 3 !== 0;
+        const sx3 = x + hx2 * w;
+        const sy3 = y + hy2 * h;
+        ctx.fillStyle = isBrown
+          ? `rgba(107,76,40,${0.35 + sz * 0.3})`
+          : `rgba(220,210,200,${0.3 + sz * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(sx3, sy3, 1 + sz * 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Irregular stone blocks
+      const stones = [
+        // each entry: [relX, relY, sW, sH, shade]  0=dark 1=mid 2=light
+        [1,0,38,16,1],[40,0,20,14,0],[62,2,28,12,2],[1,17,24,18,0],[26,16,34,14,1],
+        [1,36,30,16,2],[32,35,20,17,0],[53,35,36,15,1],[1,53,44,15,1],[46,52,24,16,0],
+        [1,69,28,17,0],[30,68,42,16,2],[1,86,36,15,1],[38,85,32,17,0],[1,103,26,16,2],
+        [28,102,44,15,1],[1,119,38,14,0],[40,118,30,16,1],[1,136,46,16,2],[48,135,22,17,0],
+      ];
+      const cols = ['#3a3a36','#484844','#424240'];
+      for (const [sx, sy, sw, sh, c] of stones) {
+        if (sx >= w || sy >= h) continue;
+        const cw = Math.min(sw, w - sx - 1), ch = Math.min(sh, h - sy - 1);
+        if (cw < 2 || ch < 2) continue;
+        ctx.fillStyle = cols[c];
+        ctx.fillRect(x + sx, y + sy, cw, ch);
+        // Slight highlight on top-left edge
+        ctx.fillStyle = 'rgba(255,255,255,0.07)';
+        ctx.fillRect(x + sx, y + sy, cw, 2);
+        ctx.fillRect(x + sx, y + sy, 2, ch);
+        // Shadow on bottom-right
+        ctx.fillStyle = 'rgba(0,0,0,0.18)';
+        ctx.fillRect(x + sx, y + sy + ch - 2, cw, 2);
+        ctx.fillRect(x + sx + cw - 2, y + sy, 2, ch);
+      }
+    }
+
+    function drawFloorBand(y) {
+      const pw = WALL_R - WALL_L;
+
+      // Dark cavity fill (air between joists)
+      ctx.fillStyle = '#141210';
+      ctx.fillRect(WALL_L, y, pw, FH);
+
+      // ── Finished floor surface (hardwood oak) ────────────────────────────
+      ctx.fillStyle = '#c8a060';
+      ctx.fillRect(WALL_L, y, pw, 4);
+      ctx.fillStyle = '#b88848';
+      ctx.fillRect(WALL_L, y + 1, pw, 1);          // shadow line under top
+      ctx.strokeStyle = '#a07830'; ctx.lineWidth = 0.5;
+      for (let sx = WALL_L + 42; sx < WALL_R; sx += 42) {
+        ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, y + 4); ctx.stroke();
+      }
+
+      // ── Floor joists in cross-section (same style as roof rafters) ───────
+      for (let jx = WALL_L + 18; jx < WALL_R - 10; jx += 64) {
+        ctx.fillStyle = '#4a3018';
+        ctx.fillRect(jx, y + 4, 11, FH - 7);
+        ctx.fillStyle = '#3a2010';            // end grain face
+        ctx.fillRect(jx + 2, y + 6, 7, FH - 11);
+        ctx.strokeStyle = '#5a4028'; ctx.lineWidth = 0.5;
+        ctx.strokeRect(jx, y + 4, 11, FH - 7);
+      }
+
+      // ── Drywall ceiling (bottom of assembly, ceiling of room below) ──────
+      ctx.fillStyle = '#c4c0b8';
+      ctx.fillRect(WALL_L, y + FH - 3, pw, 3);
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.fillRect(WALL_L, y + FH - 3, pw, 1);
+      ctx.strokeStyle = '#a8a49c'; ctx.lineWidth = 1;
+      for (let sx = WALL_L + 120; sx < WALL_R; sx += 120) {
+        ctx.beginPath(); ctx.moveTo(sx, y + FH - 3); ctx.lineTo(sx, y + FH); ctx.stroke();
+      }
+    }
+
+
+    function drawWallWindow(x, y, w, h) {
+      // Frame
+      ctx.fillStyle = '#2a1408';
+      ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+      // Glass — sky blue-white
+      ctx.fillStyle = '#a8d4ee';
+      ctx.fillRect(x, y, w, h);
+      // Upper highlight (lighter / sky)
+      ctx.fillStyle = '#cce8f8';
+      ctx.fillRect(x + 1, y + 1, w / 2 - 2, h / 2 - 2);
+      // Lower pane (slightly darker blue)
+      ctx.fillStyle = '#88b8d8';
+      ctx.fillRect(x, y + h / 2, w, h / 2);
+      // Muntins
+      ctx.fillStyle = '#2a1408';
+      ctx.fillRect(x + w / 2 - 1, y, 2, h);
+      ctx.fillRect(x, y + h / 2 - 1, w, 2);
+    }
+
+    function drawGlassBlockWindow(x, y, w, h) {
+      const cols = 2, rows = 3, mortar = 3;
+      const bw = (w - mortar * (cols + 1)) / cols;
+      const bh = (h - mortar * (rows + 1)) / rows;
+      // Frame
+      ctx.fillStyle = '#2a1408';
+      ctx.fillRect(x - 3, y - 3, w + 6, h + 6);
+      // Mortar bed
+      ctx.fillStyle = '#7a7870';
+      ctx.fillRect(x, y, w, h);
+      // Glass blocks
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          const bx = x + mortar + c * (bw + mortar);
+          const by = y + mortar + r * (bh + mortar);
+          ctx.fillStyle = '#a0c8e0';
+          ctx.fillRect(bx, by, bw, bh);
+          // Bright top-left highlight
+          ctx.fillStyle = '#d4eef8';
+          ctx.fillRect(bx + 1, by + 1, bw * 0.55, bh * 0.45);
+          // Bottom-right shadow
+          ctx.fillStyle = '#6aa0c0';
+          ctx.fillRect(bx, by + bh * 0.6, bw, bh * 0.4);
+          ctx.fillRect(bx + bw * 0.6, by, bw * 0.4, bh * 0.6);
+        }
+      }
+    }
+
+    function drawFrontDoor(floorY) {
+      const dw = 36, dh = 114;
+      const dy = floorY - dh;
+      // Frame
+      ctx.fillStyle = '#2a1408';
+      ctx.fillRect(0, dy - 4, 40, dh + 4);
+      // Door panel (darker wood — classic Philly front door)
+      ctx.fillStyle = '#3a1e08';
+      ctx.fillRect(2, dy, dw, dh);
+      // Upper glass pane
+      ctx.fillStyle = '#a8d4ee';
+      ctx.fillRect(5, dy + 5, dw - 7, 30);
+      ctx.fillStyle = '#cce8f8';
+      ctx.fillRect(6, dy + 6, (dw - 9) / 2, 13);
+      ctx.fillStyle = '#88b8d8';
+      ctx.fillRect(5, dy + 20, dw - 7, 15);
+      // Muntin cross
+      ctx.fillStyle = '#2a1408';
+      ctx.fillRect(5 + (dw - 9) / 2, dy + 5, 2, 30);
+      ctx.fillRect(5, dy + 19, dw - 7, 2);
+      // Lower raised panels
+      ctx.fillStyle = '#2e1606';
+      ctx.fillRect(5, dy + 40, dw - 7, 32);
+      ctx.fillRect(5, dy + 77, dw - 7, 32);
+      ctx.fillStyle = '#201008';
+      ctx.fillRect(7, dy + 42, dw - 11, 28);
+      ctx.fillRect(7, dy + 79, dw - 11, 28);
+      // Knob (on right/interior side)
+      ctx.fillStyle = '#c8a020';
+      ctx.beginPath();
+      ctx.arc(31, dy + 63, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawBackDoor(floorY) {
+      const dx = 760, dw = 36, dh = 114;
+      const dy = floorY - dh;
+      // Frame
+      ctx.fillStyle = '#2a1408';
+      ctx.fillRect(dx, dy - 4, 40, dh + 4);
+      // Door panel (white)
+      ctx.fillStyle = '#efefef';
+      ctx.fillRect(dx + 2, dy, dw, dh);
+      // Upper glass pane
+      ctx.fillStyle = '#a8d4ee';
+      ctx.fillRect(dx + 5, dy + 5, dw - 7, 30);
+      ctx.fillStyle = '#cce8f8';
+      ctx.fillRect(dx + 6, dy + 6, (dw - 9) / 2, 13);
+      ctx.fillStyle = '#88b8d8';
+      ctx.fillRect(dx + 5, dy + 20, dw - 7, 15);
+      // Muntin cross
+      ctx.fillStyle = '#cccccc';
+      ctx.fillRect(dx + 5 + (dw - 9) / 2, dy + 5, 2, 30);
+      ctx.fillRect(dx + 5, dy + 19, dw - 7, 2);
+      // Lower raised panels
+      ctx.fillStyle = '#e0e0e0';
+      ctx.fillRect(dx + 5, dy + 40, dw - 7, 32);
+      ctx.fillRect(dx + 5, dy + 77, dw - 7, 32);
+      ctx.fillStyle = '#d0d0d0';
+      ctx.fillRect(dx + 7, dy + 42, dw - 11, 28);
+      ctx.fillRect(dx + 7, dy + 79, dw - 11, 28);
+      // Knob
+      ctx.fillStyle = '#c8a020';
+      ctx.beginPath();
+      ctx.arc(dx + 7, dy + 63, 3, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawDuctwork() {
+      const M = '#7a7a76';   // duct body (galvanized grey)
+      const L = '#b0b0ac';   // light edge highlight
+      const D = '#4e4e4c';   // dark shadow edge
+      const S = '#5c5c5a';   // seam joint color
+
+      function hDuct(x, y, w, h) {
+        ctx.fillStyle = M; ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = L; ctx.fillRect(x, y, w, Math.ceil(h * 0.16));
+        ctx.fillStyle = D; ctx.fillRect(x, y + h - Math.ceil(h * 0.16), w, Math.ceil(h * 0.16));
+      }
+      function vDuct(x, y, w, h) {
+        ctx.fillStyle = M; ctx.fillRect(x, y, w, h);
+        ctx.fillStyle = L; ctx.fillRect(x, y, Math.ceil(w * 0.22), h);
+        ctx.fillStyle = D; ctx.fillRect(x + w - Math.ceil(w * 0.22), y, Math.ceil(w * 0.22), h);
+      }
+      function hSeams(x, y, w, h, step) {
+        ctx.strokeStyle = S; ctx.lineWidth = 1;
+        for (let sx = x + step; sx < x + w - 4; sx += step) {
+          ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, y + h); ctx.stroke();
+        }
+      }
+      function vSeams(x, y, w, h, step) {
+        ctx.strokeStyle = S; ctx.lineWidth = 1;
+        for (let sy = y + step; sy < y + h - 4; sy += step) {
+          ctx.beginPath(); ctx.moveTo(x, sy); ctx.lineTo(x + w, sy); ctx.stroke();
+        }
+      }
+      function supplyRegister(x, y, h) {
+        ctx.fillStyle = D; ctx.fillRect(x, y, 16, h);
+        ctx.strokeStyle = '#3a3a38'; ctx.lineWidth = 0.8;
+        for (let gx = x + 3; gx < x + 14; gx += 4) {
+          ctx.beginPath(); ctx.moveTo(gx, y + 1); ctx.lineTo(gx, y + h - 1); ctx.stroke();
+        }
+      }
+
+      // ── Main supply trunk (basement ceiling, hangs below F1 floor band) ────
+      const tX1 = 98, tX2 = 656, tY = 838, tH = 20;
+      hDuct(tX1, tY, tX2 - tX1, tH);
+      hSeams(tX1, tY, tX2 - tX1, tH, 72);
+      ctx.fillStyle = D; ctx.fillRect(tX1, tY, 3, tH);          // left end cap
+      // Transition plenum where trunk meets furnace (sits on top of furnace)
+      ctx.fillStyle = M; ctx.fillRect(tX2, tY - 7, 26, tH + 7);
+      ctx.fillStyle = L; ctx.fillRect(tX2, tY - 7, 26, 3);
+      ctx.strokeStyle = S; ctx.lineWidth = 1;
+      ctx.strokeRect(tX2, tY - 7, 26, tH + 7);
+      // Vertical supply drop — connects plenum directly to furnace top
+      vDuct(tX2 + 1, tY + tH, 24, 978 - (tY + tH));
+      vSeams(tX2 + 1, tY + tH, 24, 978 - (tY + tH), 40);
+      ctx.strokeStyle = S; ctx.lineWidth = 1;
+      ctx.strokeRect(tX2 + 1, tY + tH, 24, 978 - (tY + tH));
+
+      // ── Supply riser (vertical, from trunk up to 2nd floor ceiling) ─────────
+      const rX = 520, rW = 14;
+      vDuct(rX, F3 + FH, rW, tY - (F3 + FH));     // F3+FH=222 down to trunk
+      vSeams(rX, F3 + FH, rW, tY - (F3 + FH), 80);
+      // Cap at top of riser
+      ctx.fillStyle = D; ctx.fillRect(rX, F3 + FH, rW, 3);
+      // Reinforced sleeves where riser penetrates floor bands (F1 and F2 only)
+      for (const fy of [F2, F1]) {
+        ctx.fillStyle = '#686864';
+        ctx.fillRect(rX - 3, fy, rW + 6, FH);
+        ctx.fillStyle = L; ctx.fillRect(rX - 1, fy, rW + 2, 2);
+        ctx.strokeStyle = D; ctx.lineWidth = 1;
+        ctx.strokeRect(rX - 3, fy, rW + 6, FH);
+      }
+
+      // ── Branch ducts (2nd floor and 1st floor only) ──────────────────────
+      const bH = 9;
+
+      // 2nd floor branch (F3 + FH + 14 = 236)
+      const b2Y = F3 + FH + 14;
+      hDuct(195, b2Y, rX - 195, bH);
+      hSeams(195, b2Y, rX - 195, bH, 60);
+      supplyRegister(178, b2Y - 1, bH + 2);
+
+      // 1st floor branches — left (living room) and right (kitchen)
+      const b1Y = F2 + FH + 14;   // = 434
+      hDuct(215, b1Y, rX - 215, bH);         // living room (left)
+      hSeams(215, b1Y, rX - 215, bH, 60);
+      supplyRegister(198, b1Y - 1, bH + 2);
+      hDuct(rX + rW, b1Y, 624 - (rX + rW), bH);  // kitchen (right)
+      hSeams(rX + rW, b1Y, 624 - (rX + rW), bH, 60);
+      supplyRegister(624, b1Y - 1, bH + 2);
+
+      // ── Return air grilles (flat wall grilles, left side, each floor) ──────
+      for (const gy of [F3 + FH + 50, F2 + FH + 50, F1 + FH + 50]) {
+        ctx.fillStyle = '#4e4e4c';
+        ctx.fillRect(WALL_L, gy, 6, 20);
+        ctx.strokeStyle = '#383836'; ctx.lineWidth = 0.8;
+        for (let gly = gy + 3; gly < gy + 19; gly += 5) {
+          ctx.beginPath(); ctx.moveTo(WALL_L, gly); ctx.lineTo(WALL_L + 6, gly); ctx.stroke();
+        }
+      }
+    }
+
+    function drawInteriorWalls() {
+      // Interior drywall assembly on inside face of each exterior wall
+      // From outside in: [brick/stone] → [air gap] → [furring strips] → [drywall face]
+      const gapW  = 5;    // air gap width (px)
+      const dwW   = 4;    // drywall face thickness (px)
+      const top   = 40;   // start below roof drywall
+      const bot   = F1 + FH; // stop at basement — no drywall below grade
+      const span  = bot - top;
+
+      // ── Left wall (air gap at x=40–45, drywall face at x=45–49) ────────────
+      // Air gap void
+      ctx.fillStyle = '#181614';
+      ctx.fillRect(WALL_L, top, gapW, span);
+
+      // Drywall face
+      ctx.fillStyle = '#d4d0c8';
+      ctx.fillRect(WALL_L + gapW, top, dwW, span);
+      ctx.fillStyle = 'rgba(0,0,0,0.12)';  // left edge shadow
+      ctx.fillRect(WALL_L + gapW, top, 1, span);
+      // Horizontal panel seams
+      ctx.strokeStyle = '#b0aca4'; ctx.lineWidth = 0.8;
+      for (let sy = top + 96; sy < bot; sy += 96) {
+        ctx.beginPath();
+        ctx.moveTo(WALL_L + gapW, sy);
+        ctx.lineTo(WALL_L + gapW + dwW, sy);
+        ctx.stroke();
+      }
+
+      // ── Right wall — starts at F3 (above is open outside terrace) ──────────
+      const rTop  = F3;
+      const rSpan = bot - rTop;
+      // Drywall face
+      ctx.fillStyle = '#d4d0c8';
+      ctx.fillRect(WALL_R - gapW - dwW, rTop, dwW, rSpan);
+      ctx.fillStyle = 'rgba(0,0,0,0.12)';
+      ctx.fillRect(WALL_R - gapW - 1, rTop, 1, rSpan);
+      ctx.strokeStyle = '#b0aca4'; ctx.lineWidth = 0.8;
+      for (let sy = rTop + 96; sy < bot; sy += 96) {
+        ctx.beginPath();
+        ctx.moveTo(WALL_R - gapW - dwW, sy);
+        ctx.lineTo(WALL_R - gapW, sy);
+        ctx.stroke();
+      }
+
+      // Air gap void
+      ctx.fillStyle = '#181614';
+      ctx.fillRect(WALL_R - gapW, rTop, gapW, rSpan);
+
+    }
+
+    function drawMechanicals() {
+      const bFloor = 1058;
+
+      // ── Hot Water Heater ────────────────────────────────────────────────────
+      const hx = 108, hy = 973, hw = 40, hh = 85;
+
+      // Plumbing lines going up through ceiling
+      ctx.strokeStyle = '#3d7fa8'; ctx.lineWidth = 4;   // cold water (blue)
+      ctx.beginPath(); ctx.moveTo(hx + 10, hy + 4); ctx.lineTo(hx + 10, F1 + FH); ctx.stroke();
+      ctx.strokeStyle = '#a85520'; ctx.lineWidth = 4;   // hot water (copper)
+      ctx.beginPath(); ctx.moveTo(hx + 30, hy + 4); ctx.lineTo(hx + 30, F1 + FH); ctx.stroke();
+      // Pipe C/H labels
+      ctx.fillStyle = '#3d7fa8'; ctx.font = '5px monospace';
+      ctx.fillText('C', hx + 8,  F1 + FH + 12);
+      ctx.fillStyle = '#a85520';
+      ctx.fillText('H', hx + 28, F1 + FH + 12);
+
+      // Tank body (insulation jacket — off-white cylinder)
+      const hGrad = ctx.createLinearGradient(108, 0, 148, 0);
+      hGrad.addColorStop(0,    '#b0aca6');
+      hGrad.addColorStop(0.25, '#d8d4ce');
+      hGrad.addColorStop(0.75, '#d4d0ca');
+      hGrad.addColorStop(1,    '#a8a4a0');
+      ctx.fillStyle = hGrad;
+      ctx.beginPath();
+      ctx.roundRect(hx, hy + 6, hw, hh - 6, [6, 6, 2, 2]);
+      ctx.fill();
+
+      // Top dome cap
+      ctx.fillStyle = '#a0a09a';
+      ctx.beginPath();
+      ctx.ellipse(hx + hw / 2, hy + 10, hw / 2 - 1, 6, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#c0bcb6';
+      ctx.beginPath();
+      ctx.ellipse(hx + hw / 2 - 3, hy + 8, 5, 3, -0.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Label + energy stripe
+      ctx.fillStyle = '#555550'; ctx.font = 'bold 7px monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText('H.W.H.', hx + hw / 2, hy + 22);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#e0dcd6'; ctx.fillRect(hx + 3, hy + 26, hw - 6, 3);
+      ctx.fillStyle = '#2a7a2a'; ctx.fillRect(hx + 3, hy + 30, (hw - 6) * 0.75, 2);
+
+      // TPR valve (right side, red pull ring)
+      ctx.fillStyle = '#888884';
+      ctx.fillRect(hx + hw, hy + 42, 7, 4);
+      ctx.fillStyle = '#cc3300';
+      ctx.beginPath(); ctx.arc(hx + hw + 10, hy + 44, 3, 0, Math.PI * 2); ctx.fill();
+
+      // Drain valve near bottom
+      ctx.fillStyle = '#777770';
+      ctx.fillRect(hx + hw, bFloor - 18, 6, 4);
+
+      // Feet / base ring
+      ctx.fillStyle = '#909088';
+      ctx.fillRect(hx + 2,       bFloor - 5, 10, 5);
+      ctx.fillRect(hx + hw - 12, bFloor - 5, 10, 5);
+
+      // ── Furnace ─────────────────────────────────────────────────────────────
+      const fx = 656, fy = 978, fw = 90, fh = 80;
+
+      // Flue pipe (right side, going up through ceiling)
+      ctx.strokeStyle = '#404040'; ctx.lineWidth = 10;
+      ctx.beginPath(); ctx.moveTo(fx + fw - 18, fy); ctx.lineTo(fx + fw - 18, F1 + FH); ctx.stroke();
+      ctx.strokeStyle = '#545450'; ctx.lineWidth = 8;
+      ctx.beginPath(); ctx.moveTo(fx + fw - 18, fy); ctx.lineTo(fx + fw - 18, F1 + FH); ctx.stroke();
+      // Elbow collar
+      ctx.fillStyle = '#404040';
+      ctx.fillRect(fx + fw - 22, F1 + FH - 2, 8, 8);
+
+      // Main cabinet
+      const fGrad = ctx.createLinearGradient(656, 0, 746, 0);
+      fGrad.addColorStop(0,   '#303030');
+      fGrad.addColorStop(0.5, '#484844');
+      fGrad.addColorStop(1,   '#343430');
+      ctx.fillStyle = fGrad;
+      ctx.fillRect(fx, fy, fw, fh);
+
+      // Front panel
+      ctx.fillStyle = '#505048';
+      ctx.fillRect(fx + 4, fy + 4, fw - 8, fh - 8);
+
+      // Control section (upper ~42%)
+      ctx.fillStyle = '#383832';
+      ctx.fillRect(fx + 6, fy + 6, fw - 12, fh * 0.42);
+      // Green status LED
+      ctx.fillStyle = '#00dd55';
+      ctx.beginPath(); ctx.arc(fx + 15, fy + 14, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(0,220,80,0.22)';
+      ctx.beginPath(); ctx.arc(fx + 15, fy + 14, 6, 0, Math.PI * 2); ctx.fill();
+      // Nameplate
+      ctx.fillStyle = '#ffffffbb'; ctx.font = 'bold 6px monospace';
+      ctx.fillText('FURNACE', fx + 24, fy + 16);
+      ctx.fillStyle = '#ffffff66'; ctx.font = '5px monospace';
+      ctx.fillText('96% AFUE', fx + 24, fy + 25);
+
+      // Filter access panel (lower ~44%) with louvres
+      ctx.fillStyle = '#282824';
+      ctx.fillRect(fx + 6, fy + fh * 0.5, fw - 12, fh * 0.44);
+      ctx.strokeStyle = '#181814'; ctx.lineWidth = 1;
+      for (let vy = fy + fh * 0.5 + 6; vy < fy + fh - 8; vy += 6) {
+        ctx.beginPath(); ctx.moveTo(fx + 8, vy); ctx.lineTo(fx + fw - 8, vy); ctx.stroke();
+      }
+
+      // Cabinet edge highlight
+      ctx.strokeStyle = '#606058'; ctx.lineWidth = 1;
+      ctx.strokeRect(fx, fy, fw, fh);
+
+      // Leveling feet
+      ctx.fillStyle = '#282820';
+      ctx.fillRect(fx + 5,       bFloor - 5, 12, 5);
+      ctx.fillRect(fx + fw - 17, bFloor - 5, 12, 5);
+    }
+
+    function drawLevel() {
+      const pw = WALL_R - WALL_L;
+
+      // ── Exterior ──────────────────────────────────────────────────────────
+      ctx.fillStyle = '#080808';
+      ctx.fillRect(0, 0, CW, WORLD_H);
+
+      // ── Room interiors ────────────────────────────────────────────────────
+      // 3rd floor — left: baby's room, right: roof deck (outside)
+      ctx.fillStyle = '#878583';
+      ctx.fillRect(WALL_L, 40, pw, F3 - 40);
+      const skyGrad3 = ctx.createLinearGradient(400, 0, 400, F3);
+      skyGrad3.addColorStop(0,    '#2a5a98');
+      skyGrad3.addColorStop(0.12, '#5898c8');
+      skyGrad3.addColorStop(1,    '#a0c8e8');
+      ctx.fillStyle = skyGrad3;
+      ctx.fillRect(400, 0, CW - 400, F3);  // sky covers full right side including exterior wall area
+
+      // 2nd floor
+      ctx.fillStyle = '#86898c';
+      ctx.fillRect(WALL_L, F3 + FH, pw, F2 - F3 - FH);
+
+      // 1st floor: beige living room (left) + teal kitchen (right)
+      const divX = 403;
+      ctx.fillStyle = '#97928b';   // beige (50% lighter)
+      ctx.fillRect(WALL_L, F2 + FH, divX - WALL_L, F1 - F2 - FH);
+      ctx.fillStyle = '#879490';   // teal (50% lighter)
+      ctx.fillRect(divX, F2 + FH, WALL_R - divX, F1 - F2 - FH);
+
+      // Basement
+      ctx.fillStyle = '#0a0a0a';
+      ctx.fillRect(WALL_L, F1 + FH, pw, 1058 - F1 - FH);
+
+      // ── Concrete basement slab ────────────────────────────────────────────
+      ctx.fillStyle = '#222020';
+      ctx.fillRect(WALL_L, 1058, pw, 22);
+      ctx.fillStyle = '#2e2c2c';
+      ctx.fillRect(WALL_L, 1058, pw, 3);
+      // cracks
+      ctx.strokeStyle = '#181616'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(180, 1061); ctx.lineTo(240, 1069); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(510, 1063); ctx.lineTo(548, 1067); ctx.stroke();
+
+      // ── Brick walls (above basement) + stone foundation ───────────────────
+      drawBrickWall(0,      0, WALL_L, F1 + FH);
+      drawBrickWall(WALL_R, F3, CW - WALL_R, F1 + FH - F3);  // right wall starts at 3rd floor (above is open outside)
+      drawStoneWall(0,      F1 + FH, WALL_L, WORLD_H - (F1 + FH));
+      drawStoneWall(WALL_R, F1 + FH, CW - WALL_R, WORLD_H - (F1 + FH));
+
+      // ── Interior wall assembly (air gap + furring + drywall) ──────────────
+      drawInteriorWalls();
+
+      // ── Floor bands (full-width) ───────────────────────────────────────────
+      drawFloorBand(F1);
+      drawFloorBand(F2);
+      drawFloorBand(F3);
+
+      // ── 2nd floor rim joist gap — degraded sealant at wall/floor junction ──
+      ctx.fillStyle = 'rgba(180,90,20,0.65)';
+      ctx.fillRect(WALL_L,     F2 + 5, 7, FH - 10);   // left rim
+      ctx.fillRect(WALL_R - 7, F2 + 5, 7, FH - 10);   // right rim
+      ctx.strokeStyle = 'rgba(220,130,50,0.5)'; ctx.lineWidth = 1;
+      ctx.strokeRect(WALL_L - 1,     F2 + 4, 9, FH - 8);
+      ctx.strokeRect(WALL_R - 8, F2 + 4, 9, FH - 8);
+
+      // Gap arrow hints
+      ctx.fillStyle = '#ffffff10';
+      ctx.font = '9px monospace';
+      ctx.fillText('▲', 658, F1 + 13);
+      ctx.fillText('▲', 108, F2 + 13);
+      ctx.fillText('▲', 658, F3 + 13);
+
+      // ── Ductwork system ────────────────────────────────────────────────────
+      drawDuctwork();
+
+      // ── Flat roof structure — left half (baby room) only ──────────────────
+      // Roof band covers left side only; right side is open sky (outside)
+      ctx.fillStyle = '#181410';
+      ctx.fillRect(0, 0, 400, 40);
+      // Membrane / gravel surface
+      ctx.fillStyle = '#242020';
+      ctx.fillRect(WALL_L, 0, 400 - WALL_L, 6);
+      // Pink fiberglass insulation
+      ctx.fillStyle = '#e484b0';
+      ctx.fillRect(WALL_L, 31, 400 - WALL_L, 9);
+
+      // Fluffy puffs along the top of the batt
+      ctx.fillStyle = '#ee9cc4';
+      for (let bx = WALL_L + 8; bx < 408; bx += 13) {
+        ctx.beginPath();
+        ctx.ellipse(bx, 31, 8, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Lighter highlight on each puff
+      ctx.fillStyle = '#f8b8d8';
+      for (let bx = WALL_L + 8; bx < 408; bx += 13) {
+        ctx.beginPath();
+        ctx.ellipse(bx - 2, 29, 4, 3, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      // Fiber texture in the base
+      ctx.strokeStyle = '#f0a8cc'; ctx.lineWidth = 0.5;
+      for (let fy = 33; fy < 39; fy += 2) {
+        ctx.beginPath(); ctx.moveTo(WALL_L, fy); ctx.lineTo(400, fy); ctx.stroke();
+      }
+
+      // Roof rafters (left half only)
+      for (let rx = WALL_L + 18; rx < 390; rx += 64) {
+        ctx.fillStyle = '#4a3018';
+        ctx.fillRect(rx, 6, 11, 34);
+        ctx.fillStyle = '#3a2010';
+        ctx.fillRect(rx + 2, 8, 7, 28);
+        ctx.strokeStyle = '#5a4028'; ctx.lineWidth = 0.5;
+        ctx.strokeRect(rx, 6, 11, 34);
+      }
+
+      // ── Drywall ceiling (left half only) ──────────────────────────────────
+      ctx.fillStyle = '#c4c0b8';
+      ctx.fillRect(WALL_L, 40, 400 - WALL_L, 5);
+      ctx.fillStyle = 'rgba(0,0,0,0.18)';
+      ctx.fillRect(WALL_L, 40, 400 - WALL_L, 2);
+      ctx.strokeStyle = '#a8a49c'; ctx.lineWidth = 1;
+      for (let sx = WALL_L + 120; sx < 400; sx += 120) {
+        ctx.beginPath(); ctx.moveTo(sx, 40); ctx.lineTo(sx, 45); ctx.stroke();
+      }
+
+      // ── Recessed can lights (left half only) ──────────────────────────────
+      for (let lx = WALL_L + 70; lx < 400; lx += 110) {
+        // Light cone (drawn first, behind housing)
+        const coneGrad = ctx.createLinearGradient(lx, 45, lx, 45 + 70);
+        coneGrad.addColorStop(0, 'rgba(255,240,160,0.35)');
+        coneGrad.addColorStop(1, 'rgba(255,240,160,0)');
+        ctx.fillStyle = coneGrad;
+        ctx.beginPath();
+        ctx.moveTo(lx - 7, 45);
+        ctx.lineTo(lx + 7, 45);
+        ctx.lineTo(lx + 40, 45 + 70);
+        ctx.lineTo(lx - 40, 45 + 70);
+        ctx.closePath();
+        ctx.fill();
+        // Housing recess (dark oval)
+        ctx.fillStyle = '#1a1a1a';
+        ctx.beginPath();
+        ctx.ellipse(lx, 45, 8, 3, 0, 0, Math.PI * 2);
+        ctx.fill();
+        // Bulb glow
+        ctx.fillStyle = 'rgba(255,245,180,0.9)';
+        ctx.beginPath();
+        ctx.ellipse(lx, 45, 5, 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ── Attic insulation batts (left half only — no batts over outside) ───
+      ctx.fillStyle = '#f5c50018';
+      for (let ix = WALL_L + 10; ix < 390; ix += 44) {
+        ctx.beginPath();
+        ctx.ellipse(ix + 18, F3 - 9, 20, 9, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // ── Pipe penetration through left basement wall + across room ───────
+      const ppY = F1 + FH + 126;
+      // Pipe continues across basement room (background, slightly dimmer)
+      ctx.strokeStyle = '#7a4c10'; ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(WALL_L + 35, ppY); ctx.lineTo(650, ppY); ctx.stroke();
+      ctx.strokeStyle = '#a06820'; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(WALL_L + 35, ppY); ctx.lineTo(650, ppY); ctx.stroke();
+      ctx.strokeStyle = '#c8902c'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(WALL_L + 35, ppY); ctx.lineTo(650, ppY); ctx.stroke();
+      // Pipe support straps along the run
+      ctx.fillStyle = '#484440';
+      for (let sx = WALL_L + 80; sx < 650; sx += 120) {
+        ctx.fillRect(sx - 4, ppY - 7, 8, 5);   // strap top
+        ctx.fillRect(sx - 4, ppY + 2, 8, 5);   // strap bottom
+        ctx.fillRect(sx - 1, ppY - 9, 2, 18);  // mounting rod
+      }
+      // Copper pipe through stone wall into basement
+      ctx.strokeStyle = '#9a6018'; ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
+      ctx.strokeStyle = '#c88828'; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
+      ctx.strokeStyle = '#e8aa40'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
+      // Wall sleeve/collar at penetration
+      ctx.fillStyle = '#505050';
+      ctx.fillRect(WALL_L - 5, ppY - 6, 10, 12);
+      ctx.fillStyle = '#686868';
+      ctx.fillRect(WALL_L - 4, ppY - 5, 8, 10);
+      // Degraded sealant (should be air-sealed, but isn't)
+      ctx.fillStyle = 'rgba(160,100,40,0.7)';
+      ctx.fillRect(WALL_L - 2, ppY - 6, 4, 12);
+
+      // ── Basement pipes ────────────────────────────────────────────────────
+      ctx.strokeStyle = '#3c3c3c'; ctx.lineWidth = 7;
+      ctx.beginPath(); ctx.moveTo(WALL_L, F1 + 38); ctx.lineTo(420, F1 + 38); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(420, F1 + 38); ctx.lineTo(420, 1058); ctx.stroke();
+      ctx.strokeStyle = '#333'; ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(WALL_L, F1 + 55); ctx.lineTo(340, F1 + 55); ctx.stroke();
+      // pipe collar
+      ctx.fillStyle = '#484848';
+      ctx.beginPath(); ctx.arc(420, F1 + 38, 6, 0, Math.PI * 2); ctx.fill();
+
+      // ── Mechanical equipment (hot water heater + furnace) ─────────────────
+      drawMechanicals();
+
+
+      // ── 1st floor: living room (left) + kitchen (right) ─────────────────
+      const fY = F1;       // floor surface y = 490
+      const rC = F2 + FH;  // ceiling y = 358
+
+      // Warm ambient light wash (living room)
+      const lGrad = ctx.createRadialGradient(200, fY - 65, 5, 200, fY - 65, 160);
+      lGrad.addColorStop(0, 'rgba(255,210,90,0.09)');
+      lGrad.addColorStop(1, 'rgba(255,210,90,0)');
+      ctx.fillStyle = lGrad;
+      ctx.fillRect(WALL_L, rC, 360, fY - rC);
+
+
+      // TV (flat screen on left wall)
+      ctx.fillStyle = '#1c1c1c';
+      ctx.fillRect(40, rC + 30, 8, 50);
+      ctx.fillStyle = '#060610';
+      ctx.fillRect(41, rC + 32, 6, 46);
+      ctx.fillStyle = 'rgba(40,60,140,0.18)';
+      ctx.fillRect(41, rC + 32, 6, 46);
+      ctx.fillStyle = '#2a2a2a';
+      ctx.fillRect(40, rC + 55, 3, 4);   // bracket
+
+      // Rug
+      ctx.fillStyle = '#6e1e08';
+      ctx.fillRect(60, fY - 11, 232, 10);
+      ctx.fillStyle = '#882410';
+      ctx.fillRect(62, fY - 9, 228, 7);
+      ctx.fillStyle = 'rgba(245,197,0,0.2)';
+      for (let rx = 72; rx < 288; rx += 22) ctx.fillRect(rx, fY - 9, 2, 7);
+
+      // Sofa
+      ctx.fillStyle = '#3e2c1a';
+      ctx.fillRect(68, fY - 46, 122, 46);
+      ctx.fillStyle = '#52381e';
+      ctx.fillRect(70, fY - 44, 53, 24);    // left back cushion
+      ctx.fillRect(126, fY - 44, 52, 24);   // right back cushion
+      ctx.fillRect(70, fY - 20, 53, 14);    // left seat cushion
+      ctx.fillRect(126, fY - 20, 52, 14);   // right seat cushion
+      ctx.fillStyle = '#342012';
+      ctx.fillRect(68, fY - 46, 10, 46);    // left arm
+      ctx.fillRect(180, fY - 46, 10, 46);   // right arm
+      ctx.fillStyle = '#28180c';
+      ctx.fillRect(72, fY - 7, 5, 7);       // legs
+      ctx.fillRect(182, fY - 7, 5, 7);
+
+      // Coffee table
+      ctx.fillStyle = '#52321a';
+      ctx.fillRect(206, fY - 22, 66, 5);
+      ctx.fillStyle = '#3a2010';
+      ctx.fillRect(211, fY - 17, 4, 10);
+      ctx.fillRect(259, fY - 17, 4, 10);
+
+      // Half-wall divider between living room and kitchen
+      ctx.fillStyle = '#261c0e';
+      ctx.fillRect(393, fY - 52, 10, 52);
+
+      // ── Kitchen ──────────────────────────────────────────────────────────
+      // Refrigerator (far left of kitchen)
+      ctx.fillStyle = '#bfbab4';
+      ctx.fillRect(403, fY - 78, 18, 78);
+      ctx.fillStyle = '#b0aba5';
+      ctx.fillRect(403, fY - 78, 18, 36);   // freezer
+      ctx.strokeStyle = '#a8a39e'; ctx.lineWidth = 1;
+      ctx.strokeRect(403, fY - 78, 18, 36);
+      ctx.strokeRect(403, fY - 40, 18, 40);
+      ctx.fillStyle = '#888';
+      ctx.fillRect(418, fY - 68, 2, 18);    // fridge handle
+      ctx.fillRect(418, fY - 28, 2, 18);    // freezer handle
+
+      // Base cabinets (starts right of fridge)
+      ctx.fillStyle = '#342214';
+      ctx.fillRect(423, fY - 32, 305, 32);
+
+      // Stove (built-in, left of cabinets)
+      ctx.fillStyle = '#1e1e1e';
+      ctx.fillRect(423, fY - 32, 56, 32);
+
+      // Counter top
+      ctx.fillStyle = '#747068';
+      ctx.fillRect(421, fY - 35, 309, 5);
+      ctx.fillStyle = '#888078';
+      ctx.fillRect(421, fY - 35, 309, 2);   // highlight
+
+      // Stove surface (slightly darker than counter)
+      ctx.fillStyle = '#282828';
+      ctx.fillRect(423, fY - 35, 56, 5);
+
+      // Burners
+      ctx.strokeStyle = '#505050'; ctx.lineWidth = 1.5;
+      for (const bx of [438, 465]) {
+        ctx.beginPath(); ctx.arc(bx, fY - 37, 5, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(bx, fY - 37, 2, 0, Math.PI * 2); ctx.stroke();
+      }
+
+      // Cabinet door outlines
+      ctx.strokeStyle = '#241408'; ctx.lineWidth = 1;
+      for (let cx = 481; cx < 688; cx += 48) {
+        ctx.strokeRect(cx + 2, fY - 29, 43, 24);
+      }
+
+      // Sink
+      ctx.fillStyle = '#26303a';
+      ctx.fillRect(672, fY - 29, 54, 22);
+      ctx.fillStyle = '#1a242e';
+      ctx.fillRect(675, fY - 27, 48, 18);
+      // Faucet
+      ctx.fillStyle = '#848484';
+      ctx.fillRect(696, fY - 45, 3, 12);
+      ctx.fillRect(696, fY - 45, 9, 3);
+      ctx.fillStyle = '#666';
+      ctx.beginPath(); ctx.arc(705, fY - 43, 2.5, 0, Math.PI * 2); ctx.fill();
+
+      // Upper cabinets (on back/right wall)
+      ctx.fillStyle = '#342214';
+      ctx.fillRect(752, rC + 28, 8, 72);
+      ctx.strokeStyle = '#241408'; ctx.lineWidth = 1;
+      ctx.strokeRect(752, rC + 30, 8, 32);
+      ctx.strokeRect(752, rC + 64, 8, 34);
+
+      // ── 2nd floor: bedrooms ───────────────────────────────────────────────
+      // Floor y = F2 = 340, ceiling y = F3+FH = 208
+      const b2Y = F2;        // bedroom floor = 340
+      const b2C = F3 + FH;  // bedroom ceiling = 208
+
+      // ── Eagles pennant (master bedroom, 1/3 into room) ───────────────────
+      const flagX = WALL_L + 118, flagY = b2C + 76;
+      const penW = 106, penH = 67;
+      // Pole
+      ctx.fillStyle = '#888880';
+      ctx.fillRect(flagX, flagY, 4, penH);
+      // Pennant triangle — Eagles midnight green
+      ctx.fillStyle = '#004C54';
+      ctx.beginPath();
+      ctx.moveTo(flagX + 4, flagY);
+      ctx.lineTo(flagX + 4, flagY + penH);
+      ctx.lineTo(flagX + 4 + penW, flagY + penH / 2);
+      ctx.closePath();
+      ctx.fill();
+      // Top-edge lighter highlight
+      ctx.fillStyle = '#006672';
+      ctx.beginPath();
+      ctx.moveTo(flagX + 4, flagY);
+      ctx.lineTo(flagX + 4 + penW, flagY + penH / 2);
+      ctx.lineTo(flagX + 4 + penW, flagY + penH / 2 + 3);
+      ctx.lineTo(flagX + 4, flagY + 8);
+      ctx.closePath();
+      ctx.fill();
+      // "GO BIRDS!" text
+      ctx.fillStyle = 'white';
+      ctx.font = 'bold 11px monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('GO BIRDS!', flagX + 8, flagY + penH / 2 + 4);
+      ctx.textAlign = 'left';
+
+      // ── Master bedroom (left: x 40..390) ──────────────────────────────────
+      // Warm ambient light
+      const bGrad = ctx.createRadialGradient(200, b2Y - 70, 5, 200, b2Y - 70, 150);
+      bGrad.addColorStop(0, 'rgba(255,220,160,0.08)');
+      bGrad.addColorStop(1, 'rgba(255,220,160,0)');
+      ctx.fillStyle = bGrad;
+      ctx.fillRect(WALL_L, b2C, 360, b2Y - b2C);
+
+
+      // Bed (double, headboard against left wall)
+      // Headboard
+      ctx.fillStyle = '#3a2010';
+      ctx.fillRect(42, b2Y - 66, 10, 60);
+      // Mattress
+      ctx.fillStyle = '#d8d0c0';
+      ctx.fillRect(52, b2Y - 62, 140, 56);
+      // Sheets / bedding
+      ctx.fillStyle = '#c8c0b0';
+      ctx.fillRect(52, b2Y - 30, 140, 24);
+      // Pillows
+      ctx.fillStyle = '#e8e4de';
+      ctx.fillRect(55, b2Y - 60, 58, 22);
+      ctx.fillRect(120, b2Y - 60, 58, 22);
+      // Pillow highlight
+      ctx.fillStyle = '#f0ece8';
+      ctx.fillRect(57, b2Y - 58, 24, 8);
+      ctx.fillRect(122, b2Y - 58, 24, 8);
+      // Footboard
+      ctx.fillStyle = '#3a2010';
+      ctx.fillRect(192, b2Y - 62, 8, 56);
+      // Bed legs
+      ctx.fillStyle = '#28180a';
+      ctx.fillRect(52, b2Y - 6, 5, 6);
+      ctx.fillRect(187, b2Y - 6, 5, 6);
+
+      // Nightstand (left side)
+      ctx.fillStyle = '#4a2e12';
+      ctx.fillRect(42, b2Y - 30, 8, 24);
+      // Lamp on nightstand
+      ctx.fillStyle = '#888';
+      ctx.fillRect(44, b2Y - 38, 4, 8);   // stem
+      ctx.fillStyle = '#f5e080';
+      ctx.fillRect(42, b2Y - 44, 8, 7);   // shade
+
+      // Dresser (right side of master)
+      ctx.fillStyle = '#3a2010';
+      ctx.fillRect(270, b2Y - 50, 60, 50);
+      ctx.fillStyle = '#2e1808';
+      ctx.fillRect(270, b2Y - 50, 60, 4);  // top surface
+      // Drawer pulls
+      ctx.fillStyle = '#c8a030';
+      ctx.fillRect(293, b2Y - 38, 14, 3);
+      ctx.fillRect(293, b2Y - 22, 14, 3);
+      ctx.strokeStyle = '#2a1408'; ctx.lineWidth = 1;
+      ctx.strokeRect(273, b2Y - 46, 54, 18);
+      ctx.strokeRect(273, b2Y - 26, 54, 20);
+
+      // Half-wall divider (2nd floor)
+      ctx.fillStyle = '#1a1218';
+      ctx.fillRect(393, b2Y - 52, 10, 52);
+
+      // ── Baby room (right: x 403..760) ─────────────────────────────────────
+      // Light blue wall
+      ctx.fillStyle = '#c8e4f4';
+      ctx.fillRect(403, b2C, WALL_R - 403, b2Y - b2C);
+      // Polka dots
+      ctx.fillStyle = 'rgba(255,210,120,0.40)';
+      for (const [dx, dy] of [[430,222],[500,210],[575,228],[650,215],[720,225]]) {
+        ctx.beginPath(); ctx.arc(dx, dy, 5, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.fillStyle = 'rgba(130,190,255,0.35)';
+      for (const [dx, dy] of [[460,240],[538,232],[614,244],[690,236]]) {
+        ctx.beginPath(); ctx.arc(dx, dy, 4, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // ── Crib ─────────────────────────────────────────────────────────────
+      const crX = 560, crW = 74;
+      ctx.fillStyle = '#e8d098';
+      ctx.fillRect(crX,        b2Y - 56, 5, 56);
+      ctx.fillRect(crX + crW,  b2Y - 56, 5, 56);
+      ctx.fillRect(crX - 1,    b2Y - 59, crW + 7, 7);   // top rail
+      ctx.fillRect(crX - 1,    b2Y - 25, crW + 7, 5);   // bottom rail
+      ctx.strokeStyle = '#d0b880'; ctx.lineWidth = 1.5;
+      for (let sx = crX + 10; sx < crX + crW; sx += 10) {
+        ctx.beginPath(); ctx.moveTo(sx, b2Y - 52); ctx.lineTo(sx, b2Y - 25); ctx.stroke();
+      }
+      ctx.fillStyle = '#f5eedc'; ctx.fillRect(crX + 3,  b2Y - 27, crW, 6);      // mattress
+      ctx.fillStyle = 'white';   ctx.fillRect(crX + 5,  b2Y - 51, 28, 18);     // pillow
+      ctx.fillStyle = '#ffb8d0'; ctx.fillRect(crX + 5,  b2Y - 37, crW - 4, 14);// pink blanket
+
+      // (Calder mobile drawn per-frame by drawCalderMobile)
+
+      // ── Changing table (left side of baby room) ──────────────────────────
+      const ctX2 = 413;
+      ctx.fillStyle = '#e0ca88'; ctx.fillRect(ctX2,        b2Y - 46, 52, 6);
+      ctx.fillStyle = '#ccb470'; ctx.fillRect(ctX2,        b2Y - 40, 52, 4);
+      ctx.fillRect(ctX2 + 2,   b2Y - 36, 5, 36);
+      ctx.fillRect(ctX2 + 45,  b2Y - 36, 5, 36);
+      ctx.fillStyle = '#ffb8d0'; ctx.fillRect(ctX2 + 2,   b2Y - 50, 48, 10); // pink pad
+      // Toy chest beside changing table
+      ctx.fillStyle = '#e0ca88'; ctx.fillRect(ctX2 + 60, b2Y - 38, 42, 38);
+      ctx.strokeStyle = '#aa9048'; ctx.lineWidth = 1;
+      ctx.strokeRect(ctX2 + 63, b2Y - 34, 36, 13);
+      ctx.strokeRect(ctX2 + 63, b2Y - 18, 36, 13);
+      ctx.fillStyle = '#c89020';
+      ctx.beginPath(); ctx.arc(ctX2 + 81, b2Y - 27, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ctX2 + 81, b2Y - 11, 2, 0, Math.PI * 2); ctx.fill();
+
+      // ── 3rd floor split: baby room + roof deck ────────────────────────────
+      drawThirdFloor();
+
+      // ── Windows ───────────────────────────────────────────────────────────
+      // Left wall (front facade)
+      // Windows — each centered vertically in its floor's room
+      drawGlassBlockWindow(4,   F1 + FH + 8, 34, 48);  // basement left
+      drawFrontDoor(F1);                  // 1st floor left — front door
+      drawWallWindow(3,   380, 34, 80);  // 2nd floor left
+      drawWallWindow(3,   115, 34, 80);  // 3rd floor left
+      // Right wall
+      drawGlassBlockWindow(763, F1 + FH + 8, 34, 48);  // basement right
+      drawBackDoor(F1);                   // 1st floor right — back door
+      drawWallWindow(763, 380, 34, 80);  // 2nd floor right
+
+      // ── Floor labels ──────────────────────────────────────────────────────
+      ctx.fillStyle = 'rgba(255,255,255,0.13)';
+      ctx.font = 'bold 10px monospace';
+      ctx.fillText('3RD FLOOR', WALL_L + 8, F3 - 5);
+      ctx.fillText('2ND FLOOR', WALL_L + 8, F2 - 5);
+      ctx.fillText('1ST FLOOR', WALL_L + 8, F1 - 5);
+      ctx.fillText('BASEMENT',  WALL_L + 8, F1 + FH + 14);
+
+      // ── Wall cracks ───────────────────────────────────────────────────────
+      drawWallCracks();
+
+      // (air leak sources drawn per-frame by drawAirLeakSources)
+    }
+
+    function drawThirdFloor() {
+      const top  = 45;        // ceiling drywall bottom
+      const bot  = F3;        // floor surface = 269
+      const midX = 400;       // dividing wall x
+
+      // ── Office background (left half) ────────────────────────────────────
+      ctx.fillStyle = '#879490';  // teal (matches kitchen)
+      ctx.fillRect(WALL_L, top, midX - WALL_L, bot - top);
+
+      // ── Bookshelf (left wall) ─────────────────────────────────────────────
+      const bsX = WALL_L + 8, bsW = 36, bsH = 110;
+      ctx.fillStyle = '#3a2410'; ctx.fillRect(bsX, bot - bsH, bsW, bsH);
+      ctx.fillStyle = '#2a1808'; ctx.fillRect(bsX, bot - bsH, bsW, 4);       // top cap
+      // Shelf dividers
+      for (let sy = bot - bsH + 30; sy < bot - 8; sy += 30) {
+        ctx.fillStyle = '#2a1808'; ctx.fillRect(bsX, sy, bsW, 3);
+      }
+      // Books on each shelf
+      const bookColors = ['#8c1a1a','#1a508c','#1a6e2a','#7a6010','#5a1a7a','#c0602a','#1a4a5c'];
+      for (let shelf = 0; shelf < 3; shelf++) {
+        const shY = bot - bsH + 6 + shelf * 30;
+        let cx = bsX + 2;
+        for (let bk = 0; bk < 7; bk++) {
+          const bw = 3 + (bk % 3);
+          ctx.fillStyle = bookColors[(shelf * 7 + bk) % bookColors.length];
+          ctx.fillRect(cx, shY, bw - 1, 22);
+          cx += bw;
+          if (cx >= bsX + bsW - 2) break;
+        }
+      }
+
+      // ── Desk ─────────────────────────────────────────────────────────────
+      const dkX = 110, dkW = 230;
+      ctx.fillStyle = '#5a3818'; ctx.fillRect(dkX, bot - 37, dkW, 4);        // desk surface
+      ctx.fillStyle = '#4a2e12'; ctx.fillRect(dkX, bot - 33, dkW, 5);        // apron
+      ctx.fillStyle = '#3a2010';
+      ctx.fillRect(dkX + 2,        bot - 28, 5, 28);  // left leg
+      ctx.fillRect(dkX + dkW - 7,  bot - 28, 5, 28);  // right leg
+
+      // Monitor on desk
+      ctx.fillStyle = '#1a1a1a'; ctx.fillRect(dkX + dkW - 62, bot - 72, 40, 32);
+      ctx.fillStyle = '#060610'; ctx.fillRect(dkX + dkW - 61, bot - 71, 38, 30);
+      ctx.fillStyle = 'rgba(40,80,200,0.18)'; ctx.fillRect(dkX + dkW - 61, bot - 71, 38, 30);
+      ctx.fillStyle = '#333'; ctx.fillRect(dkX + dkW - 44, bot - 37, 6, 4);  // stand
+
+      // Papers + coffee mug on desk
+      ctx.fillStyle = '#e8e8e0'; ctx.fillRect(dkX + 18, bot - 38, 55, 4);   // papers
+      ctx.fillStyle = '#884422'; ctx.fillRect(dkX + 82, bot - 42, 10, 8);   // mug body
+      ctx.fillStyle = '#662200'; ctx.fillRect(dkX + 84, bot - 38, 6, 4);    // coffee
+
+      // ── Office chair ──────────────────────────────────────────────────────
+      const chX = dkX + 55;
+      ctx.fillStyle = '#1a1a2a'; ctx.fillRect(chX,      bot - 24, 42, 12);  // seat
+      ctx.fillStyle = '#141420'; ctx.fillRect(chX + 2,  bot - 42, 38, 18);  // back
+      ctx.fillStyle = '#0e0e18'; ctx.fillRect(chX + 17, bot - 12, 8, 12);   // pole
+      ctx.fillRect(chX + 7, bot - 4, 28, 4);   // base
+      ctx.fillStyle = '#555'; ctx.fillRect(chX + 7, bot - 1, 6, 2);         // casters
+      ctx.fillRect(chX + 29, bot - 1, 6, 2);
+
+      // ── Large receptacle (below monitor, showing leakage) ────────────────
+      const rcpX = dkX + dkW - 58;  // centered below monitor (~x 284)
+      const rcpY = bot - 22;
+      // Gap/air path around box — degraded sealant
+      ctx.fillStyle = 'rgba(140,90,30,0.55)';
+      ctx.fillRect(rcpX - 2, rcpY - 2, 28, 24);
+      // Box body
+      ctx.fillStyle = '#c4bdb0'; ctx.fillRect(rcpX, rcpY, 24, 20);
+      ctx.fillStyle = '#b8b0a4'; ctx.fillRect(rcpX + 1, rcpY + 1, 22, 18);
+      // Face plate outline
+      ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
+      ctx.strokeRect(rcpX + 2, rcpY + 2, 20, 16);
+      // Top outlet (duplex — two slots + ground)
+      ctx.fillStyle = '#444';
+      ctx.fillRect(rcpX + 5,  rcpY + 4, 2, 4);   // L slot
+      ctx.fillRect(rcpX + 9,  rcpY + 4, 2, 4);   // R slot
+      ctx.beginPath(); ctx.arc(rcpX + 8, rcpY + 11, 1.5, 0, Math.PI * 2); ctx.fill();
+      // Bottom outlet
+      ctx.fillRect(rcpX + 14, rcpY + 4, 2, 4);
+      ctx.fillRect(rcpX + 18, rcpY + 4, 2, 4);
+      ctx.beginPath(); ctx.arc(rcpX + 17, rcpY + 11, 1.5, 0, Math.PI * 2); ctx.fill();
+      // Center screw
+      ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(rcpX + 12, rcpY + 10, 2, 0, Math.PI * 2); ctx.stroke();
+
+      // ── Small desk plant ──────────────────────────────────────────────────
+      ctx.fillStyle = '#6a3818'; ctx.fillRect(dkX + 8, bot - 42, 12, 6);    // pot
+      ctx.fillStyle = '#4a1a08'; ctx.fillRect(dkX + 10, bot - 40, 8, 4);    // soil
+      ctx.fillStyle = '#387020';
+      ctx.beginPath(); ctx.ellipse(dkX + 14, bot - 44, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(dkX + 8,  bot - 47, 6, 3, -0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(dkX + 20, bot - 47, 6, 3, 0.5, 0, Math.PI * 2); ctx.fill();
+
+      // ── Dividing brick wall with door ────────────────────────────────────
+      const wX = 392, wW = 16;
+      const dH = 92, dY = bot - dH;
+      // Brick wall from roofline to door top
+      drawBrickWall(wX, 0, wW, dY);
+      // Parapet cap at roofline
+      ctx.fillStyle = '#181410';
+      ctx.fillRect(wX - 1, 0, wW + 2, 6);
+      // Door lintel + jambs
+      ctx.fillStyle = '#2a1408';
+      ctx.fillRect(wX - 3, dY - 4, wW + 6, 4);
+      ctx.fillRect(wX - 3, dY - 4, 3, dH + 4);
+      ctx.fillRect(wX + wW, dY - 4, 3, dH + 4);
+      // Door panel
+      ctx.fillStyle = '#c49a58';
+      ctx.fillRect(wX, dY, wW, dH);
+      ctx.fillStyle = '#a87840';
+      ctx.fillRect(wX + 2, dY + 5,  wW - 4, 34);
+      ctx.fillRect(wX + 2, dY + 44, wW - 4, 34);
+      ctx.fillStyle = '#cc9820';
+      ctx.beginPath(); ctx.arc(wX - 1, dY + dH * 0.55, 2, 0, Math.PI * 2); ctx.fill();
+
+      // ── Roof deck (right half) ────────────────────────────────────────────
+      // Deck boards
+      ctx.fillStyle = '#b88848';
+      ctx.fillRect(midX, bot - 5, WALL_R - midX, 5);
+      ctx.strokeStyle = '#9a7030'; ctx.lineWidth = 0.8;
+      for (let dx = midX + 28; dx < WALL_R; dx += 28) {
+        ctx.beginPath(); ctx.moveTo(dx, bot - 5); ctx.lineTo(dx, bot); ctx.stroke();
+      }
+      // Low railing (dividing wall side)
+      ctx.fillStyle = '#b4b4ac';
+      ctx.fillRect(midX + 10, bot - 48, 3, 44);
+      ctx.fillRect(midX + 28, bot - 48, 3, 44);
+      ctx.fillRect(midX + 10, bot - 48, 21, 3);
+
+      // ── Planters with plants ─────────────────────────────────────────────
+      for (const [px, pw2, ph] of [
+        [midX + 55,  28, 26],
+        [midX + 140, 22, 20],
+        [midX + 220, 32, 30],
+        [midX + 305, 24, 22],
+      ]) {
+        // Pot
+        ctx.fillStyle = '#904828';
+        ctx.fillRect(px - pw2/2, bot - 20, pw2, 20);
+        ctx.fillStyle = '#6a3018';
+        ctx.fillRect(px - pw2/2 + 2, bot - 18, pw2 - 4, 16);
+        ctx.fillStyle = '#241408';
+        ctx.fillRect(px - pw2/2 + 2, bot - 20, pw2 - 4, 5);
+        // Stem
+        ctx.strokeStyle = '#387020'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(px, bot - 20); ctx.lineTo(px, bot - 20 - ph); ctx.stroke();
+        // Leaves
+        ctx.fillStyle = '#4a9828';
+        ctx.beginPath(); ctx.ellipse(px,     bot - 20 - ph - 7, 13, 5,  0,    0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(px - 9, bot - 20 - ph,      9, 4, -0.5,  0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(px + 9, bot - 20 - ph,      9, 4,  0.5,  0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(100,200,60,0.45)';
+        ctx.beginPath(); ctx.ellipse(px - 2, bot - 20 - ph - 9, 5, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // ── Railing along right wall (top of right exterior wall) ────────────
+      const rlY = bot - 56;  // railing top height
+      // Posts along right wall
+      ctx.fillStyle = '#909088';
+      for (let rx = WALL_R - 14; rx >= midX + 50; rx -= 48) {
+        ctx.fillRect(rx, rlY, 3, 52);
+      }
+      // Top rail cap
+      ctx.fillStyle = '#a8a8a0';
+      ctx.fillRect(midX + 50, rlY, WALL_R - 14 - midX - 50 + 3, 3);
+      // Mid rail
+      ctx.fillStyle = '#909088';
+      ctx.fillRect(midX + 50, rlY + 26, WALL_R - 14 - midX - 50 + 3, 2);
+
+      // ── Small bistro table + chairs ───────────────────────────────────────
+      const btX = midX + 185;
+      ctx.fillStyle = '#909088';
+      ctx.fillRect(btX - 1, bot - 50, 2, 17);
+      ctx.fillStyle = '#a8a8a0';
+      ctx.fillRect(btX - 16, bot - 50, 32, 3);
+      ctx.fillStyle = '#808078';
+      ctx.fillRect(btX - 32, bot - 36, 12, 3);
+      ctx.fillRect(btX - 32, bot - 48, 3, 12);
+      ctx.fillRect(btX + 20, bot - 36, 12, 3);
+      ctx.fillRect(btX + 29, bot - 48, 3, 12);
+    }
+
+    function drawCalderMobile() {
+      const b2C = F3 + FH;
+      const mCX = 590, mCY = b2C;
+      const o1 = Math.sin(tick * 0.014) * 10;
+      const o2 = Math.sin(tick * 0.020 + 1.1) * 7;
+      const o3 = Math.sin(tick * 0.017 + 2.4) * 6;
+      ctx.strokeStyle = '#555'; ctx.lineWidth = 0.8; ctx.shadowBlur = 0;
+
+      ctx.beginPath(); ctx.moveTo(mCX, mCY); ctx.lineTo(mCX, mCY + 22); ctx.stroke();
+
+      const a1Y = mCY + 22, a1L = mCX - 50 + o1, a1R = mCX + 36 + o1;
+      ctx.beginPath(); ctx.moveTo(a1L, a1Y); ctx.lineTo(a1R, a1Y); ctx.stroke();
+
+      const a2PX = a1L + o2, a2Y = a1Y + 32;
+      ctx.beginPath(); ctx.moveTo(a1L, a1Y); ctx.lineTo(a2PX, a2Y); ctx.stroke();
+      const a2L = a2PX - 28, a2R = a2PX + 20;
+      ctx.beginPath(); ctx.moveTo(a2L, a2Y); ctx.lineTo(a2R, a2Y); ctx.stroke();
+
+      const s1Y = a2Y + 22;
+      ctx.beginPath(); ctx.moveTo(a2L, a2Y); ctx.lineTo(a2L, s1Y); ctx.stroke();
+      ctx.fillStyle = '#D12820';
+      ctx.beginPath(); ctx.arc(a2L, s1Y + 11, 11, 0, Math.PI * 2); ctx.fill();
+
+      const s2Y = a2Y + 28;
+      ctx.beginPath(); ctx.moveTo(a2R, a2Y); ctx.lineTo(a2R, s2Y); ctx.stroke();
+      ctx.fillStyle = '#1840C8';
+      ctx.beginPath(); ctx.ellipse(a2R, s2Y + 13, 7, 11, 0, 0, Math.PI * 2); ctx.fill();
+
+      const a3PX = a1R + o3, a3Y = a1Y + 40;
+      ctx.beginPath(); ctx.moveTo(a1R, a1Y); ctx.lineTo(a3PX, a3Y); ctx.stroke();
+      const a3L = a3PX - 22, a3R = a3PX + 30;
+      ctx.beginPath(); ctx.moveTo(a3L, a3Y); ctx.lineTo(a3R, a3Y); ctx.stroke();
+
+      const s3Y = a3Y + 18;
+      ctx.beginPath(); ctx.moveTo(a3L, a3Y); ctx.lineTo(a3L, s3Y); ctx.stroke();
+      ctx.fillStyle = '#F5C500';
+      ctx.beginPath(); ctx.arc(a3L, s3Y + 12, 12, 0, Math.PI * 2); ctx.fill();
+
+      const s4Y = a3Y + 25;
+      ctx.beginPath(); ctx.moveTo(a3R, a3Y); ctx.lineTo(a3R, s4Y); ctx.stroke();
+      ctx.fillStyle = '#111111';
+      ctx.beginPath();
+      ctx.moveTo(a3R,      s4Y);
+      ctx.lineTo(a3R - 12, s4Y + 22);
+      ctx.lineTo(a3R + 12, s4Y + 22);
+      ctx.closePath(); ctx.fill();
+    }
+
+    function drawWallCracks() {
+      // Cracks span full 40px wall thickness, outer face (x=0/800) to inner face (x=40/760)
+      // pts = [dx_from_outer_face, dy_from_crack_center], dx goes 0 → 40
+      const crackShapes = [
+        { pts: [[0,-4],[8,-8],[16,0],[24,-5],[32,2],[40,-1]],  branch: [2, [16,-13],[22,-19]] },
+        { pts: [[0,2],[8,-4],[16,5],[24,-2],[32,6],[40,1]],    branch: [3, [24,9],[30,15]]    },
+        { pts: [[0,-2],[8,4],[16,-3],[24,5],[32,-2],[40,1]],   branch: [2, [16,-9],[22,-17]]  },
+        { pts: [[0,3],[8,-5],[16,4],[24,-6],[32,5],[40,-2]],   branch: [3, [24,-11],[30,-18]] },
+      ];
+
+      ctx.lineCap   = 'round';
+      ctx.lineJoin  = 'round';
+      ctx.shadowColor = 'rgba(0,0,0,0.8)';
+
+      WALL_CRACKS.forEach((crack, ci) => {
+        const shape = crackShapes[ci];
+        const wx    = crack.fromLeft ? 0 : CW;   // outer face of wall
+        const dir   = crack.fromLeft ? 1 : -1;    // direction through wall
+        const cy    = crack.y;
+
+        // Dark gap shadow
+        ctx.strokeStyle = '#0a0604';
+        ctx.lineWidth   = 2.5;
+        ctx.shadowBlur  = 4;
+        ctx.beginPath();
+        shape.pts.forEach(([dx, dy], i) => {
+          const px = wx + dir * dx, py = cy + dy;
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+
+        // Branch crack
+        const [bi, ...bpts] = shape.branch;
+        const [bsx, bsy] = shape.pts[bi];
+        ctx.beginPath();
+        ctx.moveTo(wx + dir * bsx, cy + bsy);
+        bpts.forEach(([dx, dy]) => ctx.lineTo(wx + dir * dx, cy + dy));
+        ctx.stroke();
+
+        // Lighter highlight rim on interior side
+        ctx.strokeStyle = '#5a3020';
+        ctx.lineWidth   = 1;
+        ctx.shadowBlur  = 0;
+        ctx.beginPath();
+        shape.pts.forEach(([dx, dy], i) => {
+          const px = wx + dir * dx + dir, py = cy + dy;
+          i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+        });
+        ctx.stroke();
+      });
+
+      ctx.shadowBlur = 0;
+    }
+
+    function drawAirLeakSources() {
+      ctx.save();
+      ctx.lineCap    = 'round';
+      ctx.shadowColor = '#b8e8ff';
+      ctx.shadowBlur  = 4;
+
+      ctx.strokeStyle = '#d8f2ff';  // set once — stream() never changes this
+
+      // Single animated streak: starts tiny at source, grows as it travels inward
+      // sc = size scale (1 = normal, 2 = double, etc.)
+      function stream(ox, oy, dx, dy, ph, sc = 1) {
+        const t     = ((tick * 0.013 + ph) % 1.0);
+        const dist  = t * 52 * sc;
+        const len   = t * 24 * sc;
+        const alpha = t < 0.18 ? t / 0.18 : (1 - t);
+        const w     = 0.6 * sc + t * 3.0 * sc;
+        const hx    = ox + dx * dist,  hy = oy + dy * dist;
+        const tx    = hx  - dx * len,  ty = hy  - dy * len;
+        ctx.globalAlpha = Math.max(0, alpha) * 0.88;
+        ctx.lineWidth   = w;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(hx, hy);
+        ctx.stroke();
+      }
+
+      // Helper: emit N parallel streams spread along the perpendicular axis
+      function emit(ox, oy, dx, dy, spread, n, phOffset, sc = 1, phases = 2) {
+        const px = dy, py = -dx;  // perpendicular direction
+        for (let i = 0; i < n; i++) {
+          const s  = (i / (n - 1) - 0.5) * spread;
+          const ph = i / n + phOffset;
+          for (let p = 0; p < phases; p++) {
+            stream(ox + px * s, oy + py * s, dx, dy, ph + p / phases, sc);
+          }
+        }
+      }
+
+      const SC = 1.5;  // all leaks same scale — 100%+ larger than before
+
+      // ── Front door — air at top of door frame ──────────────────────────────
+      emit(WALL_L, F1 - 114, 1, 0, 12, 10, 0.0, SC, 3);
+
+      // ── Back door — air at top of door frame ───────────────────────────────
+      emit(WALL_R, F1 - 114, -1, 0, 12, 10, 0.1, SC, 3);
+
+      // ── Left wall windows — one edge per window (random top or bottom) ──────
+      emit(WALL_L, we(0), 1, 0, 8, 10, 0.07, SC, 3);  // 3rd floor
+      emit(WALL_L, we(1), 1, 0, 8, 10, 0.14, SC, 3);  // 2nd floor
+
+      // ── Right wall windows ─────────────────────────────────────────────────
+      emit(WALL_R, we(2), -1, 0, 8, 10, 0.21, SC, 3);  // 2nd floor right
+
+      // ── Basement glass block windows ───────────────────────────────────────
+      emit(WALL_L, we(3),  1, 0, 8, 10, 0.35, SC, 3);
+      emit(WALL_R, we(4), -1, 0, 8, 10, 0.42, SC, 3);
+
+
+      // ── Wall cracks — narrow streams through each crack ────────────────────
+      WALL_CRACKS.forEach((crack, ci) => {
+        const wx = crack.fromLeft ? WALL_L : WALL_R;
+        const dx = crack.fromLeft ? 1 : -1;
+        emit(wx, crack.y, dx, 0, 10, 6, ci * 0.15 + 0.6, SC * 0.7, 3);
+      });
+
+      // ── Duct leaks at seam joints — downward toward basement ─────────────
+      const DS = SC * 0.675;
+      emit(240, 838,            0,  1, 8, 4, 0.55, DS, 2);  // trunk seam
+      emit(460, 838,            0,  1, 8, 4, 0.62, DS, 2);  // trunk seam
+      emit(320, F3 + FH + 14,  0,  1, 6, 4, 0.70, DS, 2);  // 2nd floor branch
+      emit(340, F2 + FH + 14,  0,  1, 6, 4, 0.77, DS, 2);  // 1st floor branch
+      emit(520, F2 + 80,        0,  1, 6, 4, 0.84, DS, 2);  // supply riser
+
+      // ── 2nd floor rim joist leaks ─────────────────────────────────────────
+      emit(WALL_L, F2 + FH * 0.5, 1, 0, FH - 6, 5, 0.18, SC * 0.85, 3);
+      emit(WALL_R, F2 + FH * 0.5, -1, 0, FH - 6, 5, 0.26, SC * 0.85, 3);
+
+      // ── Office receptacle — air infiltration upward (x=294 = center of box) ─
+      emit(294, F3 - 12, 0, -1, 14, 8, 0.48, SC * 1.0, 4);
+
+      // ── Recessed can lights — small leaks from left & right housing edges ──
+      for (const [lx, ph] of [[110, 0.33], [220, 0.41], [330, 0.50]]) {
+        emit(lx - 8, 45, 0, 1, 3, 3, ph,        SC * 0.3, 2);  // left edge
+        emit(lx + 8, 45, 0, 1, 3, 3, ph + 0.05, SC * 0.3, 2);  // right edge
+      }
+
+      // ── Pipe penetration through left basement wall ───────────────────────
+      emit(WALL_L, F1 + FH + 132,  0.85,  0.52, 4, 2, 0.80, SC * 0.9, 2);  // seeps toward hot water heater
+
+      ctx.restore();
+    }
+
+    function drawPlatform(p, i) {
+      if (p.invisible) return;
+      const sy = p.y - cam.y;
+      if (sy + p.h < 0 || sy > CH) return; // off screen
+
+      if (p.slippery) {
+        ctx.fillStyle = '#a8d8ea';
+        ctx.fillRect(p.x, sy, p.w, p.h);
+        ctx.fillStyle = '#78b8d4';
+        ctx.fillRect(p.x, sy + p.h - 4, p.w, 4);
+        // Icy sheen
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = 1;
+        for (let ix = p.x + 3; ix < p.x + p.w - 2; ix += 7) {
+          ctx.beginPath(); ctx.moveTo(ix, sy + 2); ctx.lineTo(ix + 4, sy + 7); ctx.stroke();
+        }
+      } else {
+        ctx.fillStyle = '#F5C500';
+        ctx.fillRect(p.x, sy, p.w, p.h);
+        ctx.fillStyle = '#c49a00';
+        ctx.fillRect(p.x, sy + p.h - 4, p.w, 4);
+      }
+
+    }
+
+    function drawPlayer() {
+      const sx = player.x;
+      const sy = player.y - cam.y;
+      const { w, h, facing, frame } = player;
+
+      ctx.save();
+      ctx.translate(sx + w / 2, sy + h / 2);
+      ctx.scale(facing, 1);
+
+      const bob = Math.sin(frame * 0.28) * 1.5;
+      const leg = Math.sin(frame * 0.28) * 3;
+
+      // ── GRITTY (Philadelphia Flyers mascot) ─────────────────────────────────
+
+      // Stumpy orange legs
+      ctx.fillStyle = '#c84000';
+      ctx.fillRect(-10, 11 + leg, 9, 8);
+      ctx.fillRect(1,   11 - leg, 9, 8);
+
+      // Big flat feet
+      ctx.fillStyle = '#e84800';
+      ctx.beginPath(); ctx.ellipse(-6, 19 + leg, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 6, 19 - leg, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Body — dark base fur shadow
+      ctx.fillStyle = '#b83600';
+      ctx.beginPath(); ctx.ellipse(0, 2 + bob, 12, 12, 0, 0, Math.PI * 2); ctx.fill();
+      // Main orange body fur
+      ctx.fillStyle = '#f04e00';
+      ctx.beginPath(); ctx.ellipse(0, 1 + bob, 11, 11, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Body fur tufts
+      ctx.fillStyle = '#ff6622';
+      for (const [tx, ty] of [[-13, 2], [13, 2], [-10, 9], [10, 9]]) {
+        ctx.beginPath();
+        ctx.ellipse(tx, ty + bob, 4, 3, Math.atan2(ty, tx), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Head — dark base
+      ctx.fillStyle = '#b83600';
+      ctx.beginPath(); ctx.ellipse(0, -8 + bob, 12, 11, 0, 0, Math.PI * 2); ctx.fill();
+      // Head main fur
+      ctx.fillStyle = '#f04e00';
+      ctx.beginPath(); ctx.ellipse(0, -9 + bob, 11, 10, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Head fur tufts
+      ctx.fillStyle = '#ff5f1a';
+      for (const [tx, ty] of [[-13, -9], [13, -9], [-10, -15], [10, -15]]) {
+        ctx.beginPath();
+        ctx.ellipse(tx, ty + bob, 3.5, 3, Math.atan2(ty, tx), 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Wild spiky top fur
+      ctx.fillStyle = '#ff5500';
+      ctx.beginPath(); ctx.ellipse(-6, -20 + bob, 4, 4.5, -0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 0, -22 + bob, 4, 4.5,  0,   0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 6, -20 + bob, 4, 4.5,  0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ff8822';
+      ctx.beginPath(); ctx.ellipse(-5.5, -24 + bob, 2.5, 2.5, -0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(  0,  -26 + bob, 2.5, 2.5,  0,   0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 5.5, -24 + bob, 2.5, 2.5,  0.5, 0, Math.PI * 2); ctx.fill();
+
+      // ── GOOGLY EYES ──────────────────────────────────────────────────────────
+      ctx.fillStyle = '#cc3800';
+      ctx.beginPath(); ctx.ellipse(-4.5, -9 + bob, 6.5, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 4.5, -9 + bob, 6.5, 6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'white';
+      ctx.beginPath(); ctx.ellipse(-4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse( 4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#f5c500';
+      ctx.beginPath(); ctx.arc(-4.5, -9 + bob, 3.2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 4.5, -9 + bob, 3.2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0a0808';
+      ctx.beginPath(); ctx.arc(-4.5, -9 + bob, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 4.5, -9 + bob, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'white';
+      ctx.beginPath(); ctx.arc(-3.5, -10 + bob, 0.7, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 5.5, -10 + bob, 0.7, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#401000'; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.ellipse(-4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse( 4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.stroke();
+
+      // Grin
+      ctx.strokeStyle = '#1a0800'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.arc(0, -3 + bob, 6, 0.15, Math.PI - 0.15, false); ctx.stroke();
+      // Teeth
+      ctx.fillStyle = 'white';
+      ctx.fillRect(-5, -3 + bob, 3, 3);
+      ctx.fillRect(-1, -3 + bob, 3, 3);
+      ctx.fillRect( 3, -3 + bob, 3, 3);
+
+      ctx.restore();
+    }
+
+    function drawLeak(leak) {
+      const sy = leak.y - cam.y;
+      if (sy + leak.h < -10 || sy > CH + 10) return;
+
+      const cx = leak.x + leak.w / 2;
+      const cy = sy   + leak.h / 2;
+      const hw = leak.w / 2;
+      const hh = leak.h / 2;
+
+      // Fade out as it nears the fan
+      const fanDist  = leak.distToFan || 999;
+      const fadeAlpha = Math.min(1, fanDist / 60);
+
+      ctx.save();
+      ctx.globalAlpha = fadeAlpha;
+      ctx.translate(cx, cy);
+      ctx.rotate(leak.angle || 0);
+      ctx.lineCap = 'round';
+
+      // Soft haze behind the lines
+      ctx.shadowBlur = 0;
+      const haze = ctx.createRadialGradient(0, 0, 2, 0, 0, hw * 1.1);
+      haze.addColorStop(0,   'rgba(160,230,255,0.13)');
+      haze.addColorStop(0.6, 'rgba(120,210,255,0.07)');
+      haze.addColorStop(1,   'rgba(100,200,255,0)');
+      ctx.fillStyle = haze;
+      ctx.beginPath();
+      ctx.ellipse(0, 0, hw * 1.1, hh * 1.5, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.shadowColor = '#aae8ff';
+      ctx.shadowBlur  = 6;
+
+      const lineCount = 8;
+      for (let li = 0; li < lineCount; li++) {
+        const lineY   = (li - (lineCount - 1) / 2) * (leak.h / lineCount);
+        const phase   = tick * 0.09 + li * 0.75;
+        const amp     = 5 + li % 3 * 2;
+        const lineLen = hw * 2 * (0.52 + (li % 3) * 0.14);
+        const startX  = -lineLen / 2;
+        const alpha   = 0.58 - li * 0.05;
+
+        ctx.globalAlpha = alpha;
+        ctx.strokeStyle = li % 3 === 1 ? '#ffffff' : li % 3 === 2 ? '#bbedff' : '#99ddff';
+        ctx.lineWidth   = 2.0 - li * 0.15;
+
+        const segs = 4, segW = lineLen / segs;
+        let curX = startX;
+        let curY = lineY + Math.sin(phase) * amp;
+        ctx.beginPath();
+        ctx.moveTo(curX, curY);
+        for (let s = 0; s < segs; s++) {
+          const nx   = curX + segW;
+          const ny   = lineY + Math.sin(phase + (s + 1) * 1.4) * amp;
+          const cp1x = curX + segW * 0.35;
+          const cp1y = lineY + Math.sin(phase + s * 1.4 + 0.5) * amp * 1.7;
+          const cp2x = nx - segW * 0.35;
+          const cp2y = lineY + Math.sin(phase + (s + 1) * 1.4 - 0.5) * amp * 1.7;
+          ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, nx, ny);
+          curX = nx; curY = ny;
+        }
+        ctx.stroke();
+
+        ctx.globalAlpha = alpha * 0.9;
+        ctx.beginPath();
+        ctx.moveTo(curX,      curY);
+        ctx.lineTo(curX - 10, curY - 5);
+        ctx.moveTo(curX,      curY);
+        ctx.lineTo(curX - 10, curY + 5);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+    }
+
+    function drawHUD() {
+      // Height indicator (how high have they climbed)
+      const pct = Math.max(0, Math.min(1, 1 - (player.y / WORLD_H)));
+      const climbed = Math.round(pct * 100);
+
+      ctx.fillStyle = '#F5C500';
+      ctx.font = 'bold 13px monospace';
+      ctx.fillText('LES NRG', 14, 24);
+
+      ctx.fillStyle = '#ffffff30';
+      ctx.font = '11px monospace';
+      ctx.fillText(`HEIGHT  ${climbed}%`, 14, 42);
+      ctx.fillText(`BIG LEAKS  ${leaks.length}`, 14, 58);
+
+      // Version
+      ctx.textAlign = 'right';
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.font = '10px monospace';
+      ctx.fillText(VERSION, CW - 8, CH - 8);
+      ctx.textAlign = 'left';
+    }
+
+    function drawLogo() {
+      // Matches the navbar SVG exactly: viewBox 0 0 270 140
+      // Fan sub-svg: x=0 y=20 w=80 h=80, viewBox 8.511 8.511 82.977 82.977
+      const H   = LOGO_H;
+      const sc  = LOGO_SC;
+      const bx  = LOGO_BX;
+      const by  = LOGO_BY;
+
+      const fanX  = bx;
+      const fanY  = by + 20 * sc;
+      const fanW  = 80 * sc;
+      const fanH  = 80 * sc;
+      const fanCX = fanX + fanW / 2;
+      const fanCY = fanY + fanH / 2;
+
+      ctx.save();
+
+      // Yellow rounded square
+      ctx.fillStyle = '#F5C500';
+      ctx.beginPath();
+      ctx.roundRect(fanX, fanY, fanW, fanH, 9 / 82.977 * fanW);
+      ctx.fill();
+
+      // White circle (r=31.72 in internal viewBox)
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(fanCX, fanCY, 31.72 / 82.977 * fanW, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Real blade path — rotated around fan center
+      if (imgBlades.complete && imgBlades.naturalWidth > 0) {
+        ctx.save();
+        ctx.translate(fanCX, fanCY);
+        ctx.rotate(tick * 0.18);
+        ctx.translate(-fanCX, -fanCY);
+        ctx.drawImage(imgBlades, fanX, fanY, fanW, fanH);
+        ctx.restore();
+      }
+
+      // White divider (x=90 y=16 w=2 h=94 in outer viewBox)
+      ctx.fillStyle = 'rgba(255,255,255,0.4)';
+      ctx.fillRect(bx + 90 * sc, by + 16 * sc, Math.max(1, 2 * sc), 94 * sc);
+
+      // LES / NRG text (fontSize=75, LES y=56, NRG y=98 in outer viewBox)
+      ctx.fillStyle = 'white';
+      ctx.font = `${Math.round(75 * sc)}px Peddana, Georgia, serif`;
+      ctx.fillText('LES', bx + 100 * sc, by + 56 * sc);
+      ctx.fillText('NRG', bx + 100 * sc, by + 98 * sc);
+
+      ctx.restore();
+    }
+
+    // ─── Build static background once, then blit it each frame ───────────────
+    function buildBG() {
+      const realCtx = ctx;
+      ctx = bgCtx;
+      drawLevel();
+      ctx = realCtx;
+      bgBuilt = true;
+    }
+
+    function draw() {
+      if (!bgBuilt) buildBG();
+      // Blit static background scrolled by camera
+      ctx.drawImage(bgCanvas, 0, -cam.y);
+      // Animated world elements — apply camera transform
+      ctx.save();
+      ctx.translate(0, -cam.y);
+      drawCalderMobile();
+      drawAirLeakSources();
+      drawLogo();
+      ctx.restore();
+      platforms.forEach((p, i) => drawPlatform(p, i));
+      for (const l of leaks) drawLeak(l);
+      drawPlayer();
+      drawHUD();
+    }
+
+    // ─── Overlay screens ──────────────────────────────────────────────────────
+    function drawOverlay(title, sub, btnLabel) {
+      ctx.fillStyle = 'rgba(0,0,0,0.72)';
+      ctx.fillRect(0, 0, CW, CH);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = '#F5C500';
+      ctx.font = 'bold 42px monospace';
+      ctx.fillText(title, CW / 2, CH / 2 - 40);
+
+      ctx.fillStyle = '#ffffffbb';
+      ctx.font = '16px monospace';
+      ctx.fillText(sub, CW / 2, CH / 2 + 4);
+
+      // Button
+      const btnW = 260, btnH = 40;
+      const btnX = CW / 2 - btnW / 2, btnY = CH / 2 + 28;
+      ctx.fillStyle = '#F5C500';
+      ctx.beginPath();
+      ctx.roundRect(btnX, btnY, btnW, btnH, 8);
+      ctx.fill();
+      ctx.fillStyle = '#111111';
+      ctx.font = 'bold 14px monospace';
+      ctx.fillText(btnLabel, CW / 2, btnY + 26);
+      ctx.textAlign = 'left';
+    }
+
+    // ─── Loop ─────────────────────────────────────────────────────────────────
+    function loop() {
+      if (gameOver) {
+        draw();
+        drawOverlay('GAME OVER', 'You got sucked into the fan.', '[ PRESS R TO RESTART ]');
+        requestAnimationFrame(loop);
+        return;
+      }
+      if (gameWon) {
+        draw();
+        drawOverlay('Congratulations!', 'You escaped the leaky house!', '[ PRESS R TO PLAY AGAIN ]');
+        requestAnimationFrame(loop);
+        return;
+      }
+      update();
+      draw();
+      requestAnimationFrame(loop);
+    }
+
+    window.addEventListener('keydown', e => {
+      if (e.code === 'KeyR' && (gameOver || gameWon)) {
+        gameOver = false;
+        gameWon  = false;
+        resetPlayer();
+      }
+    });
+
+    loop();
+  </script>
+
+  <script>
+    // ─── Horizontal rulers (top & bottom) ────────────────────────────────────
+    function drawRulerH(id) {
+      const rc = document.getElementById(id);
+      const rx = rc.getContext('2d');
+      const W = 800, H = 24;
+      const ticksDown = (id === 'rulerBot'); // rulerTop ticks point down, rulerBot ticks point up
+
+      rx.fillStyle = '#111';
+      rx.fillRect(0, 0, W, H);
+      rx.font = '9px monospace';
+      rx.textAlign = 'center';
+
+      for (let x = 0; x <= W; x += 10) {
+        const isMaj = x % 100 === 0;
+        const isMid = x % 50 === 0;
+        const tickH = isMaj ? 14 : isMid ? 9 : 5;
+        const tickY = ticksDown ? 0 : (H - tickH);
+
+        rx.fillStyle = isMaj ? '#aaa' : isMid ? '#666' : '#444';
+        rx.fillRect(x, tickY, 1, tickH);
+
+        if (isMaj && x > 0 && x < W) {
+          rx.fillStyle = '#F5C500';
+          const labelY = ticksDown ? tickH + 9 : H - tickH - 3;
+          rx.fillText(x, x, labelY);
+        }
+      }
+      rx.fillStyle = '#F5C500';
+      rx.textAlign = 'left';  rx.fillText('0',   3,     ticksDown ? 21 : H - 16);
+      rx.textAlign = 'right'; rx.fillText('800', W - 2, ticksDown ? 21 : H - 16);
+    }
+
+    // ─── Vertical rulers (left & right) ──────────────────────────────────────
+    function drawRulerV(id) {
+      const rc = document.getElementById(id);
+      const rx = rc.getContext('2d');
+      const W = 36, H = 1080;
+      const ticksRight = (id === 'rulerLeft'); // left ruler ticks point right toward canvas
+
+      rx.fillStyle = '#111';
+      rx.fillRect(0, 0, W, H);
+      rx.font = '9px monospace';
+
+      for (let y = 0; y <= H; y += 10) {
+        const isMaj = y % 100 === 0;
+        const isMid = y % 50 === 0;
+        const tickW = isMaj ? 14 : isMid ? 9 : 5;
+        const tickX = ticksRight ? (W - tickW) : 0;
+
+        rx.fillStyle = isMaj ? '#aaa' : isMid ? '#666' : '#444';
+        rx.fillRect(tickX, y, tickW, 1);
+
+        if (isMaj) {
+          rx.fillStyle = '#F5C500';
+          if (ticksRight) {
+            rx.textAlign = 'right';
+            rx.fillText(y, tickX - 2, y + 3);
+          } else {
+            rx.textAlign = 'left';
+            rx.fillText(y, tickW + 2, y + 3);
+          }
+        }
+      }
+    }
+
+    drawRulerH('rulerTop');
+    drawRulerH('rulerBot');
+    drawRulerV('rulerLeft');
+    drawRulerV('rulerRight');
+  </script>
+</body>
+</html>
