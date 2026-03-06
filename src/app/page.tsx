@@ -124,8 +124,8 @@ export default function HomePage() {
               className="font-black text-white mb-6 leading-tight"
               style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
             >
-              <span className="sm:whitespace-nowrap" style={{ color: "#FFFFFF" }}>Consulting, Inspecting & Testing</span><br />
-              <span style={{ color: "#FCF0BF" }}>Buildings to Improve</span><br />
+              <span className="sm:whitespace-nowrap" style={{ color: "#FFFFFF" }}>Consulting, Inspecting and</span><br />
+              <span style={{ color: "#FCF0BF" }}>Testing to Improve</span><br />
               <span style={{ color: "#FAE280" }}>Performance, Comfort</span><br />
               <span style={{ color: "#F5C500" }}>&amp; Durability.</span>
             </h1>
