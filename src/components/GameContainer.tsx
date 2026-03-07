@@ -39,12 +39,12 @@ export default function GameContainer() {
   }
 
   return (
-    <div className="relative w-full rounded-xl overflow-hidden border-2 border-[#F5C500]/20" style={{ aspectRatio: "800/700", maxWidth: "800px" }}>
+    <div className="relative w-full rounded-xl overflow-hidden border-2 border-[#F5C500]/20 aspect-[800/1080] md:aspect-[800/700]" style={{ maxWidth: "800px" }}>
 
       {/* Game iframe */}
       {!won && !lost && (
         <iframe
-          src="/beta/index.html?v=5.18"
+          src="/beta/index.html?v=5.27"
           className="w-full h-full border-0 block"
           title="LES NRG: The Game"
           allow="autoplay"

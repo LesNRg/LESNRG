@@ -47,15 +47,13 @@
     }
     @media (hover: none) and (pointer: coarse) {
       #mobile-controls {
-        position: absolute;
-        bottom: 10px;
-        left: 0;
-        right: 0;
         display: flex;
         justify-content: space-between;
-        align-items: flex-end;
-        padding: 0 14px;
+        align-items: center;
+        padding: 14px 14px;
+        width: 100%;
         pointer-events: none;
+        background: #0a0a0a;
       }
     }
     .dpad { display: flex; gap: 10px; pointer-events: none; }
@@ -86,13 +84,13 @@
     <div id="game-col">
       <canvas id="game" width="800" height="700"></canvas>
     </div>
-    <div id="mobile-controls">
-      <div class="dpad">
-        <button class="ctrl-btn" id="btn-left">◀</button>
-        <button class="ctrl-btn" id="btn-right">▶</button>
-      </div>
-      <button class="ctrl-btn" id="btn-jump">JUMP</button>
+  </div>
+  <div id="mobile-controls">
+    <div class="dpad">
+      <button class="ctrl-btn" id="btn-left">◀</button>
+      <button class="ctrl-btn" id="btn-right">▶</button>
     </div>
+    <button class="ctrl-btn" id="btn-jump">JUMP</button>
   </div>
   <div id="controls">ARROW KEYS / WASD &nbsp;|&nbsp; SPACE to jump &nbsp;|&nbsp; R to restart</div>
 
@@ -100,13 +98,16 @@
     const canvas = document.getElementById('game');
     let ctx      = canvas.getContext('2d');
 
-    // ─── Pre-cached gradient for big leak haze (all leaks same size w=88) ───────
-    const hazeGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 48.4);
-    hazeGrad.addColorStop(0,   'rgba(160,230,255,0.13)');
-    hazeGrad.addColorStop(0.6, 'rgba(120,210,255,0.07)');
-    hazeGrad.addColorStop(1,   'rgba(100,200,255,0)');
+    // ─── Fast sin lookup (1024-entry, avoids Math.sin in hot loops) ──────────
+    const SIN_N = 1024;
+    const SIN_K = SIN_N / (2 * Math.PI);
+    const SIN_TABLE = new Float32Array(SIN_N);
+    for (let i = 0; i < SIN_N; i++) SIN_TABLE[i] = Math.sin(2 * Math.PI * i / SIN_N);
+    function fsin(x) {
+      return SIN_TABLE[((x * SIN_K % SIN_N) + SIN_N) % SIN_N | 0];
+    }
 
-    // ─── Logo blade image (real SVG path from navbar) ─────────────────────────
+// ─── Logo blade image (real SVG path from navbar) ─────────────────────────
     const imgBlades = new Image();
     imgBlades.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="8.511 8.511 82.977 82.977">' +
@@ -114,23 +115,25 @@
       '</svg>'
     );
 
-    const CW = canvas.width;   // 800
-    const CH = canvas.height;  // 700
-
-    // ─── World dimensions ────────────────────────────────────────────────────
     const WORLD_W = 800;
     const WORLD_H = 1080;   // game world height (viewport scrolls)
 
-    const VERSION = 'v5.18';
+    const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+    if (isMobile) canvas.height = WORLD_H;
+
+    const CW = canvas.width;   // 800
+    const CH = canvas.height;  // 700 desktop, 1080 mobile
+
+    const VERSION = 'v5.27';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
     const JUMP_FORCE        = -35;   // first jump (+25%)
-    const DOUBLE_JUMP_FORCE = -37;   // second jump (+50% height)
+    const DOUBLE_JUMP_FORCE = -26;   // second jump (half height of JUMP_FORCE)
     const WALL_JUMP_VX      =   8;   // horizontal kick off wall
     const WALL_BOOST_FRAMES =  12;   // frames the kick overrides input
-    const GRAVITY_UP = 3.92;         // gravity on ascent
-    const GRAVITY_DN = 0.10;         // gravity on descent
+    const GRAVITY_UP = 7.84;         // gravity on ascent (2× heavier)
+    const GRAVITY_DN = 0.26;         // gravity on descent (+30% fall speed)
 
     let tick = 0; // global frame counter for animations
 
@@ -215,6 +218,12 @@
       { x: 656, y: 978, w: 90, h: 80 },   // furnace
     ];
 
+    // ─── Precomputed player tuft angles (constant coords — no atan2 per frame) ─
+    const BODY_TUFTS = [[-13,2],[13,2],[-10,9],[10,9]];
+    const BODY_TUFT_ANGLES = BODY_TUFTS.map(([tx,ty]) => Math.atan2(ty,tx));
+    const HEAD_TUFTS = [[-13,-9],[13,-9],[-10,-15],[10,-15]];
+    const HEAD_TUFT_ANGLES = HEAD_TUFTS.map(([tx,ty]) => Math.atan2(ty,tx));
+
     // ─── Lives & Air Leaks ───────────────────────────────────────────────────
     let gameOver = false;
     let gameWon  = false;
@@ -296,7 +305,7 @@
         y:     spawnY,
         w:     88,
         h:     44,
-        vx:    fromLeft ? 0.54 : -0.54,
+        vx:    fromLeft ? 5.0 : -5.0,
         vy:    0,
         angle: fromLeft ? 0 : Math.PI,
       });
@@ -334,7 +343,7 @@
     bindBtn('btn-jump',  'Space');
     // Tap canvas to restart on game over / win
     canvas.addEventListener('touchstart', e => {
-      if (gameOver || gameWon) { e.preventDefault(); gameOver = false; gameWon = false; resetPlayer(); }
+      if (gameOver || gameWon) { e.preventDefault(); gameOver = false; gameWon = false; resetPlayer(); requestAnimationFrame(loop); }
     }, { passive: false });
 
 const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
@@ -485,14 +494,14 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // ─── Big leaks — 7–12 on screen, more frequent near the top ─────────
       const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
-      const dynInterval = Math.round(60 - heightFrac * 40); // 60 frames at bottom → 20 at top
+      const dynInterval = Math.round(45 - heightFrac * 30); // 45 frames at bottom → 15 at top
       leakTimer++;
-      if (leakTimer >= dynInterval && leaks.length < 11) {
+      if (leakTimer >= dynInterval && leaks.length < 12) {
         spawnLeak();
         leakTimer = 0;
       }
-      // Keep minimum 6 on screen
-      if (leaks.length < 6) {
+      // Keep minimum 7 on screen
+      if (leaks.length < 7) {
         spawnLeak();
       }
 
@@ -516,8 +525,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         leaks[i].distToFan = dist;
 
         // Drag + pull in both axes — spirals reliably into fan
-        leaks[i].vx *= 0.92;
-        leaks[i].vy *= 0.92;
+        leaks[i].vx *= 0.985;
+        leaks[i].vy *= 0.985;
         leaks[i].vx += (dx / dist) * 0.06;
         leaks[i].vy += (dy / dist) * 0.06;
 
@@ -542,7 +551,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         // Push player in wind direction
         if (overlaps(player.x, player.y, player.w, player.h,
                      leaks[i].x, leaks[i].y, leaks[i].w, leaks[i].h)) {
-          player.x += moveX * 1.8;
+          player.x += moveX * 4.5;
           player.x = Math.max(WALL_L, Math.min(WALL_R - player.w, player.x));
         }
       }
@@ -1946,8 +1955,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.translate(sx + w / 2, sy + h / 2);
       ctx.scale(facing, 1);
 
-      const bob = Math.sin(frame * 0.28) * 1.5;
-      const leg = Math.sin(frame * 0.28) * 3;
+      const s28 = fsin(frame * 0.28);
+      const bob = s28 * 1.5;
+      const leg = s28 * 3;
 
       // ── GRITTY (Philadelphia Flyers mascot) ─────────────────────────────────
 
@@ -1970,9 +1980,10 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // Body fur tufts
       ctx.fillStyle = '#ff6622';
-      for (const [tx, ty] of [[-13, 2], [13, 2], [-10, 9], [10, 9]]) {
+      for (let i = 0; i < BODY_TUFTS.length; i++) {
+        const [tx, ty] = BODY_TUFTS[i];
         ctx.beginPath();
-        ctx.ellipse(tx, ty + bob, 4, 3, Math.atan2(ty, tx), 0, Math.PI * 2);
+        ctx.ellipse(tx, ty + bob, 4, 3, BODY_TUFT_ANGLES[i], 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -1985,9 +1996,10 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // Head fur tufts
       ctx.fillStyle = '#ff5f1a';
-      for (const [tx, ty] of [[-13, -9], [13, -9], [-10, -15], [10, -15]]) {
+      for (let i = 0; i < HEAD_TUFTS.length; i++) {
+        const [tx, ty] = HEAD_TUFTS[i];
         ctx.beginPath();
-        ctx.ellipse(tx, ty + bob, 3.5, 3, Math.atan2(ty, tx), 0, Math.PI * 2);
+        ctx.ellipse(tx, ty + bob, 3.5, 3, HEAD_TUFT_ANGLES[i], 0, Math.PI * 2);
         ctx.fill();
       }
 
@@ -2053,12 +2065,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.lineCap = 'round';
       ctx.shadowBlur = 0;
 
-      // Soft haze behind the lines (cached gradient — all leaks same size)
-      ctx.fillStyle = hazeGrad;
-      ctx.beginPath();
-      ctx.ellipse(0, 0, hw * 1.1, hh * 1.5, 0, 0, Math.PI * 2);
-      ctx.fill();
-
       const lineCount = 5;
       for (let li = 0; li < lineCount; li++) {
         const lineY   = (li - (lineCount - 1) / 2) * (leak.h / lineCount);
@@ -2066,24 +2072,25 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         const amp     = 5 + li % 3 * 2;
         const lineLen = hw * 2 * (0.52 + (li % 3) * 0.14);
         const startX  = -lineLen / 2;
-        const alpha   = 0.58 - li * 0.08;
+        const alpha   = 0.90 - li * 0.08;
 
         ctx.globalAlpha = alpha;
-        ctx.strokeStyle = li % 3 === 1 ? '#ffffff' : li % 3 === 2 ? '#bbedff' : '#99ddff';
-        ctx.lineWidth   = 2.0 - li * 0.2;
+        ctx.strokeStyle = li % 3 === 1 ? '#ffffff' : li % 3 === 2 ? '#cceeff' : '#aaddff';
+        ctx.lineWidth   = 2.5 - li * 0.2;
 
         const segs = 3, segW = lineLen / segs;
         let curX = startX;
-        let curY = lineY + Math.sin(phase) * amp;
+        let curY = lineY + fsin(phase) * amp;
         ctx.beginPath();
         ctx.moveTo(curX, curY);
         for (let s = 0; s < segs; s++) {
+          const ph1  = phase + (s + 1) * 1.4;
           const nx   = curX + segW;
-          const ny   = lineY + Math.sin(phase + (s + 1) * 1.4) * amp;
+          const ny   = lineY + fsin(ph1) * amp;
           const cp1x = curX + segW * 0.35;
-          const cp1y = lineY + Math.sin(phase + s * 1.4 + 0.5) * amp * 1.7;
+          const cp1y = lineY + fsin(phase + s * 1.4 + 0.5) * amp * 1.7;
           const cp2x = nx - segW * 0.35;
-          const cp2y = lineY + Math.sin(phase + (s + 1) * 1.4 - 0.5) * amp * 1.7;
+          const cp2y = lineY + fsin(ph1 - 0.5) * amp * 1.7;
           ctx.bezierCurveTo(cp1x, cp1y, cp2x, cp2y, nx, ny);
           curX = nx; curY = ny;
         }
@@ -2106,14 +2113,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const pct = Math.max(0, Math.min(1, 1 - (player.y / WORLD_H)));
       const climbed = Math.round(pct * 100);
 
-      ctx.fillStyle = '#F5C500';
-      ctx.font = 'bold 13px monospace';
-      ctx.fillText('LES NRG', 14, 24);
-
-      ctx.fillStyle = '#ffffff30';
-      ctx.font = '11px monospace';
-      ctx.fillText(`HEIGHT  ${climbed}%`, 14, 42);
-      ctx.fillText(`BIG LEAKS  ${leaks.length}`, 14, 58);
 
       // Version
       ctx.textAlign = 'right';
@@ -2230,20 +2229,16 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
     // ─── Loop ─────────────────────────────────────────────────────────────────
     function loop() {
-      if (gameOver) {
-        draw();
-        drawOverlay('GAME OVER', 'You got sucked into the fan.', '[ PRESS R TO RESTART ]');
-        requestAnimationFrame(loop);
-        return;
-      }
-      if (gameWon) {
-        draw();
-        drawOverlay('Congratulations!', 'You escaped the leaky house!', '[ PRESS R TO PLAY AGAIN ]');
-        requestAnimationFrame(loop);
-        return;
-      }
       update();
       draw();
+      if (gameOver) {
+        drawOverlay('GAME OVER', 'You got sucked into the fan.', '[ PRESS R TO RESTART ]');
+        return; // stop RAF — redraw only when restarted
+      }
+      if (gameWon) {
+        drawOverlay('Congratulations!', 'You escaped the leaky house!', '[ PRESS R TO PLAY AGAIN ]');
+        return; // stop RAF — redraw only when restarted
+      }
       requestAnimationFrame(loop);
     }
 
@@ -2252,6 +2247,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         gameOver = false;
         gameWon  = false;
         resetPlayer();
+        requestAnimationFrame(loop);
       }
     });
 
