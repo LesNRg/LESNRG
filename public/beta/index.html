@@ -2,13 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
   <meta name="robots" content="noindex, nofollow" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>LES NRG — Beta Test</title>
   <style>
     @font-face {
       font-family: 'Peddana';
-      src: url('../my-website/lesnrg/public/fonts/peddana-regular.ttf');
+      src: url('/fonts/peddana-regular.ttf');
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -19,40 +20,65 @@
       justify-content: center;
       min-height: 100vh;
       font-family: monospace;
+      overflow: hidden;
     }
     #game-wrap {
-      display: flex;
-      flex-direction: row;
-      align-items: flex-start;
+      position: relative;
+      width: min(800px, 100vw);
+      margin: 0 auto;
     }
-    #game-col {
-      display: flex;
-      flex-direction: column;
-    }
-    #game { display: block; border: 2px solid #F5C500; }
-    .ruler-h {
+    #game-col { display: flex; flex-direction: column; }
+    #game {
       display: block;
-      width: 800px;
-      height: 24px;
-      background: #111;
-      border: 1px solid #2a2a2a;
-      flex-shrink: 0;
-    }
-    .ruler-v {
-      display: block;
-      width: 36px;
-      height: 1080px;
-      background: #111;
-      border: 1px solid #2a2a2a;
-      margin-top: 28px; /* align with game canvas (24px ruler + 2px border + 2px border) */
-      flex-shrink: 0;
+      width: 100%;
+      height: auto;
+      border: 2px solid #F5C500;
     }
     #controls {
       color: #ffffff33;
       font-size: 12px;
       margin-top: 10px;
       letter-spacing: 0.08em;
+      text-align: center;
     }
+    /* ── Mobile touch controls ── */
+    #mobile-controls {
+      display: none; /* hidden on desktop */
+    }
+    @media (hover: none) and (pointer: coarse) {
+      #mobile-controls {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        padding: 0 14px;
+        pointer-events: none;
+      }
+    }
+    .dpad { display: flex; gap: 10px; pointer-events: none; }
+    .ctrl-btn {
+      pointer-events: all;
+      width: 72px;
+      height: 72px;
+      background: rgba(245, 197, 0, 0.09);
+      border: 2px solid rgba(245, 197, 0, 0.28);
+      border-radius: 50%;
+      color: rgba(245, 197, 0, 0.5);
+      font-size: 26px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      touch-action: manipulation;
+      transition: background 0.08s;
+    }
+    .ctrl-btn:active { background: rgba(245, 197, 0, 0.35); }
+    #btn-jump { width: 84px; height: 84px; font-size: 13px; font-weight: bold; letter-spacing: 0.05em; }
   </style>
 </head>
 <body>
@@ -60,12 +86,25 @@
     <div id="game-col">
       <canvas id="game" width="800" height="700"></canvas>
     </div>
+    <div id="mobile-controls">
+      <div class="dpad">
+        <button class="ctrl-btn" id="btn-left">◀</button>
+        <button class="ctrl-btn" id="btn-right">▶</button>
+      </div>
+      <button class="ctrl-btn" id="btn-jump">JUMP</button>
+    </div>
   </div>
-  <div id="controls">ARROW KEYS or WASD to move &nbsp;|&nbsp; SPACE or UP to jump</div>
+  <div id="controls">ARROW KEYS / WASD &nbsp;|&nbsp; SPACE to jump &nbsp;|&nbsp; R to restart</div>
 
   <script>
     const canvas = document.getElementById('game');
     let ctx      = canvas.getContext('2d');
+
+    // ─── Pre-cached gradient for big leak haze (all leaks same size w=88) ───────
+    const hazeGrad = ctx.createRadialGradient(0, 0, 2, 0, 0, 48.4);
+    hazeGrad.addColorStop(0,   'rgba(160,230,255,0.13)');
+    hazeGrad.addColorStop(0.6, 'rgba(120,210,255,0.07)');
+    hazeGrad.addColorStop(1,   'rgba(100,200,255,0)');
 
     // ─── Logo blade image (real SVG path from navbar) ─────────────────────────
     const imgBlades = new Image();
@@ -82,16 +121,16 @@
     const WORLD_W = 800;
     const WORLD_H = 1080;   // game world height (viewport scrolls)
 
-    const VERSION = 'v4.8';
+    const VERSION = 'v5.18';
 
     // ─── Constants ───────────────────────────────────────────────────────────
-    const SPEED             = 10;
-    const JUMP_FORCE        = -28;   // first jump  (2× height)
-    const DOUBLE_JUMP_FORCE = -33;   // second jump (2× height)
-    const WALL_JUMP_VX      =  16;   // horizontal kick off wall
+    const SPEED             = 5;
+    const JUMP_FORCE        = -35;   // first jump (+25%)
+    const DOUBLE_JUMP_FORCE = -37;   // second jump (+50% height)
+    const WALL_JUMP_VX      =   8;   // horizontal kick off wall
     const WALL_BOOST_FRAMES =  12;   // frames the kick overrides input
-    const GRAVITY_UP = 3.92;
-    const GRAVITY_DN = 3.92;
+    const GRAVITY_UP = 3.92;         // gravity on ascent
+    const GRAVITY_DN = 0.10;         // gravity on descent
 
     let tick = 0; // global frame counter for animations
 
@@ -114,7 +153,7 @@
     const FH      = 34;   // floor band thickness (framed floor depth)
 
     // ─── Camera ──────────────────────────────────────────────────────────────
-    const cam = { y: 0 }; // camera y offset (world units from top)
+    const cam = { y: WORLD_H - 700 }; // start at bottom (basement)
 
     // ─── Offscreen canvas for static background (drawn once at startup) ───────
     const bgCanvas = document.createElement('canvas');
@@ -125,7 +164,7 @@
 
     // ─── Player ──────────────────────────────────────────────────────────────
     const player = {
-      x: WALL_L + 30,
+      x: 76,    // start just left of hot water heater (left edge at x=108)
       y: 1000,  // start in basement
       w: 28, h: 38,
       vx: 0, vy: 0,
@@ -145,6 +184,9 @@
       // Basement concrete slab — invisible ground (player spawns here)
       { x: 0, y: 1058, w: 800, h: 22, invisible: true },
 
+      // Top of the LES NRG logo — invisible landing surface
+      { x: LOGO_BX, y: LOGO_BY + 20 * LOGO_SC, w: LOGO_W, h: 12, invisible: true },
+
       // ── Basement platforms ──────────────────────────────────────────────────
       { x: 400, y:  900, w: 160, h: 12 },   // basement center
 
@@ -155,16 +197,15 @@
 
       // ── 2nd floor platforms ─────────────────────────────────────────────────
       { x: 150, y:  560, w:  75, h: 12, slippery: true },   // left lower — icy
-      { x: 559, y:  490, w:  82, h: 12 },   // right lower — crib width
-      { x: 325, y:  400, w: 150, h: 12 },   // center upper
+      { x: 559, y:  490, w:  82, h: 12, solid: true },   // right lower — crib width
+      { x: 325, y:  400, w: 150, h: 12, solid: true },   // center upper
 
       // ── 3rd floor platforms ─────────────────────────────────────────────────
-      { x:  55, y:  270, w: 150, h: 12 },   // left lower
-      { x: 520, y:  230, w: 160, h: 12 },   // right lower
-      { x: 300, y:  145, w: 140, h: 12 },   // center upper
+      { x:  55, y:  270, w: 150, h: 12, solid: true },   // left lower
+      { x: 300, y:  145, w: 140, h: 12, solid: true },   // center upper
 
       // ── Win platform ────────────────────────────────────────────────────────
-      { x: 610, y: 58, w: 67, h: 14 },
+      { x: 610, y: 58, w: 67, h: 14, solid: true },
 
     ];
 
@@ -201,9 +242,21 @@
 
     // Spawn zones — big leaks enter from both sides at every floor [minY, maxY, fromLeft]
     const spawnZones = [
-      // 3rd floor (both sides)
+      // 3rd floor (both sides) — listed 3× for higher weight
       [50,       269,          true ],
       [50,       269,          false],
+      [50,       269,          true ],
+      [50,       269,          false],
+      [50,       269,          true ],
+      [50,       269,          false],
+      // Office ceiling (left side, top of 3rd floor) — extra entries
+      [45,       130,          true ],
+      [45,       130,          true ],
+      [45,       130,          true ],
+      // Roof deck (right side, top of 3rd floor) — extra entries
+      [45,       130,          false],
+      [45,       130,          false],
+      [45,       130,          false],
       // 2nd floor (both sides)
       [269+FH,   532,          true ],
       [269+FH,   532,          false],
@@ -217,7 +270,24 @@
       ...WALL_CRACKS.map(c => [c.y - 10, c.y + 10, c.fromLeft]),
     ];
 
+    // Recessed light x positions (WALL_L+70, then every 110px up to x<400)
+    const LIGHT_XS = [110, 220, 330];
+
     function spawnLeak() {
+      // 20% chance: spawn from a recessed can light, drifting downward
+      if (Math.random() < 0.20) {
+        const lx = LIGHT_XS[Math.floor(Math.random() * LIGHT_XS.length)];
+        leaks.push({
+          x:     lx - 44,
+          y:     42,
+          w:     88,
+          h:     44,
+          vx:    (Math.random() - 0.5) * 0.8,
+          vy:    0.5,
+          angle: Math.PI / 2,
+        });
+        return;
+      }
       const zone     = spawnZones[Math.floor(Math.random() * spawnZones.length)];
       const fromLeft = zone[2];
       const spawnY   = zone[0] + Math.random() * (zone[1] - zone[0]);
@@ -226,21 +296,23 @@
         y:     spawnY,
         w:     88,
         h:     44,
-        vx:    fromLeft ? 20 : -20,
+        vx:    fromLeft ? 0.54 : -0.54,
         vy:    0,
         angle: fromLeft ? 0 : Math.PI,
       });
     }
 
     function resetPlayer() {
-      player.x  = WALL_L + 30;
+      player.x  = 76;
       player.y  = 1000;
+      cam.y = WORLD_H - 700;
       player.vx = 0;
       player.vy = 0;
       player.jumpsLeft = 2;
       player.wallKickVx = 0;
       player.wallKickTimer = 0;
       player.groundPlatform = null;
+      jumpPrev = false;
       leaks.length = 0;
       leakTimer = 0;
     }
@@ -250,11 +322,26 @@
     window.addEventListener('keydown', e => { keys[e.code] = true;  e.preventDefault(); });
     window.addEventListener('keyup',   e => { keys[e.code] = false; });
 
-    const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
+    // ─── Mobile touch controls ────────────────────────────────────────────────
+    function bindBtn(id, key) {
+      const el = document.getElementById(id);
+      el.addEventListener('touchstart',  e => { e.preventDefault(); keys[key] = true;  }, { passive: false });
+      el.addEventListener('touchend',    e => { e.preventDefault(); keys[key] = false; }, { passive: false });
+      el.addEventListener('touchcancel', e => { e.preventDefault(); keys[key] = false; }, { passive: false });
+    }
+    bindBtn('btn-left',  'ArrowLeft');
+    bindBtn('btn-right', 'ArrowRight');
+    bindBtn('btn-jump',  'Space');
+    // Tap canvas to restart on game over / win
+    canvas.addEventListener('touchstart', e => {
+      if (gameOver || gameWon) { e.preventDefault(); gameOver = false; gameWon = false; resetPlayer(); }
+    }, { passive: false });
+
+const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     const wantsRight = () => keys['ArrowRight'] || keys['KeyD'];
     const wantsJump  = () => keys['ArrowUp'] || keys['KeyW'] || keys['Space'];
 
-    let jumpHeld = false;
+    let jumpPrev = false;  // was jump pressed last frame
 
     // ─── AABB overlap ─────────────────────────────────────────────────────────
     function overlaps(ax, ay, aw, ah, bx, by, bw, bh) {
@@ -267,26 +354,23 @@
       const onWallLeft  = !player.onGround && player.x <= WALL_L;
       const onWallRight = !player.onGround && player.x >= WALL_R - player.w;
 
-      // Horizontal — instant on ground, momentum in air (slippery = slow accel + high carry)
+      // Horizontal — instant, original style
       const onIce = player.onGround && player.groundPlatform && player.groundPlatform.slippery;
-      if (player.onGround) {
-        if (onIce) {
-          if (wantsLeft())       { player.vx = Math.max(player.vx - 1.2, -SPEED); player.facing = -1; }
-          else if (wantsRight()) { player.vx = Math.min(player.vx + 1.2,  SPEED); player.facing =  1; }
-          else { player.vx *= 0.97; }  // barely slows down — slides
-        } else {
-          player.vx = 0;
-          if (wantsLeft())  { player.vx = -SPEED; player.facing = -1; }
-          if (wantsRight()) { player.vx =  SPEED; player.facing =  1; }
-        }
+      if (onIce) {
+        if (wantsLeft())       { player.vx = Math.max(player.vx - 1.2, -SPEED); player.facing = -1; }
+        else if (wantsRight()) { player.vx = Math.min(player.vx + 1.2,  SPEED); player.facing =  1; }
+        else { player.vx *= 0.97; }
       } else {
-        if (wantsLeft())  { player.vx = Math.max(player.vx - 2.5, -SPEED); player.facing = -1; }
-        else if (wantsRight()) { player.vx = Math.min(player.vx + 2.5,  SPEED); player.facing =  1; }
-        else { player.vx *= 0.88; } // coast to a stop with no input
+        player.vx = 0;
+        if (wantsLeft())  { player.vx = -SPEED; player.facing = -1; }
+        if (wantsRight()) { player.vx =  SPEED; player.facing =  1; }
       }
 
-      // Jump (normal + double jump + wall jump)
-      if (wantsJump() && !jumpHeld) {
+      // Jump (normal + double jump + wall jump) — fires on each new keypress
+      const jumpCur   = wantsJump();
+      const jumpFresh = jumpCur && !jumpPrev;
+      jumpPrev = jumpCur;
+      if (jumpFresh) {
         if (player.jumpsLeft > 0) {
           player.vy = player.jumpsLeft === 1 ? DOUBLE_JUMP_FORCE : JUMP_FORCE;
           player.onGround = false;
@@ -299,7 +383,6 @@
           player.jumpsLeft   = 0;
         }
       }
-      jumpHeld = wantsJump();
 
       // Wall kick overrides input for a short burst
       if (player.wallKickTimer > 0) {
@@ -307,7 +390,7 @@
         player.wallKickTimer--;
       }
 
-      // Gravity — heavier on way down (Mario feel)
+      // Gravity — floaty fall
       const grav = player.vy > 0 ? GRAVITY_DN : GRAVITY_UP;
       player.vy = Math.min(player.vy + grav, 18);
 
@@ -331,10 +414,12 @@
             player.groundPlatform = p;
             player.jumpsLeft = 2;
           }
-        } else if (player.vy < 0) {
+        } else if (player.vy < 0 && p.solid) {
+          // solid platform — block upward movement
           player.y  = p.y + p.h;
           player.vy = 0;
         }
+        // non-solid going up — pass through
       }
 
       // Solid obstacles — full push-out (player can't walk through)
@@ -377,6 +462,7 @@
       // Win condition — reach the top platform
       if (player.y < 75 && player.onGround) {
         gameWon = true;
+        window.parent.postMessage({ type: 'GAME_WIN' }, '*');
         return;
       }
 
@@ -393,6 +479,7 @@
       }
       if (pDist < 22) {
         gameOver = true;
+        window.parent.postMessage({ type: 'GAME_LOSE' }, '*');
         return;
       }
 
@@ -400,12 +487,12 @@
       const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
       const dynInterval = Math.round(60 - heightFrac * 40); // 60 frames at bottom → 20 at top
       leakTimer++;
-      if (leakTimer >= dynInterval && leaks.length < 12) {
+      if (leakTimer >= dynInterval && leaks.length < 11) {
         spawnLeak();
         leakTimer = 0;
       }
-      // Keep minimum 7 on screen
-      if (leaks.length < 7) {
+      // Keep minimum 6 on screen
+      if (leaks.length < 6) {
         spawnLeak();
       }
 
@@ -429,10 +516,10 @@
         leaks[i].distToFan = dist;
 
         // Drag + pull in both axes — spirals reliably into fan
-        leaks[i].vx *= 0.97;
-        leaks[i].vy *= 0.97;
-        leaks[i].vx += (dx / dist) * 0.28;
-        leaks[i].vy += (dy / dist) * 0.28;
+        leaks[i].vx *= 0.92;
+        leaks[i].vy *= 0.92;
+        leaks[i].vx += (dx / dist) * 0.06;
+        leaks[i].vy += (dy / dist) * 0.06;
 
         const moveX = leaks[i].vx;
         const moveY = leaks[i].vy;
@@ -464,10 +551,12 @@
       if (player.vx !== 0) player.frame++;
       tick++;
 
-      // ─── Camera follows player, clamped to world bounds ───────────────────
-      const targetCamY = player.y - CH * 0.55;
-      cam.y += (targetCamY - cam.y) * 0.1;                 // smooth follow
-      cam.y = Math.max(0, Math.min(WORLD_H - CH, cam.y));  // clamp
+      // Camera follows player — pulls to top when LES is in the top 35% of the level
+      const topThreshold = WORLD_H * 0.35;
+      const targetCamY = player.y < topThreshold ? 0 : player.y - CH * 0.4;
+      const lerpRate = player.y < topThreshold ? 0.4 : 0.2;
+      cam.y += (targetCamY - cam.y) * lerpRate;
+      cam.y = Math.max(0, Math.min(WORLD_H - CH, cam.y));
     }
 
     // ─── Draw ─────────────────────────────────────────────────────────────────
@@ -1375,7 +1464,7 @@
 
       // ── Baby room (right: x 403..760) ─────────────────────────────────────
       // Light blue wall
-      ctx.fillStyle = '#c8e4f4';
+      ctx.fillStyle = '#a0b6c3';
       ctx.fillRect(403, b2C, WALL_R - 403, b2Y - b2C);
       // Polka dots
       ctx.fillStyle = 'rgba(255,210,120,0.40)';
@@ -1735,8 +1824,7 @@
     function drawAirLeakSources() {
       ctx.save();
       ctx.lineCap    = 'round';
-      ctx.shadowColor = '#b8e8ff';
-      ctx.shadowBlur  = 4;
+      ctx.shadowBlur  = 0;
 
       ctx.strokeStyle = '#d8f2ff';  // set once — stream() never changes this
 
@@ -1963,35 +2051,28 @@
       ctx.translate(cx, cy);
       ctx.rotate(leak.angle || 0);
       ctx.lineCap = 'round';
-
-      // Soft haze behind the lines
       ctx.shadowBlur = 0;
-      const haze = ctx.createRadialGradient(0, 0, 2, 0, 0, hw * 1.1);
-      haze.addColorStop(0,   'rgba(160,230,255,0.13)');
-      haze.addColorStop(0.6, 'rgba(120,210,255,0.07)');
-      haze.addColorStop(1,   'rgba(100,200,255,0)');
-      ctx.fillStyle = haze;
+
+      // Soft haze behind the lines (cached gradient — all leaks same size)
+      ctx.fillStyle = hazeGrad;
       ctx.beginPath();
       ctx.ellipse(0, 0, hw * 1.1, hh * 1.5, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.shadowColor = '#aae8ff';
-      ctx.shadowBlur  = 6;
-
-      const lineCount = 8;
+      const lineCount = 5;
       for (let li = 0; li < lineCount; li++) {
         const lineY   = (li - (lineCount - 1) / 2) * (leak.h / lineCount);
         const phase   = tick * 0.09 + li * 0.75;
         const amp     = 5 + li % 3 * 2;
         const lineLen = hw * 2 * (0.52 + (li % 3) * 0.14);
         const startX  = -lineLen / 2;
-        const alpha   = 0.58 - li * 0.05;
+        const alpha   = 0.58 - li * 0.08;
 
         ctx.globalAlpha = alpha;
         ctx.strokeStyle = li % 3 === 1 ? '#ffffff' : li % 3 === 2 ? '#bbedff' : '#99ddff';
-        ctx.lineWidth   = 2.0 - li * 0.15;
+        ctx.lineWidth   = 2.0 - li * 0.2;
 
-        const segs = 4, segW = lineLen / segs;
+        const segs = 3, segW = lineLen / segs;
         let curX = startX;
         let curY = lineY + Math.sin(phase) * amp;
         ctx.beginPath();
