@@ -124,12 +124,12 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'v5.34';
+    const VERSION = 'v5.35';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
     const JUMP_FORCE        = -35;   // first jump (+25%)
-    const DOUBLE_JUMP_FORCE = -26;   // second jump (half height of JUMP_FORCE)
+    const DOUBLE_JUMP_FORCE = -52;   // second jump
     const WALL_JUMP_VX      =   8;   // horizontal kick off wall
     const WALL_BOOST_FRAMES =  12;   // frames the kick overrides input
     const GRAVITY_UP = 7.84;         // gravity on ascent (2× heavier)
@@ -2267,7 +2267,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       if (e.data?.type === 'JUMP') {
         // Execute immediately — bypasses frame timing so quick taps are never lost
         if (player.jumpsLeft > 0) {
-          player.vy = player.jumpsLeft === 1 ? DOUBLE_JUMP_FORCE * 2 : JUMP_FORCE;
+          player.vy = player.jumpsLeft === 1 ? DOUBLE_JUMP_FORCE : JUMP_FORCE;
           player.onGround = false;
           player.jumpsLeft--;
         }
