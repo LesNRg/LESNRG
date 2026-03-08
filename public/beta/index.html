@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'v5.27';
+    const VERSION = 'v5.34';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -283,6 +283,22 @@
     const LIGHT_XS = [110, 220, 330];
 
     function spawnLeak() {
+      // 15% chance: emerge directly from a wall crack surface
+      if (Math.random() < 0.15) {
+        const crack    = WALL_CRACKS[Math.floor(Math.random() * WALL_CRACKS.length)];
+        const fromLeft = crack.fromLeft;
+        leaks.push({
+          x:     fromLeft ? WALL_L : WALL_R - 88,
+          y:     crack.y - 22 + (Math.random() - 0.5) * 40,
+          w:     88,
+          h:     44,
+          vx:    fromLeft ? 5.0 : -5.0,
+          vy:    (Math.random() - 0.5) * 0.8,
+          angle: fromLeft ? 0 : Math.PI,
+        });
+        return;
+      }
+
       // 20% chance: spawn from a recessed can light, drifting downward
       if (Math.random() < 0.20) {
         const lx = LIGHT_XS[Math.floor(Math.random() * LIGHT_XS.length)];
@@ -455,13 +471,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
 
-      // ── Pipe wind — pushes LES rightward when in airstream zone ──────────
-      const pipeWindY = F1 + FH + 126;
-      if (player.x < 650 &&
-          player.y + player.h > pipeWindY - 22 &&
-          player.y < pipeWindY + 22) {
-        player.x = Math.min(WALL_R - player.w, player.x + 0.9);
-      }
 
       // Fall off bottom — lose a life
       if (player.y > WORLD_H + 80) {
@@ -2248,6 +2257,23 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         gameWon  = false;
         resetPlayer();
         requestAnimationFrame(loop);
+      }
+    });
+
+    // ─── Parent-frame key injection (for embedded mobile controls) ───────────
+    window.addEventListener('message', e => {
+      if (e.data?.type === 'KEY_DOWN' && e.data.key) keys[e.data.key] = true;
+      if (e.data?.type === 'KEY_UP'   && e.data.key) keys[e.data.key] = false;
+      if (e.data?.type === 'JUMP') {
+        // Execute immediately — bypasses frame timing so quick taps are never lost
+        if (player.jumpsLeft > 0) {
+          player.vy = player.jumpsLeft === 1 ? DOUBLE_JUMP_FORCE * 2 : JUMP_FORCE;
+          player.onGround = false;
+          player.jumpsLeft--;
+        }
+      }
+      if (e.data?.type === 'RESTART' && (gameOver || gameWon)) {
+        gameOver = false; gameWon = false; resetPlayer(); requestAnimationFrame(loop);
       }
     });
 

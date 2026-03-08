@@ -45,7 +45,9 @@ export default function Navbar() {
         scrolled
           ? "bg-[#111111]/97 border-b border-white/8 shadow-lg shadow-black/20"
           : "bg-[#111111]"
-      } ${visible ? "translate-y-0" : "-translate-y-full"}`}
+      } ${visible ? "translate-y-0" : "-translate-y-full"} ${
+        pathname === "/les-nrg-game" ? "hidden md:block" : ""
+      }`}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="flex items-center justify-between h-32">
