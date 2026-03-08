@@ -46,7 +46,7 @@ export default function Navbar() {
           ? "bg-[#111111]/97 border-b border-white/8 shadow-lg shadow-black/20"
           : "bg-[#111111]"
       } ${visible ? "translate-y-0" : "-translate-y-full"} ${
-        pathname === "/les-nrg-game" ? "hidden md:block" : ""
+        pathname === "/TheGame" ? "hidden md:block" : ""
       }`}
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">

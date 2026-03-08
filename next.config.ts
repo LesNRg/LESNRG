@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         destination: "/large-building-blower-door-testing",
         permanent: true,
       },
+      {
+        source: "/les-nrg-game",
+        destination: "/TheGame",
+        permanent: true,
+      },
     ];
   },
 };
