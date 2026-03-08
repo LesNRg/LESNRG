@@ -18,11 +18,6 @@ const nextConfig: NextConfig = {
         destination: "/thegame",
         permanent: true,
       },
-      {
-        source: "/TheGame",
-        destination: "/thegame",
-        permanent: true,
-      },
     ];
   },
 };
