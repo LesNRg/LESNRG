@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import GameContainer from "@/components/GameContainer";
 
 export const metadata: Metadata = {
-  title: "LES NRG: The Game",
+  title: "LESNRG The Game",
   robots: { index: false, follow: false },
 };
 
@@ -18,7 +18,7 @@ export default function GamePage() {
           className="font-black text-white mb-2 leading-tight"
           style={{ fontSize: "clamp(2.5rem, 6vw, 4.25rem)", letterSpacing: "-0.03em" }}
         >
-          LES NRG:{" "}
+          LESNRG{" "}
           <span className="text-[#F5C500]">The Game.</span>
         </h1>
         <p className="text-white/50 text-lg max-w-xl">
