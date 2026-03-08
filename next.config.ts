@@ -15,7 +15,12 @@ const nextConfig: NextConfig = {
       },
       {
         source: "/les-nrg-game",
-        destination: "/TheGame",
+        destination: "/thegame",
+        permanent: true,
+      },
+      {
+        source: "/TheGame",
+        destination: "/thegame",
         permanent: true,
       },
     ];
