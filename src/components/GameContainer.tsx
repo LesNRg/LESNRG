@@ -21,6 +21,16 @@ export default function GameContainer() {
     return () => window.removeEventListener("message", handler);
   }, []);
 
+  useEffect(() => {
+    const prevent = (e: TouchEvent) => { if (e.touches.length > 1) e.preventDefault(); };
+    document.addEventListener("touchstart", prevent, { passive: false });
+    document.addEventListener("touchmove", prevent, { passive: false });
+    return () => {
+      document.removeEventListener("touchstart", prevent);
+      document.removeEventListener("touchmove", prevent);
+    };
+  }, []);
+
   const sendKey = useCallback((key: string, down: boolean) => {
     iframeRef.current?.contentWindow?.postMessage(
       { type: down ? "KEY_DOWN" : "KEY_UP", key },
@@ -55,7 +65,7 @@ export default function GameContainer() {
         {!won && !lost && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=5.36"
+            src="/beta/index.html?v=5.37"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
