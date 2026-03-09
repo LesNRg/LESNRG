@@ -11,6 +11,13 @@ export default function GameContainer() {
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", address: "" });
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const gameStarted = useRef(false);
+  const notifyStart = useCallback(() => {
+    if (!gameStarted.current) {
+      gameStarted.current = true;
+      window.dispatchEvent(new CustomEvent("game-started"));
+    }
+  }, []);
 
   useEffect(() => {
     const handler = (e: MessageEvent) => {
@@ -175,13 +182,13 @@ export default function GameContainer() {
         <div className="flex gap-3">
           <button
             className="w-[104px] h-[104px] rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
-            onTouchStart={e => { e.preventDefault(); sendKey("ArrowLeft", true); }}
+            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
           >◀</button>
           <button
             className="w-[104px] h-[104px] rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
-            onTouchStart={e => { e.preventDefault(); sendKey("ArrowRight", true); }}
+            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
           >▶</button>
@@ -191,6 +198,7 @@ export default function GameContainer() {
             className="w-[125px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
             onTouchStart={e => {
               e.preventDefault();
+              notifyStart();
               iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
             }}
           >JUMP</button>
