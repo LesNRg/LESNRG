@@ -124,11 +124,11 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'v5.38';
+    const VERSION = 'v5.39';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
-    const JUMP_FORCE        = -57;   // first jump (+10%)
+    const JUMP_FORCE        = -51;   // first jump (-10%)
     const DOUBLE_JUMP_FORCE = -26;   // second jump (half height)
     const WALL_JUMP_VX      =   8;   // horizontal kick off wall
     const WALL_BOOST_FRAMES =  12;   // frames the kick overrides input
@@ -199,7 +199,7 @@
       { x: 240, y:  660, w: 140, h: 12 },   // center upper
 
       // ── 2nd floor platforms ─────────────────────────────────────────────────
-      { x: 150, y:  560, w:  75, h: 12, slippery: true },   // left lower — icy
+      { x: 150, y:  460, w:  75, h: 12, slippery: true },   // left lower — icy
       { x: 559, y:  490, w:  82, h: 12, solid: true },   // right lower — crib width
       { x: 325, y:  400, w: 150, h: 12, solid: true },   // center upper
 
