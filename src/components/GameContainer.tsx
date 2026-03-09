@@ -164,20 +164,20 @@ export default function GameContainer() {
       <div className="md:hidden flex justify-between items-center px-2 pt-3 pb-1">
         <div className="flex gap-3">
           <button
-            className="w-20 h-20 rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
+            className="w-[104px] h-[104px] rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
             onTouchStart={e => { e.preventDefault(); sendKey("ArrowLeft", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
           >◀</button>
           <button
-            className="w-20 h-20 rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
+            className="w-[104px] h-[104px] rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
             onTouchStart={e => { e.preventDefault(); sendKey("ArrowRight", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
           >▶</button>
         </div>
         <button
-          className="w-24 h-20 rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
+          className="w-[125px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
           onTouchStart={e => {
             e.preventDefault();
             iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
