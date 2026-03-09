@@ -176,13 +176,16 @@ export default function GameContainer() {
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
           >▶</button>
         </div>
-        <button
-          className="w-[125px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
-          onTouchStart={e => {
-            e.preventDefault();
-            iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
-          }}
-        >JUMP</button>
+        <div className="flex flex-col items-center gap-1">
+          <button
+            className="w-[125px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
+            onTouchStart={e => {
+              e.preventDefault();
+              iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
+            }}
+          >JUMP</button>
+          <span className="text-white/30 text-[10px]">tap twice to double jump</span>
+        </div>
       </div>
     </div>
   );
