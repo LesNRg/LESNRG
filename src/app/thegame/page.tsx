@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import GameContainer from "@/components/GameContainer";
@@ -6,6 +6,10 @@ import GameContainer from "@/components/GameContainer";
 export const metadata: Metadata = {
   title: "LESNRG The Game",
   robots: { index: false, follow: false },
+};
+
+export const viewport: Viewport = {
+  userScalable: false,
 };
 
 export default function GamePage() {
