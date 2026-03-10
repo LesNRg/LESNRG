@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.4';
+    const VERSION = 'L2.5';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -603,7 +603,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           const sweepW = Math.abs(b.vx) + b.w;
           if (overlaps(sweepX, b.y, sweepW, b.h, lx, ly, lw, lh)) {
             if (l.fromWall) {
-              seals.push({ x: l.vx > 0 ? WALL_L : WALL_R, y: l.y + l.h / 2, fromLeft: l.vx > 0 });
+              seals.push({ x: l.x + l.w / 2, y: l.y + l.h / 2 });
             }
             leaks.splice(j, 1);
             score += 10;
@@ -2273,17 +2273,17 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.save();
       ctx.translate(0, -cam.y);
       for (const s of seals) {
-        const sx = s.fromLeft ? WALL_L + 3 : WALL_R - 15;
+        const sx = s.x;
         const sy = s.y;
-        // Outer glow
-        ctx.fillStyle = 'rgba(255,107,0,0.3)';
-        ctx.beginPath(); ctx.ellipse(sx + 6, sy, 16, 8, 0, 0, Math.PI * 2); ctx.fill();
-        // Main caulk bead
+        // Outer glow — wide smear to cover the sealed leak area
+        ctx.fillStyle = 'rgba(255,107,0,0.25)';
+        ctx.beginPath(); ctx.ellipse(sx, sy, 52, 16, 0, 0, Math.PI * 2); ctx.fill();
+        // Main caulk smear
         ctx.fillStyle = '#FF6B00';
-        ctx.beginPath(); ctx.ellipse(sx + 6, sy, 11, 5, 0, 0, Math.PI * 2); ctx.fill();
-        // Highlight
+        ctx.beginPath(); ctx.ellipse(sx, sy, 40, 10, 0, 0, Math.PI * 2); ctx.fill();
+        // Highlight ridge
         ctx.fillStyle = '#FFB347';
-        ctx.beginPath(); ctx.ellipse(sx + 5, sy - 1, 5, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(sx - 6, sy - 2, 20, 4, 0, 0, Math.PI * 2); ctx.fill();
       }
       ctx.restore();
     }
@@ -2452,16 +2452,23 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     }
 
     // ─── Loop ─────────────────────────────────────────────────────────────────
+    const isEmbedded = window !== window.parent;
+
     function loop() {
       update();
       draw();
       if (gameOver) {
-        const sub = loseReason === 'fan' ? 'Sucked into the fan!' : 'The leaks got you.';
-        drawOverlay('GAME OVER', `Score: ${score}  —  ${sub}`, '[ PRESS R TO RESTART ]');
+        // Only draw canvas overlay when running standalone (not in the website iframe)
+        if (!isEmbedded) {
+          const sub = loseReason === 'fan' ? 'Sucked into the fan!' : 'The leaks got you.';
+          drawOverlay('GAME OVER', `Score: ${score}  —  ${sub}`, '[ PRESS R TO RESTART ]');
+        }
         return;
       }
       if (gameWon) {
-        drawOverlay('YOU SURVIVED!', `Final score: ${score}`, '[ PRESS R TO PLAY AGAIN ]');
+        if (!isEmbedded) {
+          drawOverlay('YOU SURVIVED!', `Final score: ${score}`, '[ PRESS R TO PLAY AGAIN ]');
+        }
         return;
       }
       requestAnimationFrame(loop);
