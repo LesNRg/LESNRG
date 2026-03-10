@@ -79,9 +79,18 @@ export default function GameContainer() {
         }),
       }),
     ]);
-    const res = await fetch("/api/scores");
-    const data = await res.json();
-    setBoard(data);
+    // Fetch fresh leaderboard — always inject current player's entry so it's never blank
+    let data: BoardEntry[] = [];
+    try {
+      const res = await fetch("/api/scores", { cache: "no-store" });
+      if (res.ok) data = await res.json();
+    } catch { /* network error — fall through to local entry */ }
+    // Ensure current player appears even if API returned nothing or their entry is missing
+    const myEntry: BoardEntry = { name, company: form.company || form.building, score: finalScore };
+    const alreadyIn = data.some(e => e.name === name && e.score === finalScore);
+    if (!alreadyIn) data = [myEntry, ...data];
+    data.sort((a, b) => b.score - a.score);
+    setBoard(data.slice(0, 10));
     setSubmitting(false);
     setSubmitted(true);
   }
@@ -95,7 +104,7 @@ export default function GameContainer() {
         {!won && !lost && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.5"
+            src="/beta/index.html?v=L2.6"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"

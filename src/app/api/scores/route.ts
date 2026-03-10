@@ -20,7 +20,7 @@ function getWeekStart() {
 export async function GET() {
   const res = await fetch(
     `${SB_URL}/rest/v1/scores?select=name,company,score&created_at=gte.${getWeekStart()}&order=score.desc&limit=10`,
-    { headers: hdrs, next: { revalidate: 60 } }
+    { headers: hdrs, cache: "no-store" }
   );
   if (!res.ok) return NextResponse.json([]);
   return NextResponse.json(await res.json());
