@@ -86,7 +86,7 @@ export default function GameContainer() {
         {!won && !lost && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.0"
+            src="/beta/index.html?v=L2.1"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
@@ -213,16 +213,22 @@ export default function GameContainer() {
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
           >▶</button>
         </div>
-        <div className="flex flex-col items-center gap-1">
+        <div className="flex gap-2 items-start">
           <button
-            className="w-[125px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
-            onTouchStart={e => {
-              e.preventDefault();
-              notifyStart();
-              iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
-            }}
-          >JUMP</button>
-          <span className="text-white/30 text-[10px]">tap twice to double jump</span>
+            className="w-[104px] h-[104px] rounded-2xl bg-[#FF6B00] text-white text-sm font-black tracking-wide active:bg-[#FF6B00]/60 select-none"
+            onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "SHOOT" }, "*"); }}
+          >FIRE</button>
+          <div className="flex flex-col items-center gap-1">
+            <button
+              className="w-[104px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
+              onTouchStart={e => {
+                e.preventDefault();
+                notifyStart();
+                iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
+              }}
+            >JUMP</button>
+            <span className="text-white/30 text-[10px]">tap twice to double jump</span>
+          </div>
         </div>
       </div>
     </div>
