@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.0';
+    const VERSION = 'v5.39';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -224,20 +224,9 @@
     const HEAD_TUFTS = [[-13,-9],[13,-9],[-10,-15],[10,-15]];
     const HEAD_TUFT_ANGLES = HEAD_TUFTS.map(([tx,ty]) => Math.atan2(ty,tx));
 
-    // ─── Game state ───────────────────────────────────────────────────────────
-    const GAME_DURATION    = 120 * 60; // 2 minutes at 60 fps
-    const MAX_LIVES        = 3;
-    const INVINCIBLE_FRAMES = 90;      // 1.5s invincibility after hit
-
-    let gameOver  = false;
-    let gameWon   = false;
-    let lives     = MAX_LIVES;
-    let score     = 0;
-    let framesLeft = GAME_DURATION;
-    let invincible = 0;               // countdown frames of invincibility
-    let loseReason = '';              // 'time' | 'lives' | 'fan'
-
-    // ─── Air Leaks ────────────────────────────────────────────────────────────
+    // ─── Lives & Air Leaks ───────────────────────────────────────────────────
+    let gameOver = false;
+    let gameWon  = false;
     const leaks = [];
     let leakTimer = 0;
     const LEAK_INTERVAL = 37; // frames between spawns (~0.6s)
@@ -353,18 +342,6 @@
       leakTimer = 0;
     }
 
-    function startGame() {
-      lives      = MAX_LIVES;
-      score      = 0;
-      framesLeft = GAME_DURATION;
-      invincible = 0;
-      loseReason = '';
-      gameOver   = false;
-      gameWon    = false;
-      resetPlayer();
-      requestAnimationFrame(loop);
-    }
-
     // ─── Input ───────────────────────────────────────────────────────────────
     const keys = {};
     window.addEventListener('keydown', e => { keys[e.code] = true;  e.preventDefault(); });
@@ -382,7 +359,7 @@
     bindBtn('btn-jump',  'Space');
     // Tap canvas to restart on game over / win
     canvas.addEventListener('touchstart', e => {
-      if (gameOver || gameWon) { e.preventDefault(); startGame(); }
+      if (gameOver || gameWon) { e.preventDefault(); gameOver = false; gameWon = false; resetPlayer(); requestAnimationFrame(loop); }
     }, { passive: false });
 
 const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
@@ -495,20 +472,19 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
 
 
-      // Fall off bottom — respawn
+      // Fall off bottom — lose a life
       if (player.y > WORLD_H + 80) {
         resetPlayer();
       }
 
-      // ─── Timer countdown ─────────────────────────────────────────────────────
-      framesLeft = Math.max(0, framesLeft - 1);
-      if (framesLeft === 0) {
+      // Win condition — reach the top platform
+      if (player.y < 75 && player.onGround) {
         gameWon = true;
-        window.parent.postMessage({ type: 'GAME_WIN', score }, '*');
+        window.parent.postMessage({ type: 'GAME_WIN' }, '*');
         return;
       }
 
-      // ─── Fan suck ────────────────────────────────────────────────────────────
+      // Fan suck — pull LES toward fan, game over if he gets too close
       const fanCX2 = LOGO_BX + 40 * LOGO_SC;
       const fanCY2 = LOGO_FAN_Y + 40 * LOGO_SC;
       const pdx = fanCX2 - (player.x + player.w / 2);
@@ -520,37 +496,10 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         player.vy += (pdy / pDist) * pull;
       }
       if (pDist < 22) {
-        lives--;
-        invincible = INVINCIBLE_FRAMES;
-        resetPlayer();
-        if (lives <= 0) {
-          lives = 0;
-          loseReason = 'fan';
-          gameOver = true;
-          window.parent.postMessage({ type: 'GAME_LOSE', score }, '*');
-          return;
-        }
+        gameOver = true;
+        window.parent.postMessage({ type: 'GAME_LOSE' }, '*');
+        return;
       }
-
-      // ─── Leak hit detection ───────────────────────────────────────────────────
-      if (invincible === 0) {
-        const px = player.x + 6, py = player.y + 6, pw = player.w - 12, ph = player.h - 12;
-        for (const l of leaks) {
-          if (overlaps(px, py, pw, ph, l.x + l.w * 0.2, l.y + l.h * 0.2, l.w * 0.6, l.h * 0.6)) {
-            lives--;
-            invincible = INVINCIBLE_FRAMES;
-            if (lives <= 0) {
-              lives = 0;
-              loseReason = 'lives';
-              gameOver = true;
-              window.parent.postMessage({ type: 'GAME_LOSE', score }, '*');
-              return;
-            }
-            break;
-          }
-        }
-      }
-      if (invincible > 0) invincible--;
 
       // ─── Big leaks — 7–12 on screen, more frequent near the top ─────────
       const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
@@ -2007,9 +1956,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     }
 
     function drawPlayer() {
-      // Flicker during invincibility (every 6 frames)
-      if (invincible > 0 && Math.floor(invincible / 6) % 2 === 1) return;
-
       const sx = player.x;
       const sy = player.y - cam.y;
       const { w, h, facing, frame } = player;
@@ -2172,40 +2118,17 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     }
 
     function drawHUD() {
-      ctx.save();
-      ctx.textBaseline = 'top';
+      // Height indicator (how high have they climbed)
+      const pct = Math.max(0, Math.min(1, 1 - (player.y / WORLD_H)));
+      const climbed = Math.round(pct * 100);
 
-      // ── Lives (hearts) ────────────────────────────────────────────────────
-      ctx.font = 'bold 22px Arial';
-      for (let i = 0; i < MAX_LIVES; i++) {
-        ctx.fillStyle = i < lives ? '#ff3355' : 'rgba(255,255,255,0.18)';
-        ctx.textAlign = 'left';
-        ctx.fillText('♥', 16 + i * 28, 14);
-      }
 
-      // ── Timer (center) ────────────────────────────────────────────────────
-      const totalSecs = Math.ceil(framesLeft / 60);
-      const mins = Math.floor(totalSecs / 60);
-      const secs = totalSecs % 60;
-      const timeStr = `${mins}:${secs.toString().padStart(2, '0')}`;
-      ctx.font = 'bold 20px monospace';
-      ctx.fillStyle = framesLeft < 600 ? '#ff3355' : 'rgba(255,255,255,0.9)';
-      ctx.textAlign = 'center';
-      ctx.fillText(timeStr, CW / 2, 16);
-
-      // ── Score (right) ─────────────────────────────────────────────────────
-      ctx.font = 'bold 20px monospace';
-      ctx.fillStyle = '#F5C500';
+      // Version
       ctx.textAlign = 'right';
-      ctx.fillText(score.toString(), CW - 16, 16);
-
-      // ── Version (bottom-right, faint) ─────────────────────────────────────
-      ctx.textBaseline = 'bottom';
-      ctx.fillStyle = 'rgba(255,255,255,0.15)';
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
       ctx.font = '10px monospace';
       ctx.fillText(VERSION, CW - 8, CH - 8);
-
-      ctx.restore();
+      ctx.textAlign = 'left';
     }
 
     function drawLogo() {
@@ -2318,19 +2241,23 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       update();
       draw();
       if (gameOver) {
-        const sub = loseReason === 'fan' ? 'Sucked into the fan!' : 'The leaks got you.';
-        drawOverlay('GAME OVER', `Score: ${score}  —  ${sub}`, '[ PRESS R TO RESTART ]');
-        return;
+        drawOverlay('GAME OVER', 'You got sucked into the fan.', '[ PRESS R TO RESTART ]');
+        return; // stop RAF — redraw only when restarted
       }
       if (gameWon) {
-        drawOverlay('YOU SURVIVED!', `Final score: ${score}`, '[ PRESS R TO PLAY AGAIN ]');
-        return;
+        drawOverlay('Congratulations!', 'You escaped the leaky house!', '[ PRESS R TO PLAY AGAIN ]');
+        return; // stop RAF — redraw only when restarted
       }
       requestAnimationFrame(loop);
     }
 
     window.addEventListener('keydown', e => {
-      if (e.code === 'KeyR' && (gameOver || gameWon)) startGame();
+      if (e.code === 'KeyR' && (gameOver || gameWon)) {
+        gameOver = false;
+        gameWon  = false;
+        resetPlayer();
+        requestAnimationFrame(loop);
+      }
     });
 
     // ─── Parent-frame key injection (for embedded mobile controls) ───────────
@@ -2346,7 +2273,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         }
       }
       if (e.data?.type === 'RESTART' && (gameOver || gameWon)) {
-        startGame();
+        gameOver = false; gameWon = false; resetPlayer(); requestAnimationFrame(loop);
       }
     });
 
