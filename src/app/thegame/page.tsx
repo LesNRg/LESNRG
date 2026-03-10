@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import GameContainer from "@/components/GameContainer";
+import Leaderboard from "./Leaderboard";
 
 export const metadata: Metadata = {
   title: "LESNRG The Game",
@@ -26,7 +28,7 @@ export default function GamePage() {
           <span className="text-[#F5C500]">The Game.</span>
         </h1>
         <p className="text-white/50 text-lg max-w-xl">
-          Can you escape the leaky house?
+          Survive 2 minutes. Shoot the leaks. Get on the board.
         </p>
       </div>
 
@@ -35,6 +37,15 @@ export default function GamePage() {
         <GameContainer />
       </div>
 
+      {/* Leaderboard */}
+      <Suspense fallback={
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 pb-20">
+          <p className="text-white/20 text-sm">Loading leaderboard…</p>
+        </div>
+      }>
+        <Leaderboard />
+      </Suspense>
+
       {/* Prize Callout */}
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 pb-20">
         <div className="bg-[#F5C500] rounded-2xl p-10 md:p-14 max-w-3xl">
@@ -42,10 +53,10 @@ export default function GamePage() {
             className="font-black text-[#111111] mb-4 leading-tight"
             style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)", letterSpacing: "-0.03em" }}
           >
-            Escape the leaky house. Enter to win a free blower door test.
+            Top score wins a free blower door test.
           </h2>
           <p className="text-[#111111]/70 text-lg leading-relaxed mb-6">
-            Beat the game and enter to win a free blower door test. We&apos;ll come to your building and find exactly where it&apos;s losing energy — no charge.
+            Beat the game, submit your score, and enter to win. We&apos;ll come to your building and find exactly where it&apos;s losing energy — no charge.
           </p>
           <p className="text-[#111111]/50 text-sm mb-8">
             Terms apply. One prize per household. Valid for residential properties in PA, NJ, NY, or DE.

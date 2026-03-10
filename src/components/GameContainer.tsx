@@ -61,18 +61,27 @@ export default function GameContainer() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
-    await fetch("https://formspree.io/f/mgollbvl", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
-      body: JSON.stringify({
-        name: form.name,
-        email: form.email,
-        company: form.company,
-        score: finalScore,
-        _subject: `🏆 Game Winner — Score: ${finalScore}`,
-        message: `Game winner! Name: ${form.name} | Email: ${form.email} | Company: ${form.company} | Score: ${finalScore}`,
+    await Promise.all([
+      // Save to leaderboard
+      fetch("/api/scores", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name, company: form.company, score: finalScore }),
       }),
-    });
+      // Prize entry via Formspree
+      fetch("https://formspree.io/f/mgollbvl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          name: form.name,
+          email: form.email,
+          company: form.company,
+          score: finalScore,
+          _subject: `🏆 Game Score — ${finalScore} pts — ${form.name}`,
+          message: `Score submission! Name: ${form.name} | Email: ${form.email} | Company: ${form.company} | Score: ${finalScore}`,
+        }),
+      }),
+    ]);
     setSubmitting(false);
     setSubmitted(true);
   }
