@@ -13,7 +13,7 @@ export default function GameContainer() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [board, setBoard] = useState<BoardEntry[]>([]);
-  const [form, setForm] = useState({ initials: "", email: "", building: "" });
+  const [form, setForm] = useState({ initials: "", email: "", building: "", company: "" });
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const notifyStart = useCallback(() => {
@@ -50,7 +50,7 @@ export default function GameContainer() {
 
   function tryAgain() {
     setLost(false); setWon(false); setSubmitted(false);
-    setForm({ initials: "", email: "", building: "" });
+    setForm({ initials: "", email: "", building: "", company: "" });
     setBoard([]);
     gameStarted.current = false;
     setTimeout(() => {
@@ -66,16 +66,16 @@ export default function GameContainer() {
       fetch("/api/scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, company: form.building, score: finalScore }),
+        body: JSON.stringify({ name, company: form.company || form.building, score: finalScore }),
       }),
       fetch("https://formspree.io/f/mgollbvl", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          initials: name, email: form.email, building: form.building,
+          initials: name, email: form.email, company: form.company, building: form.building,
           score: finalScore,
           _subject: `🏆 Game Score — ${finalScore} pts — ${name}`,
-          message: `Score: ${finalScore} | Initials: ${name} | Email: ${form.email} | Building: ${form.building}`,
+          message: `Score: ${finalScore} | Initials: ${name} | Company: ${form.company} | Email: ${form.email} | Building: ${form.building}`,
         }),
       }),
     ]);
@@ -146,12 +146,12 @@ export default function GameContainer() {
                     />
                   </div>
                   <div>
-                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Favorite building</label>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Company</label>
                     <input
                       className="input-field"
-                      type="text" placeholder="e.g. Empire State, your office..."
-                      value={form.building}
-                      onChange={e => setForm(f => ({ ...f, building: e.target.value }))}
+                      type="text" placeholder="Your company"
+                      value={form.company}
+                      onChange={e => setForm(f => ({ ...f, company: e.target.value }))}
                     />
                   </div>
                   <div>
@@ -161,6 +161,15 @@ export default function GameContainer() {
                       type="email" placeholder="optional"
                       value={form.email}
                       onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Favorite building</label>
+                    <input
+                      className="input-field"
+                      type="text" placeholder="e.g. Empire State, your office..."
+                      value={form.building}
+                      onChange={e => setForm(f => ({ ...f, building: e.target.value }))}
                     />
                   </div>
                   <button type="submit" disabled={submitting} className="btn-primary w-full justify-center mt-2">
