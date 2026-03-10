@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.6';
+    const VERSION = 'L2.7';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -593,18 +593,15 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         let hit = false;
         for (let j = leaks.length - 1; j >= 0; j--) {
           const l = leaks[j];
-          // Full leak bounding box for all leaks (generous hit detection)
-          const lx = l.x;
-          const ly = l.y;
-          const lw = l.w;
-          const lh = l.h;
-          // Sweep: check full horizontal path + expanded vertical window (±30px)
-          // so the bullet height doesn't have to exactly align with the leak height
+          // Horizontal sweep: cover full bullet path this frame
           const sweepX = Math.min(bxPrev, b.x);
           const sweepW = Math.abs(b.vx) + b.w;
-          const sweepY = b.y - 30;
-          const sweepH = b.h + 60;
-          if (overlaps(sweepX, sweepY, sweepW, sweepH, lx, ly, lw, lh)) {
+          // LL (wall leaks): ±80px vertical tolerance — crack heights don't align with
+          // platform heights, so the bullet needs a wide Y window to reliably connect.
+          // Regular leaks: tight ±10px — they travel across the room at bullet height.
+          const sweepY = l.fromWall ? b.y - 80 : b.y - 10;
+          const sweepH = l.fromWall ? b.h + 160 : b.h + 20;
+          if (overlaps(sweepX, sweepY, sweepW, sweepH, l.x, l.y, l.w, l.h)) {
             if (l.fromWall) {
               seals.push({ x: l.x + l.w / 2, y: l.y + l.h / 2 });
             }

@@ -104,7 +104,7 @@ export default function GameContainer() {
         {!won && !lost && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.6"
+            src="/beta/index.html?v=L2.7"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
