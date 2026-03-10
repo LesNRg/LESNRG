@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.2';
+    const VERSION = 'L2.3';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -242,7 +242,8 @@
     // ─── Bullets & Air Leaks ─────────────────────────────────────────────────
     const bullets = [];
     let   fireCooldown = 0;
-    const leaks = [];
+    const seals  = [];   // caulk marks left on wall after shooting a wall leak
+    const leaks  = [];
     let leakTimer = 0;
     const LEAK_INTERVAL = 37; // frames between spawns (~0.6s)
 
@@ -298,6 +299,18 @@
     const LIGHT_XS = [110, 220, 330];
 
     function spawnLeak() {
+      // 10% chance: emerge from AC unit top or bottom gap
+      if (Math.random() < 0.10) {
+        const fromTop = Math.random() < 0.5;
+        leaks.push({
+          x: WALL_L, y: fromTop ? 143 : 185,
+          w: 88, h: 44,
+          vx: 5.0, vy: fromTop ? -0.4 : 0.4,
+          angle: 0, fromWall: true,
+        });
+        return;
+      }
+
       // 15% chance: emerge directly from a wall crack surface
       if (Math.random() < 0.15) {
         const crack    = WALL_CRACKS[Math.floor(Math.random() * WALL_CRACKS.length)];
@@ -310,6 +323,7 @@
           vx:    fromLeft ? 5.0 : -5.0,
           vy:    (Math.random() - 0.5) * 0.8,
           angle: fromLeft ? 0 : Math.PI,
+          fromWall: true,
         });
         return;
       }
@@ -367,6 +381,7 @@
       gameOver     = false;
       gameWon      = false;
       bullets.length = 0;
+      seals.length   = 0;
       resetPlayer();
       requestAnimationFrame(loop);
     }
@@ -578,6 +593,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         for (let j = leaks.length - 1; j >= 0; j--) {
           const l = leaks[j];
           if (overlaps(b.x, b.y, b.w, b.h, l.x + l.w * 0.15, l.y + l.h * 0.15, l.w * 0.7, l.h * 0.7)) {
+            if (l.fromWall) {
+              seals.push({ x: l.vx > 0 ? WALL_L : WALL_R, y: l.y + l.h / 2, fromLeft: l.vx > 0 });
+            }
             leaks.splice(j, 1);
             score += 10;
             hit = true;
@@ -1821,6 +1839,31 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(btX - 32, bot - 48, 3, 12);
       ctx.fillRect(btX + 20, bot - 36, 12, 3);
       ctx.fillRect(btX + 29, bot - 48, 3, 12);
+
+      // ── Window AC unit (lower 55px of 3rd floor left window, x=3 y=138) ────
+      const acX = 3, acY = 138, acW = 34, acH = 55;
+      // Aged foam side-fill — yellowed, showing gap at edges
+      ctx.fillStyle = '#b89f60';
+      ctx.fillRect(acX, acY, acW, acH);
+      // Housing body
+      ctx.fillStyle = '#d4d0c8'; ctx.fillRect(acX + 2, acY + 2, acW - 4, acH - 4);
+      // Control strip (top)
+      ctx.fillStyle = '#b8b4ac'; ctx.fillRect(acX + 2, acY + 2, acW - 4, 10);
+      // Power LED
+      ctx.fillStyle = '#00dd44';
+      ctx.beginPath(); ctx.arc(acX + acW - 7, acY + 7, 2, 0, Math.PI * 2); ctx.fill();
+      // Grille slats
+      ctx.fillStyle = '#a8a4a0';
+      for (let gy = acY + 14; gy < acY + acH - 8; gy += 6) {
+        ctx.fillRect(acX + 4, gy, acW - 8, 3);
+      }
+      // Drip edge / bottom rail
+      ctx.fillStyle = '#909088'; ctx.fillRect(acX + 2, acY + acH - 6, acW - 4, 6);
+      // Gap shadow at top — air escaping
+      ctx.fillStyle = 'rgba(80,50,10,0.45)';
+      ctx.fillRect(acX, acY, acW, 3);
+      // Gap shadow at bottom
+      ctx.fillRect(acX, acY + acH - 3, acW, 3);
     }
 
     function drawCalderMobile() {
@@ -2216,6 +2259,26 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.restore();
     }
 
+    function drawSeals() {
+      if (!seals.length) return;
+      ctx.save();
+      ctx.translate(0, -cam.y);
+      for (const s of seals) {
+        const sx = s.fromLeft ? WALL_L + 3 : WALL_R - 15;
+        const sy = s.y;
+        // Outer glow
+        ctx.fillStyle = 'rgba(255,107,0,0.3)';
+        ctx.beginPath(); ctx.ellipse(sx + 6, sy, 16, 8, 0, 0, Math.PI * 2); ctx.fill();
+        // Main caulk bead
+        ctx.fillStyle = '#FF6B00';
+        ctx.beginPath(); ctx.ellipse(sx + 6, sy, 11, 5, 0, 0, Math.PI * 2); ctx.fill();
+        // Highlight
+        ctx.fillStyle = '#FFB347';
+        ctx.beginPath(); ctx.ellipse(sx + 5, sy - 1, 5, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
     function drawBullets() {
       if (!bullets.length) return;
       ctx.save();
@@ -2347,6 +2410,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       platforms.forEach((p, i) => drawPlatform(p, i));
       for (const l of leaks) drawLeak(l);
       drawPlayer();
+      drawSeals();
       drawBullets();
       drawHUD();
     }
