@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.1';
+    const VERSION = 'L2.2';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -591,12 +591,12 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
       const dynInterval = Math.round(45 - heightFrac * 30); // 45 frames at bottom → 15 at top
       leakTimer++;
-      if (leakTimer >= dynInterval && leaks.length < 12) {
+      if (leakTimer >= dynInterval && leaks.length < 6) {
         spawnLeak();
         leakTimer = 0;
       }
-      // Keep minimum 7 on screen
-      if (leaks.length < 7) {
+      // Keep minimum 4 on screen
+      if (leaks.length < 4) {
         spawnLeak();
       }
 
