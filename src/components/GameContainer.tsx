@@ -1,8 +1,10 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { ArrowRight, Trophy, CheckCircle, Flame } from "lucide-react";
+import { ArrowRight, Flame } from "lucide-react";
 import Link from "next/link";
+
+type BoardEntry = { name: string; company: string; score: number };
 
 export default function GameContainer() {
   const [won, setWon] = useState(false);
@@ -10,7 +12,8 @@ export default function GameContainer() {
   const [finalScore, setFinalScore] = useState(0);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", company: "" });
+  const [board, setBoard] = useState<BoardEntry[]>([]);
+  const [form, setForm] = useState({ initials: "", email: "", building: "" });
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const notifyStart = useCallback(() => {
@@ -41,18 +44,15 @@ export default function GameContainer() {
 
   const sendKey = useCallback((key: string, down: boolean) => {
     iframeRef.current?.contentWindow?.postMessage(
-      { type: down ? "KEY_DOWN" : "KEY_UP", key },
-      "*"
+      { type: down ? "KEY_DOWN" : "KEY_UP", key }, "*"
     );
   }, []);
 
   function tryAgain() {
-    setLost(false);
-    setWon(false);
-    setSubmitted(false);
-    setForm({ name: "", email: "", company: "" });
+    setLost(false); setWon(false); setSubmitted(false);
+    setForm({ initials: "", email: "", building: "" });
+    setBoard([]);
     gameStarted.current = false;
-    // Brief delay so iframe is back in DOM before we send RESTART
     setTimeout(() => {
       iframeRef.current?.contentWindow?.postMessage({ type: "RESTART" }, "*");
     }, 50);
@@ -61,27 +61,27 @@ export default function GameContainer() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    const name = form.initials.toUpperCase().slice(0, 3).padEnd(3, "_");
     await Promise.all([
-      // Save to leaderboard
       fetch("/api/scores", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: form.name, company: form.company, score: finalScore }),
+        body: JSON.stringify({ name, company: form.building, score: finalScore }),
       }),
-      // Prize entry via Formspree
       fetch("https://formspree.io/f/mgollbvl", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
-          name: form.name,
-          email: form.email,
-          company: form.company,
+          initials: name, email: form.email, building: form.building,
           score: finalScore,
-          _subject: `🏆 Game Score — ${finalScore} pts — ${form.name}`,
-          message: `Score submission! Name: ${form.name} | Email: ${form.email} | Company: ${form.company} | Score: ${finalScore}`,
+          _subject: `🏆 Game Score — ${finalScore} pts — ${name}`,
+          message: `Score: ${finalScore} | Initials: ${name} | Email: ${form.email} | Building: ${form.building}`,
         }),
       }),
     ]);
+    const res = await fetch("/api/scores");
+    const data = await res.json();
+    setBoard(data);
     setSubmitting(false);
     setSubmitted(true);
   }
@@ -95,7 +95,7 @@ export default function GameContainer() {
         {!won && !lost && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.2"
+            src="/beta/index.html?v=L2.3"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
@@ -114,11 +114,10 @@ export default function GameContainer() {
               </h2>
               <p className="text-[#F5C500] text-3xl font-black mb-1">{finalScore} pts</p>
               <p className="text-white/50 text-sm mb-8">
-                Shoot the leaks to score — earn enough points and beat the 2-minute timer.
+                Shoot the leaks to score — survive 2 minutes to win.
               </p>
               <button onClick={tryAgain} className="btn-primary justify-center w-full mb-3">
-                Try again
-                <ArrowRight size={16} />
+                Try again <ArrowRight size={16} />
               </button>
               <Link href="/services" className="block text-center text-white/30 text-xs hover:text-white/60 transition-colors">
                 See our services →
@@ -129,76 +128,84 @@ export default function GameContainer() {
 
         {/* Win overlay */}
         {won && (
-          <div className="absolute inset-0 bg-[#111111]/95 flex items-center justify-center p-8">
+          <div className="absolute inset-0 bg-[#111111]/95 flex items-center justify-center p-6 overflow-y-auto">
             {!submitted ? (
-              <div className="w-full max-w-md">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-[#F5C500] flex items-center justify-center shrink-0">
-                    <Trophy size={18} className="text-[#111111]" />
-                  </div>
-                  <h2 className="font-black text-white text-2xl" style={{ letterSpacing: "-0.02em" }}>
-                    You survived!
-                  </h2>
-                </div>
-                <p className="text-[#F5C500] text-4xl font-black mb-1">{finalScore} pts</p>
-                <p className="text-white/50 text-sm leading-relaxed mb-5">
-                  You made it through 2 minutes. Enter your details to get on the leaderboard and enter to win a free blower door test.
-                </p>
+              <div className="w-full max-w-sm">
+                <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore} pts</p>
+                <h2 className="font-black text-white text-xl mb-5" style={{ letterSpacing: "-0.02em" }}>
+                  You survived! Enter your score.
+                </h2>
                 <form onSubmit={handleSubmit} className="space-y-3">
-                  <input
-                    className="input-field"
-                    type="text"
-                    placeholder="Your name"
-                    required
-                    value={form.name}
-                    onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  />
-                  <input
-                    className="input-field"
-                    type="email"
-                    placeholder="Email address"
-                    required
-                    value={form.email}
-                    onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
-                  />
-                  <input
-                    className="input-field"
-                    type="text"
-                    placeholder="Company (optional)"
-                    value={form.company}
-                    onChange={e => setForm(f => ({ ...f, company: e.target.value }))}
-                  />
-                  <button
-                    type="submit"
-                    disabled={submitting}
-                    className="btn-primary w-full justify-center mt-2"
-                  >
-                    {submitting ? "Submitting…" : "Submit score"}
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Initials (3 letters)</label>
+                    <input
+                      className="input-field uppercase tracking-[0.3em] text-center text-lg font-black"
+                      type="text" maxLength={3} placeholder="AAA" required
+                      value={form.initials}
+                      onChange={e => setForm(f => ({ ...f, initials: e.target.value.replace(/[^a-zA-Z]/g, "") }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Favorite building</label>
+                    <input
+                      className="input-field"
+                      type="text" placeholder="e.g. Empire State, your office..."
+                      value={form.building}
+                      onChange={e => setForm(f => ({ ...f, building: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Email (for prize entry)</label>
+                    <input
+                      className="input-field"
+                      type="email" placeholder="optional"
+                      value={form.email}
+                      onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    />
+                  </div>
+                  <button type="submit" disabled={submitting} className="btn-primary w-full justify-center mt-2">
+                    {submitting ? "Saving…" : "Submit score"}
                     {!submitting && <ArrowRight size={16} />}
                   </button>
                 </form>
-                <button onClick={tryAgain} className="block w-full text-center text-white/25 text-xs mt-4 hover:text-white/50 transition-colors">
-                  Play again →
-                </button>
                 <p className="text-white/20 text-xs mt-3 leading-relaxed">
-                  Terms apply. One prize per household. Valid for residential properties in PA, NJ, NY, or DE.
+                  Terms apply. One prize per household. Valid for PA, NJ, NY, or DE.
                 </p>
               </div>
             ) : (
-              <div className="text-center max-w-sm">
-                <div className="w-12 h-12 rounded-full bg-[#F5C500] flex items-center justify-center mx-auto mb-5">
-                  <CheckCircle size={22} className="text-[#111111]" />
+              /* ── Arcade leaderboard ── */
+              <div className="w-full max-w-sm font-mono">
+                <div className="text-center mb-4">
+                  <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ HIGH SCORES ◀</p>
+                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">THIS WEEK</p>
                 </div>
-                <h2 className="font-black text-white text-2xl mb-1" style={{ letterSpacing: "-0.02em" }}>
-                  Score submitted!
-                </h2>
-                <p className="text-[#F5C500] text-3xl font-black mb-3">{finalScore} pts</p>
-                <p className="text-white/50 text-sm leading-relaxed mb-6">
-                  You&apos;re on the board. We&apos;ll be in touch if you win.
-                </p>
-                <button onClick={tryAgain} className="btn-primary justify-center w-full">
-                  Play again
-                  <ArrowRight size={16} />
+                <div className="bg-black border border-[#00ff41]/25 rounded-lg overflow-hidden mb-4">
+                  {board.length === 0 ? (
+                    <p className="text-[#00ff41]/40 text-xs text-center py-4">NO SCORES YET</p>
+                  ) : (
+                    board.map((s, i) => {
+                      const isMe = s.name === form.initials.toUpperCase().slice(0, 3).padEnd(3, "_");
+                      return (
+                        <div key={i} className={`flex items-center gap-3 px-4 py-2 text-xs border-b border-[#00ff41]/10 last:border-0 ${isMe ? "bg-[#00ff41]/8" : ""}`}>
+                          <span className={`w-5 tabular-nums ${i === 0 ? "text-[#F5C500]" : i === 1 ? "text-white/50" : i === 2 ? "text-[#cd7f32]" : "text-[#00ff41]/30"}`}>
+                            {i + 1}
+                          </span>
+                          <span className={`flex-1 tracking-widest ${isMe ? "text-[#F5C500]" : "text-[#00ff41]/80"}`}>
+                            {s.name}
+                          </span>
+                          {s.company && (
+                            <span className="text-[#00ff41]/30 text-[10px] truncate max-w-[80px]">{s.company}</span>
+                          )}
+                          <span className={`tabular-nums font-bold ${isMe ? "text-[#F5C500]" : "text-[#00ff41]"}`}>
+                            {s.score}
+                          </span>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+                <button onClick={tryAgain} className="w-full font-mono text-sm font-bold tracking-widest py-3 rounded-lg border border-[#F5C500]/60 text-[#F5C500] hover:bg-[#F5C500]/10 transition-colors">
+                  ▶ PLAY AGAIN
                 </button>
               </div>
             )}
@@ -206,7 +213,7 @@ export default function GameContainer() {
         )}
       </div>
 
-      {/* Mobile controls — outside the iframe so they're never clipped */}
+      {/* Mobile controls */}
       <div className="md:hidden flex justify-between items-center px-2 pt-3 pb-1">
         <div className="flex gap-3">
           <button
@@ -231,8 +238,7 @@ export default function GameContainer() {
             <button
               className="w-[104px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
               onTouchStart={e => {
-                e.preventDefault();
-                notifyStart();
+                e.preventDefault(); notifyStart();
                 iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
               }}
             >JUMP</button>
