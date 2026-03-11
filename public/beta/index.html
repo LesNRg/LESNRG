@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'BETA3';
+    const VERSION = 'BETA4';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -2423,7 +2423,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       // ── Manometer (top right) ─────────────────────────────────────────────
-      const mw = 135, mh = 86, mx = CW - 12, my = 8;
+      const mw = 135, mh = 68, mx = CW - 12, my = 8;
       const mgx = mx - mw;
       // Background
       ctx.fillStyle = '#060e0a';
@@ -2449,7 +2449,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillStyle = cfmColor;
       ctx.fillText(cfm.toLocaleString(), mgx + mw / 2, my + 24);
       // Bar: full at 3141, shrinks to left as score improves
-      const bx2 = mgx + 8, by2 = my + mh - 15, bw2 = mw - 16, bh2 = 7;
+      const bx2 = mgx + 8, by2 = my + mh - 13, bw2 = mw - 16, bh2 = 7;
       ctx.fillStyle = '#0d1f15';
       ctx.fillRect(bx2, by2, bw2, bh2);
       ctx.fillStyle = cfmColor;
@@ -2458,7 +2458,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.font = '8px monospace';
       ctx.fillStyle = 'rgba(0,200,100,0.30)';
       ctx.textAlign = 'right';
-      ctx.fillText('3,141', mgx + mw - 8, my + mh - 16);
+      ctx.fillText('3,141', mgx + mw - 8, my + mh - 14);
 
       // ── Full-seal bonus flash ──────────────────────────────────────────────
       if (bonusFlash > 0) {

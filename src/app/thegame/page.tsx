@@ -59,7 +59,7 @@ export default function GamePage() {
             Top score wins a free blower door test.
           </h2>
           <p className="text-[#111111]/70 text-lg leading-relaxed mb-6">
-            Beat the game, submit your score, and enter to win. We&apos;ll come to your building and find exactly where it&apos;s losing energy — no charge.
+            Play the game, submit your score, and enter to win. We&apos;ll come to your building and find exactly where it&apos;s losing energy — no charge.
           </p>
           <p className="text-[#111111]/50 text-sm mb-8">
             Terms apply. One prize per household. Valid for residential properties in PA, NJ, or DE.
