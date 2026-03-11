@@ -119,7 +119,7 @@ export default function GameContainer() {
         {!won && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.27"
+            src="/beta/index.html?v=BETA"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
@@ -176,10 +176,10 @@ export default function GameContainer() {
                     />
                   </div>
                   <div>
-                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Favorite building</label>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Beta test comment</label>
                     <input
                       className="input-field"
-                      type="text" placeholder="e.g. Empire State, your office..."
+                      type="text" placeholder="Feedback, bugs, thoughts..."
                       value={form.building}
                       onChange={e => setForm(f => ({ ...f, building: e.target.value }))}
                     />

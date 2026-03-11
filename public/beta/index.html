@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.27';
+    const VERSION = 'BETA';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -238,6 +238,7 @@
     let framesLeft = GAME_DURATION;
     let invincible = 0;               // countdown frames of invincibility
     let loseReason = '';              // 'time' | 'lives' | 'fan'
+    let bonusFlash = 0;               // countdown frames for full-seal bonus flash
 
     // ─── Bullets & Air Leaks ─────────────────────────────────────────────────
     const bullets = [];
@@ -407,6 +408,7 @@
       invincible   = 0;
       fireCooldown = 0;
       loseReason   = '';
+      bonusFlash   = 0;
       gameOver     = false;
       gameWon      = false;
       bullets.length = 0;
@@ -657,6 +659,11 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
             if (Math.abs(bCX - em.ox) < 40 && Math.abs(bCY - em.oy) < 40) {
               sealedEmitters.add(e);
               cfm = Math.max(0, cfm - 15); // LL seal: -15 CFM
+              // Bonus: seal ALL emitters → -1000 CFM
+              if (sealedEmitters.size === EMITTERS.length) {
+                cfm = Math.max(0, cfm - 1000);
+                bonusFlash = 240; // show for 4 seconds
+              }
               hit = true;
               break;
             }
@@ -2453,11 +2460,31 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.textAlign = 'right';
       ctx.fillText(`−${(3141 - cfm).toLocaleString()} CFM@50`, mx, my + mh - 16);
 
+      // ── Full-seal bonus flash ──────────────────────────────────────────────
+      if (bonusFlash > 0) {
+        bonusFlash--;
+        const alpha = Math.min(1, bonusFlash / 30); // fade out last 0.5s
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        // glow backdrop
+        ctx.fillStyle = `rgba(0,0,0,${alpha * 0.55})`;
+        ctx.beginPath(); ctx.roundRect(CW / 2 - 180, CH / 2 - 36, 360, 68, 10); ctx.fill();
+        // main text
+        ctx.font = 'bold 28px monospace';
+        ctx.fillStyle = `rgba(0,232,122,${alpha})`;
+        ctx.fillText('ALL LEAKS SEALED!', CW / 2, CH / 2 - 10);
+        ctx.font = 'bold 20px monospace';
+        ctx.fillStyle = `rgba(245,197,0,${alpha})`;
+        ctx.fillText('−1,000 CFM@50pa BONUS', CW / 2, CH / 2 + 18);
+        ctx.restore();
+      }
+
       // ── Version (bottom-right, faint) ─────────────────────────────────────
       ctx.textBaseline = 'bottom';
       ctx.fillStyle = 'rgba(255,255,255,0.15)';
       ctx.font = '10px monospace';
-      ctx.fillText(VERSION, CW - 8, CH - 8);
+      ctx.fillText('BETA TEST', CW - 8, CH - 8);
 
       ctx.restore();
     }
