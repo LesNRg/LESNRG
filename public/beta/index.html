@@ -124,16 +124,16 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.9';
+    const VERSION = 'L2.23';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
     const JUMP_FORCE        = -51;   // first jump (-10%)
-    const DOUBLE_JUMP_FORCE = -26;   // second jump (half height)
+    const DOUBLE_JUMP_FORCE = -52;   // second jump (cut by 1/3)
     const WALL_JUMP_VX      =   8;   // horizontal kick off wall
     const WALL_BOOST_FRAMES =  12;   // frames the kick overrides input
     const GRAVITY_UP = 7.84;         // gravity on ascent (2× heavier)
-    const GRAVITY_DN = 0.26;         // gravity on descent (+30% fall speed)
+    const GRAVITY_DN = 0.13;         // gravity on descent (50% slower fall)
     const BULLET_SPEED  = 14;        // caulk projectile px/frame
     const FIRE_COOLDOWN = 18;        // frames between shots (~0.3s)
 
@@ -193,7 +193,7 @@
       { x: LOGO_BX, y: LOGO_BY + 20 * LOGO_SC, w: LOGO_W, h: 12, invisible: true },
 
       // ── Basement platforms ──────────────────────────────────────────────────
-      { x: 400, y:  900, w: 160, h: 12 },   // basement center
+
 
       // ── 1st floor platforms ─────────────────────────────────────────────────
       { x:  55, y:  790, w: 150, h: 12 },   // left lower
@@ -201,7 +201,7 @@
       { x: 240, y:  660, w: 140, h: 12 },   // center upper
 
       // ── 2nd floor platforms ─────────────────────────────────────────────────
-      { x: 150, y:  460, w:  75, h: 12, slippery: true },   // left lower — icy
+      { x: 150, y:  560, w:  75, h: 12, slippery: true },   // left lower — icy
       { x: 559, y:  490, w:  82, h: 12, solid: true },   // right lower — crib width
       { x: 325, y:  400, w: 150, h: 12, solid: true },   // center upper
 
@@ -227,14 +227,14 @@
     const HEAD_TUFT_ANGLES = HEAD_TUFTS.map(([tx,ty]) => Math.atan2(ty,tx));
 
     // ─── Game state ───────────────────────────────────────────────────────────
-    const GAME_DURATION    = 120 * 60; // 2 minutes at 60 fps
+    const GAME_DURATION    = 60 * 60;  // 1 minute at 60 fps
     const MAX_LIVES        = 3;
     const INVINCIBLE_FRAMES = 90;      // 1.5s invincibility after hit
 
     let gameOver  = false;
     let gameWon   = false;
     let lives     = MAX_LIVES;
-    let score     = 0;
+    let cfm       = 3141; // CFM50 infiltration — starts high, player reduces it
     let framesLeft = GAME_DURATION;
     let invincible = 0;               // countdown frames of invincibility
     let loseReason = '';              // 'time' | 'lives' | 'fan'
@@ -264,6 +264,35 @@
       [F1+FH+8,  F1+FH+56,  Math.random() < 0.5],  // right basement glass block [4]
     ];
     const we = i => WIN_EDGES[i][2] ? WIN_EDGES[i][0] : WIN_EDGES[i][1];
+
+    // ─── Sealable air leak emitters ───────────────────────────────────────────
+    // Each: world-space origin (ox, oy) used for bullet hit detection + caulk bead
+    const EMITTERS = [
+      { ox: WALL_L,  oy: F1 - 114       },  //  0 front door
+      { ox: WALL_R,  oy: F1 - 114       },  //  1 back door
+      { ox: WALL_L,  oy: we(0)          },  //  2 left 3rd floor window
+      { ox: WALL_L,  oy: we(1)          },  //  3 left 2nd floor window
+      { ox: WALL_R,  oy: we(2)          },  //  4 right 2nd floor window
+      { ox: WALL_L,  oy: we(3)          },  //  5 basement left window
+      { ox: WALL_R,  oy: we(4)          },  //  6 basement right window
+      { ox: WALL_L,  oy: 343            },  //  7 wall crack left upper
+      { ox: WALL_L,  oy: 626            },  //  8 wall crack left lower
+      { ox: WALL_R,  oy: 343            },  //  9 wall crack right upper
+      { ox: WALL_R,  oy: 626            },  // 10 wall crack right lower
+      { ox: 240,     oy: 838            },  // 11 duct trunk 1
+      { ox: 460,     oy: 838            },  // 12 duct trunk 2
+      { ox: 320,     oy: F3 + FH + 14  },  // 13 duct 2nd floor branch
+      { ox: 340,     oy: F2 + FH + 14  },  // 14 duct 1st floor branch
+      { ox: 520,     oy: F2 + 80        },  // 15 supply riser
+      { ox: WALL_L,  oy: F2 + FH * 0.5 },  // 16 rim joist left
+      { ox: WALL_R,  oy: F2 + FH * 0.5 },  // 17 rim joist right
+      { ox: 294,     oy: F3 - 12        },  // 18 receptacle
+      { ox: 110,     oy: 45             },  // 19 can light 1
+      { ox: 220,     oy: 45             },  // 20 can light 2
+      { ox: 330,     oy: 45             },  // 21 can light 3
+      { ox: WALL_L,  oy: F1 + FH + 132 },  // 22 pipe penetration
+    ];
+    const sealedEmitters = new Set();
 
     // Spawn zones — big leaks enter from both sides at every floor [minY, maxY, fromLeft]
     const spawnZones = [
@@ -373,7 +402,7 @@
 
     function startGame() {
       lives        = MAX_LIVES;
-      score        = 0;
+      cfm          = 3141;
       framesLeft   = GAME_DURATION;
       invincible   = 0;
       fireCooldown = 0;
@@ -382,6 +411,7 @@
       gameWon      = false;
       bullets.length = 0;
       seals.length   = 0;
+      sealedEmitters.clear();
       resetPlayer();
       requestAnimationFrame(loop);
     }
@@ -532,9 +562,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ─── Timer countdown ─────────────────────────────────────────────────────
       framesLeft = Math.max(0, framesLeft - 1);
       if (framesLeft === 0) {
-        score += 50; // survival bonus for lasting 2 minutes
         gameWon = true;
-        window.parent.postMessage({ type: 'GAME_WIN', score }, '*');
+        window.parent.postMessage({ type: 'GAME_WIN', score: cfm }, '*');
         return;
       }
 
@@ -557,8 +586,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           lives = 0;
           loseReason = 'fan';
           gameOver = true;
-          score += Math.floor(framesLeft / 60); // time bonus: seconds remaining
-          window.parent.postMessage({ type: 'GAME_LOSE', score }, '*');
+          window.parent.postMessage({ type: 'GAME_LOSE', score: cfm }, '*');
           return;
         }
       }
@@ -574,8 +602,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
               lives = 0;
               loseReason = 'lives';
               gameOver = true;
-              score += Math.floor(framesLeft / 60); // time bonus: seconds remaining
-              window.parent.postMessage({ type: 'GAME_LOSE', score }, '*');
+              window.parent.postMessage({ type: 'GAME_LOSE', score: cfm }, '*');
               return;
             }
             break;
@@ -596,20 +623,43 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         let hit = false;
         for (let j = leaks.length - 1; j >= 0; j--) {
           const l = leaks[j];
-          // Horizontal sweep: cover full bullet path this frame
-          const sweepX = Math.min(bxPrev, b.x);
-          const sweepW = Math.abs(b.vx) + b.w;
-          // LL (wall leaks): ±80px vertical tolerance — crack heights don't align with
-          // platform heights, so the bullet needs a wide Y window to reliably connect.
-          // Regular leaks: tight ±10px — they travel across the room at bullet height.
-          const sweepY = l.fromWall ? b.y - 80 : b.y - 10;
-          const sweepH = l.fromWall ? b.h + 160 : b.h + 20;
-          if (overlaps(sweepX, sweepY, sweepW, sweepH, l.x, l.y, l.w, l.h)) {
-            if (l.fromWall) seals.push({ x: l.x + l.w / 2, y: l.y + l.h / 2 });
+          let isHit = false;
+          if (l.fromWall) {
+            // Wall/AC leaks: wide sweep in both directions so the bullet hits
+            // regardless of which way the player faces or which way the leak moves.
+            const sweepX = Math.min(bxPrev, b.x) - 150;
+            const sweepW = Math.abs(b.vx) + b.w + 300;
+            const sweepY = b.y - 100;
+            const sweepH = b.h + 200;
+            isHit = overlaps(sweepX, sweepY, sweepW, sweepH, l.x, l.y, l.w, l.h);
+          } else {
+            // Traversing leaks: directional sweep
+            const sweepX = Math.min(bxPrev, b.x);
+            const sweepW = Math.abs(b.vx) + b.w;
+            const sweepY = b.y - 20;
+            const sweepH = b.h + 40;
+            isHit = overlaps(sweepX, sweepY, sweepW, sweepH, l.x, l.y, l.w, l.h);
+          }
+          if (isHit) {
             leaks.splice(j, 1);
-            score += 10;
+            cfm = Math.max(0, cfm - 5); // big leak: -5 CFM
             hit = true;
             break;
+          }
+        }
+        // Check emitter sources (particle streams at walls/cracks/ducts)
+        if (!hit) {
+          const bCX = b.x + b.w / 2;
+          const bCY = b.y + b.h / 2;
+          for (let e = 0; e < EMITTERS.length; e++) {
+            if (sealedEmitters.has(e)) continue;
+            const em = EMITTERS[e];
+            if (Math.abs(bCX - em.ox) < 40 && Math.abs(bCY - em.oy) < 40) {
+              sealedEmitters.add(e);
+              cfm = Math.max(0, cfm - 15); // LL seal: -15 CFM
+              hit = true;
+              break;
+            }
           }
         }
         if (hit) { bullets.splice(i, 1); }
@@ -1850,30 +1900,36 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(btX + 20, bot - 36, 12, 3);
       ctx.fillRect(btX + 29, bot - 48, 3, 12);
 
-      // ── Window AC unit (lower 55px of 3rd floor left window, x=3 y=138) ────
-      const acX = 3, acY = 138, acW = 34, acH = 55;
-      // Aged foam side-fill — yellowed, showing gap at edges
+      // ── Window AC unit — bottom half of 3rd floor left window, protrudes into room ──
+      const acX = 3, acY = 155, acW = 34, acH = 40; // bottom half of window (y=115+40=155)
+      const acP = 14; // pixels protruding past wall into room
+      // Aged foam/seal in window gap (wall portion only)
       ctx.fillStyle = '#b89f60';
       ctx.fillRect(acX, acY, acW, acH);
-      // Housing body
+      // Outdoor grille face (window portion)
       ctx.fillStyle = '#d4d0c8'; ctx.fillRect(acX + 2, acY + 2, acW - 4, acH - 4);
-      // Control strip (top)
-      ctx.fillStyle = '#b8b4ac'; ctx.fillRect(acX + 2, acY + 2, acW - 4, 10);
-      // Power LED
-      ctx.fillStyle = '#00dd44';
-      ctx.beginPath(); ctx.arc(acX + acW - 7, acY + 7, 2, 0, Math.PI * 2); ctx.fill();
-      // Grille slats
+      // Grille slats (outdoor face)
       ctx.fillStyle = '#a8a4a0';
-      for (let gy = acY + 14; gy < acY + acH - 8; gy += 6) {
+      for (let gy = acY + 4; gy < acY + acH - 6; gy += 5) {
         ctx.fillRect(acX + 4, gy, acW - 8, 3);
       }
-      // Drip edge / bottom rail
-      ctx.fillStyle = '#909088'; ctx.fillRect(acX + 2, acY + acH - 6, acW - 4, 6);
-      // Gap shadow at top — air escaping
+      // Indoor protrusion box (sticks into room)
+      ctx.fillStyle = '#c8c4bc';
+      ctx.fillRect(acX + acW, acY + 2, acP, acH - 4);
+      // Indoor front face — slightly lighter panel
+      ctx.fillStyle = '#deded8';
+      ctx.fillRect(acX + acW + 1, acY + 3, acP - 3, acH - 8);
+      // Control strip across top of indoor face
+      ctx.fillStyle = '#b0b0a8';
+      ctx.fillRect(acX + acW + 1, acY + 3, acP - 3, 8);
+      // Power LED on indoor face
+      ctx.fillStyle = '#00dd44';
+      ctx.beginPath(); ctx.arc(acX + acW + acP - 5, acY + 7, 2, 0, Math.PI * 2); ctx.fill();
+      // Gap shadow at top (air escaping)
       ctx.fillStyle = 'rgba(80,50,10,0.45)';
       ctx.fillRect(acX, acY, acW, 3);
-      // Gap shadow at bottom
-      ctx.fillRect(acX, acY + acH - 3, acW, 3);
+      // Drip edge at bottom
+      ctx.fillStyle = '#909088'; ctx.fillRect(acX + 2, acY + acH - 5, acW + acP - 4, 5);
     }
 
     function drawCalderMobile() {
@@ -2016,55 +2072,68 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       const SC = 1.5;  // all leaks same scale — 100%+ larger than before
+      const SE = sealedEmitters;
 
       // ── Front door — air at top of door frame ──────────────────────────────
-      emit(WALL_L, F1 - 114, 1, 0, 12, 10, 0.0, SC, 3);
+      if (!SE.has(0)) emit(WALL_L, F1 - 114, 1, 0, 12, 10, 0.0, SC, 3);
 
       // ── Back door — air at top of door frame ───────────────────────────────
-      emit(WALL_R, F1 - 114, -1, 0, 12, 10, 0.1, SC, 3);
+      if (!SE.has(1)) emit(WALL_R, F1 - 114, -1, 0, 12, 10, 0.1, SC, 3);
 
-      // ── Left wall windows — one edge per window (random top or bottom) ──────
-      emit(WALL_L, we(0), 1, 0, 8, 10, 0.07, SC, 3);  // 3rd floor
-      emit(WALL_L, we(1), 1, 0, 8, 10, 0.14, SC, 3);  // 2nd floor
+      // ── Left wall windows ──────────────────────────────────────────────────
+      if (!SE.has(2)) emit(WALL_L, we(0), 1, 0, 8, 10, 0.07, SC, 3);  // 3rd floor
+      if (!SE.has(3)) emit(WALL_L, we(1), 1, 0, 8, 10, 0.14, SC, 3);  // 2nd floor
 
       // ── Right wall windows ─────────────────────────────────────────────────
-      emit(WALL_R, we(2), -1, 0, 8, 10, 0.21, SC, 3);  // 2nd floor right
+      if (!SE.has(4)) emit(WALL_R, we(2), -1, 0, 8, 10, 0.21, SC, 3);
 
       // ── Basement glass block windows ───────────────────────────────────────
-      emit(WALL_L, we(3),  1, 0, 8, 10, 0.35, SC, 3);
-      emit(WALL_R, we(4), -1, 0, 8, 10, 0.42, SC, 3);
+      if (!SE.has(5)) emit(WALL_L, we(3),  1, 0, 8, 10, 0.35, SC, 3);
+      if (!SE.has(6)) emit(WALL_R, we(4), -1, 0, 8, 10, 0.42, SC, 3);
 
-
-      // ── Wall cracks — narrow streams through each crack ────────────────────
+      // ── Wall cracks ────────────────────────────────────────────────────────
       WALL_CRACKS.forEach((crack, ci) => {
+        if (SE.has(7 + ci)) return;
         const wx = crack.fromLeft ? WALL_L : WALL_R;
         const dx = crack.fromLeft ? 1 : -1;
         emit(wx, crack.y, dx, 0, 10, 6, ci * 0.15 + 0.6, SC * 0.7, 3);
       });
 
-      // ── Duct leaks at seam joints — downward toward basement ─────────────
+      // ── Duct leaks ─────────────────────────────────────────────────────────
       const DS = SC * 0.675;
-      emit(240, 838,            0,  1, 8, 4, 0.55, DS, 2);  // trunk seam
-      emit(460, 838,            0,  1, 8, 4, 0.62, DS, 2);  // trunk seam
-      emit(320, F3 + FH + 14,  0,  1, 6, 4, 0.70, DS, 2);  // 2nd floor branch
-      emit(340, F2 + FH + 14,  0,  1, 6, 4, 0.77, DS, 2);  // 1st floor branch
-      emit(520, F2 + 80,        0,  1, 6, 4, 0.84, DS, 2);  // supply riser
+      if (!SE.has(11)) emit(240, 838,           0,  1, 8, 4, 0.55, DS, 2);
+      if (!SE.has(12)) emit(460, 838,           0,  1, 8, 4, 0.62, DS, 2);
+      if (!SE.has(13)) emit(320, F3 + FH + 14, 0,  1, 6, 4, 0.70, DS, 2);
+      if (!SE.has(14)) emit(340, F2 + FH + 14, 0,  1, 6, 4, 0.77, DS, 2);
+      if (!SE.has(15)) emit(520, F2 + 80,       0,  1, 6, 4, 0.84, DS, 2);
 
-      // ── 2nd floor rim joist leaks ─────────────────────────────────────────
-      emit(WALL_L, F2 + FH * 0.5, 1, 0, FH - 6, 5, 0.18, SC * 0.85, 3);
-      emit(WALL_R, F2 + FH * 0.5, -1, 0, FH - 6, 5, 0.26, SC * 0.85, 3);
+      // ── Rim joist leaks ────────────────────────────────────────────────────
+      if (!SE.has(16)) emit(WALL_L, F2 + FH * 0.5,  1, 0, FH - 6, 5, 0.18, SC * 0.85, 3);
+      if (!SE.has(17)) emit(WALL_R, F2 + FH * 0.5, -1, 0, FH - 6, 5, 0.26, SC * 0.85, 3);
 
-      // ── Office receptacle — air infiltration upward (x=294 = center of box) ─
-      emit(294, F3 - 12, 0, -1, 14, 8, 0.48, SC * 1.0, 4);
+      // ── Office receptacle ──────────────────────────────────────────────────
+      if (!SE.has(18)) emit(294, F3 - 12, 0, -1, 14, 8, 0.48, SC * 1.0, 4);
 
-      // ── Recessed can lights — small leaks from left & right housing edges ──
-      for (const [lx, ph] of [[110, 0.33], [220, 0.41], [330, 0.50]]) {
-        emit(lx - 8, 45, 0, 1, 3, 3, ph,        SC * 0.3, 2);  // left edge
-        emit(lx + 8, 45, 0, 1, 3, 3, ph + 0.05, SC * 0.3, 2);  // right edge
+      // ── Recessed can lights ────────────────────────────────────────────────
+      for (const [lx, ph, ei] of [[110, 0.33, 19], [220, 0.41, 20], [330, 0.50, 21]]) {
+        if (SE.has(ei)) continue;
+        emit(lx - 8, 45, 0, 1, 3, 3, ph,        SC * 0.3, 2);
+        emit(lx + 8, 45, 0, 1, 3, 3, ph + 0.05, SC * 0.3, 2);
       }
 
-      // ── Pipe penetration through left basement wall ───────────────────────
-      emit(WALL_L, F1 + FH + 132,  0.85,  0.52, 4, 2, 0.80, SC * 0.9, 2);  // seeps toward hot water heater
+      // ── Pipe penetration ───────────────────────────────────────────────────
+      if (!SE.has(22)) emit(WALL_L, F1 + FH + 132, 0.85, 0.52, 4, 2, 0.80, SC * 0.9, 2);
+
+      // ── Caulk beads at sealed sources ──────────────────────────────────────
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = '#FF6B00';
+      for (let i = 0; i < EMITTERS.length; i++) {
+        if (!SE.has(i)) continue;
+        const em = EMITTERS[i];
+        ctx.beginPath();
+        ctx.arc(em.ox, em.oy, 7, 0, Math.PI * 2);
+        ctx.fill();
+      }
 
       ctx.restore();
     }
@@ -2330,11 +2399,57 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.textAlign = 'center';
       ctx.fillText(timeStr, CW / 2, 16);
 
-      // ── Score (right) ─────────────────────────────────────────────────────
-      ctx.font = 'bold 20px monospace';
-      ctx.fillStyle = '#F5C500';
+      // ── Controls key (below timer) ────────────────────────────────────────
+      const keyItems = ['← → move', '↑/space jump (×2)', 'Z/X fire'];
+      const keyStr = keyItems.join('   ');
+      ctx.font = '9px monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const keyW = ctx.measureText(keyStr).width + 18;
+      const keyX = CW / 2 - keyW / 2;
+      const keyY = 40;
+      ctx.fillStyle = 'rgba(0,0,0,0.45)';
+      ctx.beginPath(); ctx.roundRect(keyX, keyY, keyW, 16, 4); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillText(keyStr, CW / 2, keyY + 4);
+
+      // ── Manometer (top right) ─────────────────────────────────────────────
+      const mw = 135, mh = 86, mx = CW - 12, my = 8;
+      const mgx = mx - mw;
+      // Background
+      ctx.fillStyle = '#060e0a';
+      ctx.strokeStyle = '#1a3a28';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(mgx, my, mw, mh, 6);
+      ctx.fill(); ctx.stroke();
+      // CFM color: red→orange→yellow→green as cfm drops
+      const cfmRatio = cfm / 3141;
+      const cfmColor = cfmRatio > 0.75 ? '#ff3333'
+                     : cfmRatio > 0.5  ? '#ff8800'
+                     : cfmRatio > 0.25 ? '#F5C500'
+                     : '#00e87a';
+      // Label
+      ctx.font = 'bold 16px monospace';
+      ctx.fillStyle = 'rgba(0,200,100,0.55)';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.fillText('CFM@50pa', mgx + mw / 2, my + 5);
+      // Reading
+      ctx.font = 'bold 36px monospace';
+      ctx.fillStyle = cfmColor;
+      ctx.fillText(cfm.toLocaleString(), mgx + mw / 2, my + 24);
+      // Reduction bar
+      const bx2 = mgx + 8, by2 = my + mh - 15, bw2 = mw - 16, bh2 = 7;
+      ctx.fillStyle = '#0d1f15';
+      ctx.fillRect(bx2, by2, bw2, bh2);
+      ctx.fillStyle = cfmColor;
+      ctx.fillRect(bx2, by2, bw2 * (1 - cfmRatio), bh2);
+      // "REDUCTION" label
+      ctx.font = '8px monospace';
+      ctx.fillStyle = 'rgba(0,200,100,0.35)';
       ctx.textAlign = 'right';
-      ctx.fillText(score.toString(), CW - 16, 16);
+      ctx.fillText(`−${(3141 - cfm).toLocaleString()} CFM@50`, mx, my + mh - 16);
 
       // ── Version (bottom-right, faint) ─────────────────────────────────────
       ctx.textBaseline = 'bottom';
@@ -2462,13 +2577,13 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         // Only draw canvas overlay when running standalone (not in the website iframe)
         if (!isEmbedded) {
           const sub = loseReason === 'fan' ? 'Sucked into the fan!' : 'The leaks got you.';
-          drawOverlay('GAME OVER', `Score: ${score}  —  ${sub}`, '[ PRESS R TO RESTART ]');
+          drawOverlay('GAME OVER', `${cfm} CFM50  —  ${sub}`, '[ PRESS R TO RESTART ]');
         }
         return;
       }
       if (gameWon) {
         if (!isEmbedded) {
-          drawOverlay('YOU SURVIVED!', `Final score: ${score}`, '[ PRESS R TO PLAY AGAIN ]');
+          drawOverlay('YOU SURVIVED!', `${cfm} CFM50`, '[ PRESS R TO PLAY AGAIN ]');
         }
         return;
       }

@@ -73,8 +73,8 @@ export default function GameContainer() {
         body: JSON.stringify({
           initials: name, name: form.name, email: form.email, company: form.company, building: form.building,
           score: finalScore,
-          _subject: `🏆 Game Score — ${finalScore} pts — ${name}`,
-          message: `Score: ${finalScore} | Initials: ${name} | Name: ${form.name} | Company: ${form.company} | Email: ${form.email} | Building: ${form.building}`,
+          _subject: `🏆 Game Result — ${finalScore} CFM50 — ${name}`,
+          message: `CFM50: ${finalScore} | Initials: ${name} | Name: ${form.name} | Company: ${form.company} | Email: ${form.email} | Building: ${form.building}`,
         }),
       }),
     ]);
@@ -88,7 +88,7 @@ export default function GameContainer() {
     const myEntry: BoardEntry = { name, company: form.company || form.building, score: finalScore };
     const alreadyIn = data.some(e => e.name === name && e.score === finalScore);
     if (!alreadyIn) data = [myEntry, ...data];
-    data.sort((a, b) => b.score - a.score);
+    data.sort((a, b) => a.score - b.score); // lowest CFM50 = best
     setBoard(data.slice(0, 10));
     setSubmitting(false);
     setSubmitted(true);
@@ -103,7 +103,7 @@ export default function GameContainer() {
         {!won && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.9"
+            src="/beta/index.html?v=L2.23"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
@@ -115,9 +115,10 @@ export default function GameContainer() {
           <div className="absolute inset-0 bg-[#111111]/95 flex items-center justify-center p-6 overflow-y-auto">
             {!submitted ? (
               <div className="w-full max-w-sm">
-                <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore} pts</p>
+                <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore.toLocaleString()} <span className="text-2xl font-bold">CFM50</span></p>
+                <p className="text-white/40 text-xs mb-3">Lower is better — seal more leaks to reduce infiltration.</p>
                 <h2 className="font-black text-white text-xl mb-5" style={{ letterSpacing: "-0.02em" }}>
-                  {survived ? "You survived! Enter your score." : "Nice run. Submit your score."}
+                  {survived ? "You survived! Enter your result." : "Nice run. Submit your result."}
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-3">
                   <div>
@@ -171,15 +172,15 @@ export default function GameContainer() {
                   </button>
                 </form>
                 <p className="text-white/20 text-xs mt-3 leading-relaxed">
-                  Terms apply. One prize per household. Valid for PA, NJ, NY, or DE.
+                  Terms apply. One prize per household. Valid for PA, NJ, or DE.
                 </p>
               </div>
             ) : (
               /* ── Arcade leaderboard ── */
               <div className="w-full max-w-sm font-mono">
                 <div className="text-center mb-4">
-                  <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ HIGH SCORES ◀</p>
-                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">THIS WEEK</p>
+                  <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ LOWEST CFM50 ◀</p>
+                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">THIS WEEK — LOWER IS BETTER</p>
                 </div>
                 <div className="bg-black border border-[#00ff41]/25 rounded-lg overflow-hidden mb-4">
                   {board.length === 0 ? (
@@ -199,7 +200,7 @@ export default function GameContainer() {
                             <span className="text-[#00ff41]/30 text-[10px] truncate max-w-[80px]">{s.company}</span>
                           )}
                           <span className={`tabular-nums font-bold ${isMe ? "text-[#F5C500]" : "text-[#00ff41]"}`}>
-                            {s.score}
+                            {s.score.toLocaleString()}
                           </span>
                         </div>
                       );
