@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.26';
+    const VERSION = 'L2.27';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -1900,8 +1900,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(btX + 20, bot - 36, 12, 3);
       ctx.fillRect(btX + 29, bot - 48, 3, 12);
 
-      // ── Window AC unit — bottom half of 3rd floor left window, protrudes into room ──
-      const acX = 3, acY = 155, acW = 34, acH = 40; // bottom half of window (y=115+40=155)
+      // ── Window AC unit — full 3rd floor left window, protrudes into room ──
+      const acX = 3, acY = 115, acW = 34, acH = 80; // full window
       const acP = 14; // pixels protruding past wall into room
       // Aged foam/seal in window gap (wall portion only)
       ctx.fillStyle = '#b89f60';
