@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.23';
+    const VERSION = 'L2.25';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -2399,19 +2399,21 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.textAlign = 'center';
       ctx.fillText(timeStr, CW / 2, 16);
 
-      // ── Controls key (below timer) ────────────────────────────────────────
-      const keyItems = ['← → move', '↑/space jump (×2)', 'Z/X fire'];
-      const keyStr = keyItems.join('   ');
-      ctx.font = '9px monospace';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      const keyW = ctx.measureText(keyStr).width + 18;
-      const keyX = CW / 2 - keyW / 2;
-      const keyY = 40;
-      ctx.fillStyle = 'rgba(0,0,0,0.45)';
-      ctx.beginPath(); ctx.roundRect(keyX, keyY, keyW, 16, 4); ctx.fill();
-      ctx.fillStyle = 'rgba(255,255,255,0.35)';
-      ctx.fillText(keyStr, CW / 2, keyY + 4);
+      // ── Controls key — desktop only (mobile uses overlay buttons) ────────
+      if (!isMobile) {
+        const keyItems = ['← → move', '↑/space jump (×2)', 'Z/X fire'];
+        const keyStr = keyItems.join('   ');
+        ctx.font = '9px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        const keyW = ctx.measureText(keyStr).width + 18;
+        const keyX = CW / 2 - keyW / 2;
+        const keyY = 40;
+        ctx.fillStyle = 'rgba(0,0,0,0.45)';
+        ctx.beginPath(); ctx.roundRect(keyX, keyY, keyW, 16, 4); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.35)';
+        ctx.fillText(keyStr, CW / 2, keyY + 4);
+      }
 
       // ── Manometer (top right) ─────────────────────────────────────────────
       const mw = 135, mh = 86, mx = CW - 12, my = 8;

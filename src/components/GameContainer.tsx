@@ -15,6 +15,8 @@ export default function GameContainer() {
   const [form, setForm] = useState({ initials: "", name: "", email: "", building: "", company: "" });
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
+  const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
   const notifyStart = useCallback(() => {
     if (!gameStarted.current) {
       gameStarted.current = true;
@@ -47,11 +49,27 @@ export default function GameContainer() {
     );
   }, []);
 
+  // Hold-to-fire: shoot immediately then repeat every 150 ms while held
+  const startFire = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    notifyStart();
+    iframeRef.current?.contentWindow?.postMessage({ type: "SHOOT" }, "*");
+    fireIntervalRef.current = setInterval(() => {
+      iframeRef.current?.contentWindow?.postMessage({ type: "SHOOT" }, "*");
+    }, 150);
+  }, [notifyStart]);
+
+  const stopFire = useCallback((e: React.TouchEvent) => {
+    e.preventDefault();
+    if (fireIntervalRef.current) { clearInterval(fireIntervalRef.current); fireIntervalRef.current = null; }
+  }, []);
+
   function tryAgain() {
     setWon(false); setSurvived(false); setSubmitted(false);
     setForm({ initials: "", name: "", email: "", building: "", company: "" });
     setBoard([]);
     gameStarted.current = false;
+    if (fireIntervalRef.current) { clearInterval(fireIntervalRef.current); fireIntervalRef.current = null; }
     setTimeout(() => {
       iframeRef.current?.contentWindow?.postMessage({ type: "RESTART" }, "*");
     }, 50);
@@ -73,22 +91,20 @@ export default function GameContainer() {
         body: JSON.stringify({
           initials: name, name: form.name, email: form.email, company: form.company, building: form.building,
           score: finalScore,
-          _subject: `🏆 Game Result — ${finalScore} CFM50 — ${name}`,
-          message: `CFM50: ${finalScore} | Initials: ${name} | Name: ${form.name} | Company: ${form.company} | Email: ${form.email} | Building: ${form.building}`,
+          _subject: `🏆 Game Result — ${finalScore} CFM@50pa — ${name}`,
+          message: `CFM@50pa: ${finalScore} | Initials: ${name} | Name: ${form.name} | Company: ${form.company} | Email: ${form.email} | Building: ${form.building}`,
         }),
       }),
     ]);
-    // Fetch fresh leaderboard — always inject current player's entry so it's never blank
     let data: BoardEntry[] = [];
     try {
       const res = await fetch("/api/scores", { cache: "no-store" });
       if (res.ok) data = await res.json();
-    } catch { /* network error — fall through to local entry */ }
-    // Ensure current player appears even if API returned nothing or their entry is missing
+    } catch { /* fall through */ }
     const myEntry: BoardEntry = { name, company: form.company || form.building, score: finalScore };
     const alreadyIn = data.some(e => e.name === name && e.score === finalScore);
     if (!alreadyIn) data = [myEntry, ...data];
-    data.sort((a, b) => a.score - b.score); // lowest CFM50 = best
+    data.sort((a, b) => a.score - b.score);
     setBoard(data.slice(0, 10));
     setSubmitting(false);
     setSubmitted(true);
@@ -103,11 +119,52 @@ export default function GameContainer() {
         {!won && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.23"
+            src="/beta/index.html?v=L2.25"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
           />
+        )}
+
+        {/* Mobile touch controls — overlaid on game canvas, bottom corners */}
+        {!won && (
+          <div className="md:hidden absolute inset-x-0 bottom-0 flex justify-between items-end px-5 pb-7 pointer-events-none select-none">
+            {/* Left side: ◀ ▶ */}
+            <div className="flex gap-4 pointer-events-auto">
+              <button
+                className="w-20 h-20 rounded-2xl bg-black/60 border border-white/25 text-white text-3xl active:bg-[#F5C500]/40 active:border-[#F5C500]/60"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
+                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+              >◀</button>
+              <button
+                className="w-20 h-20 rounded-2xl bg-black/60 border border-white/25 text-white text-3xl active:bg-[#F5C500]/40 active:border-[#F5C500]/60"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
+                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+              >▶</button>
+            </div>
+
+            {/* Right side: FIRE + JUMP */}
+            <div className="flex gap-4 items-end pointer-events-auto">
+              <button
+                className="w-20 h-20 rounded-2xl bg-[#FF6B00]/80 border border-[#FF6B00]/60 text-white text-sm font-black tracking-widest active:bg-[#FF6B00]"
+                onTouchStart={startFire}
+                onTouchEnd={stopFire}
+                onTouchCancel={stopFire}
+              >FIRE</button>
+              <div className="flex flex-col items-center gap-[3px]">
+                <button
+                  className="w-20 h-20 rounded-2xl bg-[#F5C500]/85 border border-[#F5C500]/60 text-[#111111] text-sm font-black tracking-widest active:bg-[#F5C500]"
+                  onTouchStart={e => {
+                    e.preventDefault(); notifyStart();
+                    iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
+                  }}
+                >JUMP</button>
+                <span className="text-white/35 text-[9px]">tap ×2</span>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* Win overlay */}
@@ -115,7 +172,7 @@ export default function GameContainer() {
           <div className="absolute inset-0 bg-[#111111]/95 flex items-center justify-center p-6 overflow-y-auto">
             {!submitted ? (
               <div className="w-full max-w-sm">
-                <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore.toLocaleString()} <span className="text-2xl font-bold">CFM50</span></p>
+                <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore.toLocaleString()} <span className="text-2xl font-bold">CFM@50pa</span></p>
                 <p className="text-white/40 text-xs mb-3">Lower is better — seal more leaks to reduce infiltration.</p>
                 <h2 className="font-black text-white text-xl mb-5" style={{ letterSpacing: "-0.02em" }}>
                   {survived ? "You survived! Enter your result." : "Nice run. Submit your result."}
@@ -179,8 +236,8 @@ export default function GameContainer() {
               /* ── Arcade leaderboard ── */
               <div className="w-full max-w-sm font-mono">
                 <div className="text-center mb-4">
-                  <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ LOWEST CFM50 ◀</p>
-                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">THIS WEEK — LOWER IS BETTER</p>
+                  <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ LOWEST CFM@50pa ◀</p>
+                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">ALL TIME TOP 10 — LOWER IS BETTER</p>
                 </div>
                 <div className="bg-black border border-[#00ff41]/25 rounded-lg overflow-hidden mb-4">
                   {board.length === 0 ? (
@@ -214,40 +271,6 @@ export default function GameContainer() {
             )}
           </div>
         )}
-      </div>
-
-      {/* Mobile controls */}
-      <div className="md:hidden flex justify-between items-center px-2 pt-3 pb-1">
-        <div className="flex gap-3">
-          <button
-            className="w-[104px] h-[104px] rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
-            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
-            onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-            onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-          >◀</button>
-          <button
-            className="w-[104px] h-[104px] rounded-2xl bg-white/10 text-white text-2xl font-bold active:bg-[#F5C500]/30 select-none"
-            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
-            onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-            onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-          >▶</button>
-        </div>
-        <div className="flex gap-2 items-start">
-          <button
-            className="w-[104px] h-[104px] rounded-2xl bg-[#FF6B00] text-white text-sm font-black tracking-wide active:bg-[#FF6B00]/60 select-none"
-            onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "SHOOT" }, "*"); }}
-          >FIRE</button>
-          <div className="flex flex-col items-center gap-1">
-            <button
-              className="w-[104px] h-[104px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-wide active:bg-[#F5C500]/70 select-none"
-              onTouchStart={e => {
-                e.preventDefault(); notifyStart();
-                iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
-              }}
-            >JUMP</button>
-            <span className="text-white/30 text-[10px]">tap twice to double jump</span>
-          </div>
-        </div>
       </div>
     </div>
   );
