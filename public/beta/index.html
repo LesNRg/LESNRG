@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'BETA';
+    const VERSION = 'BETA2';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -2479,13 +2479,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         ctx.fillText('−1,000 CFM@50pa BONUS', CW / 2, CH / 2 + 18);
         ctx.restore();
       }
-
-      // ── Prize notice (bottom center) ──────────────────────────────────────
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'bottom';
-      ctx.font = 'bold 11px monospace';
-      ctx.fillStyle = 'rgba(245,197,0,0.75)';
-      ctx.fillText('🏆 Prize awarded Sunday 10pm', CW / 2, CH - 8);
 
       // ── Version (bottom-right, faint) ─────────────────────────────────────
       ctx.textAlign = 'right';
