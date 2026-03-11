@@ -12,7 +12,7 @@ export default function GameContainer() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [board, setBoard] = useState<BoardEntry[]>([]);
-  const [form, setForm] = useState({ initials: "", name: "", email: "", building: "", company: "" });
+  const [form, setForm] = useState({ initials: "", name: "", email: "", building: "", company: "", services: "", otherService: "" });
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -66,7 +66,7 @@ export default function GameContainer() {
 
   function tryAgain() {
     setWon(false); setSurvived(false); setSubmitted(false);
-    setForm({ initials: "", name: "", email: "", building: "", company: "" });
+    setForm({ initials: "", name: "", email: "", building: "", company: "", services: "", otherService: "" });
     setBoard([]);
     gameStarted.current = false;
     if (fireIntervalRef.current) { clearInterval(fireIntervalRef.current); fireIntervalRef.current = null; }
@@ -90,9 +90,10 @@ export default function GameContainer() {
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
           initials: name, name: form.name, email: form.email, company: form.company, building: form.building,
+          services: form.services === "Other" ? `Other: ${form.otherService}` : form.services,
           score: finalScore,
           _subject: `🏆 Game Result — ${finalScore} CFM@50pa — ${name}`,
-          message: `CFM@50pa: ${finalScore} | Initials: ${name} | Name: ${form.name} | Company: ${form.company} | Email: ${form.email} | Building: ${form.building}`,
+          message: `CFM@50pa: ${finalScore} | Initials: ${name} | Name: ${form.name} | Affiliation: ${form.company} | Email: ${form.email} | Services: ${form.services === "Other" ? `Other: ${form.otherService}` : form.services || "none"} | Comment: ${form.building}`,
         }),
       }),
     ]);
@@ -184,6 +185,31 @@ export default function GameContainer() {
                       onChange={e => setForm(f => ({ ...f, building: e.target.value }))}
                     />
                   </div>
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Services interested in <span className="normal-case">(optional)</span></label>
+                    <select
+                      className="input-field"
+                      value={form.services}
+                      onChange={e => setForm(f => ({ ...f, services: e.target.value, otherService: "" }))}
+                    >
+                      <option value="">— Select a service —</option>
+                      <option value="Large Building Blower Door">Large Building Blower Door</option>
+                      <option value="Passive House Verification">Passive House Verification</option>
+                      <option value="Energy Star for Homes Certification">Energy Star for Homes Certification</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  {form.services === "Other" && (
+                    <div>
+                      <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Please describe</label>
+                      <input
+                        className="input-field"
+                        type="text" placeholder="Tell us what you need..."
+                        value={form.otherService}
+                        onChange={e => setForm(f => ({ ...f, otherService: e.target.value }))}
+                      />
+                    </div>
+                  )}
                   <button type="submit" disabled={submitting} className="btn-primary w-full justify-center mt-2">
                     {submitting ? "Saving…" : "Submit score"}
                     {!submitting && <ArrowRight size={16} />}
