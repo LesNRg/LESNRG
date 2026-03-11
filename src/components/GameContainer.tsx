@@ -119,57 +119,18 @@ export default function GameContainer() {
         {!won && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=L2.25"
+            src="/beta/index.html?v=L2.26"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
           />
         )}
 
-        {/* Mobile touch controls — overlaid on game canvas, bottom corners */}
-        {!won && (
-          <div className="md:hidden absolute inset-x-0 bottom-0 flex justify-between items-end px-5 pb-7 pointer-events-none select-none">
-            {/* Left side: ◀ ▶ */}
-            <div className="flex gap-4 pointer-events-auto">
-              <button
-                className="w-20 h-20 rounded-2xl bg-black/60 border border-white/25 text-white text-3xl active:bg-[#F5C500]/40 active:border-[#F5C500]/60"
-                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
-                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-              >◀</button>
-              <button
-                className="w-20 h-20 rounded-2xl bg-black/60 border border-white/25 text-white text-3xl active:bg-[#F5C500]/40 active:border-[#F5C500]/60"
-                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
-                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-              >▶</button>
-            </div>
-
-            {/* Right side: FIRE + JUMP */}
-            <div className="flex gap-4 items-end pointer-events-auto">
-              <button
-                className="w-20 h-20 rounded-2xl bg-[#FF6B00]/80 border border-[#FF6B00]/60 text-white text-sm font-black tracking-widest active:bg-[#FF6B00]"
-                onTouchStart={startFire}
-                onTouchEnd={stopFire}
-                onTouchCancel={stopFire}
-              >FIRE</button>
-              <div className="flex flex-col items-center gap-[3px]">
-                <button
-                  className="w-20 h-20 rounded-2xl bg-[#F5C500]/85 border border-[#F5C500]/60 text-[#111111] text-sm font-black tracking-widest active:bg-[#F5C500]"
-                  onTouchStart={e => {
-                    e.preventDefault(); notifyStart();
-                    iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
-                  }}
-                >JUMP</button>
-                <span className="text-white/35 text-[9px]">tap ×2</span>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Win overlay */}
         {won && (
-          <div className="absolute inset-0 bg-[#111111]/95 flex items-center justify-center p-6 overflow-y-auto">
+          <div className="absolute inset-0 bg-[#111111]/95 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+          <div className="min-h-full flex items-center justify-center p-6">
             {!submitted ? (
               <div className="w-full max-w-sm">
                 <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore.toLocaleString()} <span className="text-2xl font-bold">CFM@50pa</span></p>
@@ -237,7 +198,7 @@ export default function GameContainer() {
               <div className="w-full max-w-sm font-mono">
                 <div className="text-center mb-4">
                   <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ LOWEST CFM@50pa ◀</p>
-                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">ALL TIME TOP 10 — LOWER IS BETTER</p>
+                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">THIS WEEK — LOWER IS BETTER</p>
                 </div>
                 <div className="bg-black border border-[#00ff41]/25 rounded-lg overflow-hidden mb-4">
                   {board.length === 0 ? (
@@ -270,7 +231,46 @@ export default function GameContainer() {
               </div>
             )}
           </div>
+          </div>
         )}
+      </div>
+
+      {/* Mobile controls — below game, well-spaced */}
+      <div className="md:hidden flex justify-between items-center px-4 pt-3 pb-2 select-none">
+        {/* Left: move */}
+        <div className="flex gap-4">
+          <button
+            className="w-[88px] h-[88px] rounded-2xl bg-white/10 border border-white/20 text-white text-3xl font-bold active:bg-[#F5C500]/30 active:border-[#F5C500]/50"
+            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
+            onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+            onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+          >◀</button>
+          <button
+            className="w-[88px] h-[88px] rounded-2xl bg-white/10 border border-white/20 text-white text-3xl font-bold active:bg-[#F5C500]/30 active:border-[#F5C500]/50"
+            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
+            onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+            onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+          >▶</button>
+        </div>
+        {/* Right: fire + jump */}
+        <div className="flex gap-4 items-end">
+          <button
+            className="w-[88px] h-[88px] rounded-2xl bg-[#FF6B00] text-white text-sm font-black tracking-widest active:bg-[#FF6B00]/60"
+            onTouchStart={startFire}
+            onTouchEnd={stopFire}
+            onTouchCancel={stopFire}
+          >FIRE</button>
+          <div className="flex flex-col items-center gap-1">
+            <button
+              className="w-[88px] h-[88px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-widest active:bg-[#F5C500]/70"
+              onTouchStart={e => {
+                e.preventDefault(); notifyStart();
+                iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
+              }}
+            >JUMP</button>
+            <span className="text-white/30 text-[10px]">tap ×2</span>
+          </div>
+        </div>
       </div>
     </div>
   );
