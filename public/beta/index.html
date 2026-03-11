@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'BETA2';
+    const VERSION = 'BETA3';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -2448,17 +2448,17 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.font = 'bold 36px monospace';
       ctx.fillStyle = cfmColor;
       ctx.fillText(cfm.toLocaleString(), mgx + mw / 2, my + 24);
-      // Reduction bar
+      // Bar: full at 3141, shrinks to left as score improves
       const bx2 = mgx + 8, by2 = my + mh - 15, bw2 = mw - 16, bh2 = 7;
       ctx.fillStyle = '#0d1f15';
       ctx.fillRect(bx2, by2, bw2, bh2);
       ctx.fillStyle = cfmColor;
-      ctx.fillRect(bx2, by2, bw2 * (1 - cfmRatio), bh2);
-      // "REDUCTION" label
+      ctx.fillRect(bx2, by2, bw2 * cfmRatio, bh2);
+      // "3,141" max label at right end of track
       ctx.font = '8px monospace';
-      ctx.fillStyle = 'rgba(0,200,100,0.35)';
+      ctx.fillStyle = 'rgba(0,200,100,0.30)';
       ctx.textAlign = 'right';
-      ctx.fillText(`−${(3141 - cfm).toLocaleString()} CFM@50`, mx, my + mh - 16);
+      ctx.fillText('3,141', mgx + mw - 8, my + mh - 16);
 
       // ── Full-seal bonus flash ──────────────────────────────────────────────
       if (bonusFlash > 0) {

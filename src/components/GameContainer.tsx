@@ -120,7 +120,7 @@ export default function GameContainer() {
         {!won && (
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=BETA2"
+            src="/beta/index.html?v=BETA3"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay"
@@ -137,7 +137,7 @@ export default function GameContainer() {
                 <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore.toLocaleString()} <span className="text-2xl font-bold">CFM@50pa</span></p>
                 <p className="text-white/40 text-xs mb-3">Lower is better — seal more leaks to reduce infiltration.</p>
                 <h2 className="font-black text-white text-xl mb-5" style={{ letterSpacing: "-0.02em" }}>
-                  {survived ? "You survived! Enter your result." : "Nice run. Submit your result."}
+                  Submit your results to get on the leaderboard.
                 </h2>
                 <form onSubmit={handleSubmit} className="space-y-3">
                   <div>
