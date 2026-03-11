@@ -279,7 +279,7 @@ export default function GameContainer() {
           >▶</button>
         </div>
         {/* Right: fire + jump */}
-        <div className="flex gap-4 items-end">
+        <div className="flex gap-4 items-center">
           <button
             className="w-[88px] h-[88px] rounded-2xl bg-[#FF6B00] text-white text-sm font-black tracking-widest active:bg-[#FF6B00]/60"
             onTouchStart={startFire}
