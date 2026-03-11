@@ -45,7 +45,7 @@ export default async function Leaderboard() {
 
       {scores.length === 0 ? (
         <p className="text-white/30 text-sm">
-          No scores yet this week — beat the game to get on the board.
+          No scores yet this week — play the game to get on the board.
         </p>
       ) : (
         <div className="rounded-xl overflow-hidden border border-white/8 max-w-xl">
