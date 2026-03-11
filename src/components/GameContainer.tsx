@@ -262,7 +262,7 @@ export default function GameContainer() {
       </div>
 
       {/* Mobile controls — below game, well-spaced */}
-      <div className="md:hidden flex justify-between items-center px-4 pt-3 pb-2 select-none">
+      <div className="md:hidden flex justify-between items-center px-4 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
         {/* Left: move */}
         <div className="flex gap-4">
           <button
