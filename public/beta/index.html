@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'L2.7';
+    const VERSION = 'L2.9';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -532,6 +532,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ─── Timer countdown ─────────────────────────────────────────────────────
       framesLeft = Math.max(0, framesLeft - 1);
       if (framesLeft === 0) {
+        score += 50; // survival bonus for lasting 2 minutes
         gameWon = true;
         window.parent.postMessage({ type: 'GAME_WIN', score }, '*');
         return;
@@ -556,6 +557,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           lives = 0;
           loseReason = 'fan';
           gameOver = true;
+          score += Math.floor(framesLeft / 60); // time bonus: seconds remaining
           window.parent.postMessage({ type: 'GAME_LOSE', score }, '*');
           return;
         }
@@ -572,6 +574,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
               lives = 0;
               loseReason = 'lives';
               gameOver = true;
+              score += Math.floor(framesLeft / 60); // time bonus: seconds remaining
               window.parent.postMessage({ type: 'GAME_LOSE', score }, '*');
               return;
             }
@@ -602,9 +605,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           const sweepY = l.fromWall ? b.y - 80 : b.y - 10;
           const sweepH = l.fromWall ? b.h + 160 : b.h + 20;
           if (overlaps(sweepX, sweepY, sweepW, sweepH, l.x, l.y, l.w, l.h)) {
-            if (l.fromWall) {
-              seals.push({ x: l.x + l.w / 2, y: l.y + l.h / 2 });
-            }
+            if (l.fromWall) seals.push({ x: l.x + l.w / 2, y: l.y + l.h / 2 });
             leaks.splice(j, 1);
             score += 10;
             hit = true;
