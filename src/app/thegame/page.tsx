@@ -28,7 +28,7 @@ export default function GamePage() {
           <span className="text-[#F5C500]">The Game.</span>
         </h1>
         <p className="text-white/50 text-lg max-w-xl">
-          Survive 2 minutes. Shoot the leaks. Get on the board.
+          Survive 1 minute. Shoot the air leaks with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">F</kbd> to seal them up and lower your CFM@50pa score. Lowest score wins.
         </p>
       </div>
 
@@ -59,7 +59,7 @@ export default function GamePage() {
             Beat the game, submit your score, and enter to win. We&apos;ll come to your building and find exactly where it&apos;s losing energy — no charge.
           </p>
           <p className="text-[#111111]/50 text-sm mb-8">
-            Terms apply. One prize per household. Valid for residential properties in PA, NJ, NY, or DE.
+            Terms apply. One prize per household. Valid for residential properties in PA, NJ, or DE.
             Prize has no cash value and may not be combined with other offers. LES NRG reserves the right
             to verify game completion. Offer subject to scheduling availability.
           </p>

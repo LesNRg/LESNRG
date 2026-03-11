@@ -167,10 +167,10 @@ export default function GameContainer() {
                     />
                   </div>
                   <div>
-                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Company</label>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Affiliation</label>
                     <input
                       className="input-field"
-                      type="text" placeholder="Your company"
+                      type="text" placeholder="Company, school, firm..."
                       value={form.company}
                       onChange={e => setForm(f => ({ ...f, company: e.target.value }))}
                     />
