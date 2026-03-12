@@ -262,7 +262,7 @@ export default function GameContainer() {
       </div>
 
       {/* Mobile controls — below game, well-spaced */}
-      <div className="md:hidden flex justify-between items-center px-4 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
+      <div className="md:hidden flex justify-between items-start px-4 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
         {/* Left: move */}
         <div className="flex gap-4">
           <button
@@ -279,7 +279,7 @@ export default function GameContainer() {
           >▶</button>
         </div>
         {/* Right: fire + jump */}
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-4 items-start">
           <button
             className="w-[88px] h-[88px] rounded-2xl bg-[#FF6B00] text-white text-sm font-black tracking-widest active:bg-[#FF6B00]/60"
             onTouchStart={startFire}
