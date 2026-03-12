@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'BETA5';
+    const VERSION = 'BETA6';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -239,6 +239,7 @@
     let invincible = 0;               // countdown frames of invincibility
     let loseReason = '';              // 'time' | 'lives' | 'fan'
     let bonusFlash = 0;               // countdown frames for full-seal bonus flash
+    let floatTexts = [];              // [{wx, wy, text, life}] floating score popups
 
     // ─── Bullets & Air Leaks ─────────────────────────────────────────────────
     const bullets = [];
@@ -409,6 +410,7 @@
       fireCooldown = 0;
       loseReason   = '';
       bonusFlash   = 0;
+      floatTexts.length = 0;
       gameOver     = false;
       gameWon      = false;
       bullets.length = 0;
@@ -644,7 +646,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           }
           if (isHit) {
             leaks.splice(j, 1);
-            cfm = Math.max(0, cfm - 5); // big leak: -5 CFM
+            cfm = Math.max(0, cfm - 10); // big leak: -10 CFM
+            floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−10', life: 65 });
             hit = true;
             break;
           }
@@ -658,10 +661,11 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
             const em = EMITTERS[e];
             if (Math.abs(bCX - em.ox) < 40 && Math.abs(bCY - em.oy) < 40) {
               sealedEmitters.add(e);
-              cfm = Math.max(0, cfm - 15); // LL seal: -15 CFM
-              // Bonus: seal ALL emitters → -1000 CFM
+              cfm = Math.max(0, cfm - 30); // LL seal: -30 CFM
+              floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−30', life: 65 });
+              // Bonus: seal ALL emitters → -2000 CFM
               if (sealedEmitters.size === EMITTERS.length) {
-                cfm = Math.max(0, cfm - 1000);
+                cfm = Math.max(0, cfm - 2000);
                 bonusFlash = 240; // show for 4 seconds
               }
               hit = true;
@@ -674,14 +678,14 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // ─── Big leaks — 7–12 on screen, more frequent near the top ─────────
       const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
-      const dynInterval = Math.round(45 - heightFrac * 30); // 45 frames at bottom → 15 at top
+      const dynInterval = Math.round(70 - heightFrac * 30); // 70 frames at bottom → 40 at top
       leakTimer++;
-      if (leakTimer >= dynInterval && leaks.length < 6) {
+      if (leakTimer >= dynInterval && leaks.length < 4) {
         spawnLeak();
         leakTimer = 0;
       }
-      // Keep minimum 4 on screen
-      if (leaks.length < 4) {
+      // Keep minimum 2 on screen
+      if (leaks.length < 2) {
         spawnLeak();
       }
 
@@ -2476,7 +2480,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         ctx.fillText('ALL LEAKS SEALED!', CW / 2, CH / 2 - 10);
         ctx.font = 'bold 20px monospace';
         ctx.fillStyle = `rgba(245,197,0,${alpha})`;
-        ctx.fillText('−1,000 CFM@50pa BONUS', CW / 2, CH / 2 + 18);
+        ctx.fillText('−2,000 CFM@50pa BONUS', CW / 2, CH / 2 + 18);
         ctx.restore();
       }
 
@@ -2567,7 +2571,26 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       drawPlayer();
       drawSeals();
       drawBullets();
+      drawFloatTexts();
       drawHUD();
+    }
+
+    function drawFloatTexts() {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 18px monospace';
+      for (let i = floatTexts.length - 1; i >= 0; i--) {
+        const ft = floatTexts[i];
+        ft.wy -= 1.2;
+        ft.life--;
+        if (ft.life <= 0) { floatTexts.splice(i, 1); continue; }
+        const alpha = Math.min(1, ft.life / 20);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#00e87a';
+        ctx.fillText(ft.text, ft.wx, ft.wy - cam.y);
+      }
+      ctx.restore();
     }
 
     // ─── Overlay screens ──────────────────────────────────────────────────────
