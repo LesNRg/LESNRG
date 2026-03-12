@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'BETA6';
+    const VERSION = 'BETA7';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -646,8 +646,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           }
           if (isHit) {
             leaks.splice(j, 1);
-            cfm = Math.max(0, cfm - 10); // big leak: -10 CFM
-            floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−10', life: 65 });
+            cfm = Math.max(0, cfm - 50); // big leak: -50 CFM
+            floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−50', life: 65 });
             hit = true;
             break;
           }
@@ -661,8 +661,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
             const em = EMITTERS[e];
             if (Math.abs(bCX - em.ox) < 40 && Math.abs(bCY - em.oy) < 40) {
               sealedEmitters.add(e);
-              cfm = Math.max(0, cfm - 30); // LL seal: -30 CFM
-              floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−30', life: 65 });
+              cfm = Math.max(0, cfm - 100); // LL seal: -100 CFM
+              floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−100', life: 65 });
               // Bonus: seal ALL emitters → -2000 CFM
               if (sealedEmitters.size === EMITTERS.length) {
                 cfm = Math.max(0, cfm - 2000);
