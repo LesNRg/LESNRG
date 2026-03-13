@@ -10,7 +10,7 @@ async function getWeeklyScores(): Promise<Score[]> {
 
   try {
     const res = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/scores?select=name,company,score&created_at=gte.${d.toISOString()}&order=score.desc&limit=10`,
+      `${process.env.SUPABASE_URL}/rest/v1/scores?select=name,company,score&created_at=gte.${d.toISOString()}&order=score.asc&limit=10`,
       {
         headers: {
           apikey: process.env.SUPABASE_ANON_KEY!,
@@ -72,7 +72,7 @@ export default async function Leaderboard() {
                 )}
               </div>
               <span className="text-[#F5C500] font-black text-sm tabular-nums">
-                {s.score} pts
+                {s.score.toLocaleString()} CFM
               </span>
             </div>
           ))}
