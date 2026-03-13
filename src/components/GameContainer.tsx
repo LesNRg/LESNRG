@@ -261,41 +261,44 @@ export default function GameContainer() {
         )}
       </div>
 
-      {/* Mobile controls — below game, well-spaced */}
-      <div className="md:hidden flex justify-between items-start px-4 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
-        {/* Left: move */}
-        <div className="flex gap-4">
+      {/* Mobile controls — below game, evenly spaced */}
+      <div className="md:hidden flex justify-evenly items-end px-2 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
+        <div className="flex flex-col items-center gap-1">
           <button
             className="w-[88px] h-[88px] rounded-2xl bg-white/10 border border-white/20 text-white text-3xl font-bold active:bg-[#F5C500]/30 active:border-[#F5C500]/50"
             onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
           >◀</button>
+          <span className="text-transparent text-[10px] select-none">·</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
           <button
             className="w-[88px] h-[88px] rounded-2xl bg-white/10 border border-white/20 text-white text-3xl font-bold active:bg-[#F5C500]/30 active:border-[#F5C500]/50"
             onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
           >▶</button>
+          <span className="text-transparent text-[10px] select-none">·</span>
         </div>
-        {/* Right: fire + jump */}
-        <div className="flex gap-4 items-start">
+        <div className="flex flex-col items-center gap-1">
           <button
             className="w-[88px] h-[88px] rounded-2xl bg-[#FF6B00] text-white text-sm font-black tracking-widest active:bg-[#FF6B00]/60"
             onTouchStart={startFire}
             onTouchEnd={stopFire}
             onTouchCancel={stopFire}
           >FIRE</button>
-          <div className="flex flex-col items-center gap-1">
-            <button
-              className="w-[88px] h-[88px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-widest active:bg-[#F5C500]/70"
-              onTouchStart={e => {
-                e.preventDefault(); notifyStart();
-                iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
-              }}
-            >JUMP</button>
-            <span className="text-white/30 text-[10px]">tap ×2</span>
-          </div>
+          <span className="text-transparent text-[10px] select-none">·</span>
+        </div>
+        <div className="flex flex-col items-center gap-1">
+          <button
+            className="w-[88px] h-[88px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-widest active:bg-[#F5C500]/70"
+            onTouchStart={e => {
+              e.preventDefault(); notifyStart();
+              iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
+            }}
+          >JUMP</button>
+          <span className="text-white/30 text-[10px]">tap ×2</span>
         </div>
       </div>
     </div>
