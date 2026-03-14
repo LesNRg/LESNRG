@@ -124,7 +124,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 1080 mobile
 
-    const VERSION = 'BETA7';
+    const VERSION = 'BETA8';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -227,7 +227,7 @@
     const HEAD_TUFT_ANGLES = HEAD_TUFTS.map(([tx,ty]) => Math.atan2(ty,tx));
 
     // ─── Game state ───────────────────────────────────────────────────────────
-    const GAME_DURATION    = 60 * 60;  // 1 minute at 60 fps
+    const GAME_DURATION    = 90 * 60;  // 90 seconds at 60 fps
     const MAX_LIVES        = 3;
     const INVINCIBLE_FRAMES = 90;      // 1.5s invincibility after hit
 
@@ -2489,7 +2489,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.textBaseline = 'bottom';
       ctx.fillStyle = 'rgba(255,255,255,0.15)';
       ctx.font = '10px monospace';
-      ctx.fillText('BETA TEST · ' + VERSION, CW - 8, CH - 8);
+      ctx.fillText('BETA TEST', CW - 8, CH - 8);
 
       ctx.restore();
     }

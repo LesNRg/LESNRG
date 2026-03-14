@@ -28,7 +28,7 @@ export default function GamePage() {
           <span className="text-[#F5C500]">The Game.</span>
         </h1>
         <p className="text-white/50 text-lg max-w-xl">
-          Survive 1 minute. Shoot the air leaks in the house with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">F</kbd> to seal them up and lower your CFM@50pa score. Lowest score wins.
+          Survive 90 seconds. Shoot the air leaks in the house with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">F</kbd> to seal them up and lower your CFM@50pa score. Lowest score wins.
         </p>
       </div>
 
