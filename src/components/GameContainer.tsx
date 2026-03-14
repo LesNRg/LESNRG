@@ -13,6 +13,8 @@ export default function GameContainer() {
   const [submitting, setSubmitting] = useState(false);
   const [board, setBoard] = useState<BoardEntry[]>([]);
   const [form, setForm] = useState({ initials: "", name: "", email: "", building: "", company: "", services: "", otherService: "" });
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -31,6 +33,16 @@ export default function GameContainer() {
     };
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
+  }, []);
+
+  useEffect(() => {
+    const mobileMq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const orientMq = window.matchMedia("(orientation: landscape)");
+    setIsMobileDevice(mobileMq.matches);
+    setIsLandscape(orientMq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsLandscape(e.matches);
+    orientMq.addEventListener("change", handler);
+    return () => orientMq.removeEventListener("change", handler);
   }, []);
 
   useEffect(() => {
@@ -170,15 +182,6 @@ export default function GameContainer() {
                     />
                   </div>
                   <div>
-                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Affiliation</label>
-                    <input
-                      className="input-field"
-                      type="text" placeholder="Company, school, firm..."
-                      value={form.company}
-                      onChange={e => setForm(f => ({ ...f, company: e.target.value }))}
-                    />
-                  </div>
-                  <div>
                     <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Beta test comment</label>
                     <input
                       className="input-field"
@@ -217,6 +220,9 @@ export default function GameContainer() {
                     {!submitting && <ArrowRight size={16} />}
                   </button>
                 </form>
+                <button onClick={tryAgain} className="w-full font-mono text-sm font-bold tracking-widest py-2.5 rounded-lg border border-white/15 text-white/40 hover:text-white/60 hover:border-white/30 transition-colors mt-2">
+                  ▶ TRY AGAIN
+                </button>
                 <p className="text-white/20 text-xs mt-3 leading-relaxed">
                   Terms apply. One prize per household. Valid for PA, NJ, or DE.
                 </p>
@@ -263,44 +269,72 @@ export default function GameContainer() {
         )}
       </div>
 
-      {/* Mobile controls — overlaid in corners */}
-      <div className="md:hidden absolute inset-0 pointer-events-none select-none z-10">
-        {/* Bottom-left: ◀ ▶ */}
-        <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
-          <button
-            className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
-            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
-            onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-            onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-          >◀</button>
-          <button
-            className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
-            onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
-            onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-            onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-          >▶</button>
-        </div>
-        {/* Bottom-right: FIRE + JUMP */}
-        <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
-          <button
-            className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
-            onTouchStart={startFire}
-            onTouchEnd={stopFire}
-            onTouchCancel={stopFire}
-          >FIRE</button>
-          <div className="flex flex-col items-center gap-0.5">
+      {/* Landscape mobile: overlay controls in corners */}
+      {isMobileDevice && isLandscape && (
+        <div className="absolute inset-0 pointer-events-none select-none z-10">
+          <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
             <button
-              className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
-              onTouchStart={e => {
-                e.preventDefault(); notifyStart();
-                iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
-              }}
-            >JUMP</button>
-            <span className="text-white/20 text-[9px]">tap ×2</span>
+              className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+              onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
+              onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+              onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+            >◀</button>
+            <button
+              className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+              onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
+              onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+              onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+            >▶</button>
+          </div>
+          <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
+            <button
+              className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
+              onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
+            >FIRE</button>
+            <div className="flex flex-col items-center gap-0.5">
+              <button
+                className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
+              >JUMP</button>
+              <span className="text-white/20 text-[9px]">tap ×2</span>
+            </div>
           </div>
         </div>
+      )}
       </div>
-      </div>
+
+      {/* Portrait mobile: controls below game */}
+      {isMobileDevice && !isLandscape && (
+        <div className="flex justify-between items-start px-4 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
+          <div className="flex gap-3">
+            <button
+              className="w-[72px] h-[72px] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25"
+              onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
+              onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+              onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+            >◀</button>
+            <button
+              className="w-[72px] h-[72px] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25"
+              onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
+              onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+              onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+            >▶</button>
+          </div>
+          <div className="flex gap-3 items-start">
+            <button
+              className="w-[72px] h-[72px] rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
+              onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
+            >FIRE</button>
+            <div className="flex flex-col items-center gap-0.5">
+              <button
+                className="w-[72px] h-[72px] rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
+              >JUMP</button>
+              <span className="text-white/20 text-[9px]">tap ×2</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
