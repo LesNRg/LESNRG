@@ -113,6 +113,8 @@ export default function GameContainer() {
 
   return (
     <div style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
+      {/* Game + overlay wrapper */}
+      <div className="relative">
       {/* Game area */}
       <div className="relative w-full rounded-xl overflow-hidden border-2 border-[#F5C500]/20 aspect-[800/500] md:aspect-[800/700]">
 
@@ -261,45 +263,43 @@ export default function GameContainer() {
         )}
       </div>
 
-      {/* Mobile controls — below game, evenly spaced */}
-      <div className="md:hidden flex justify-evenly items-end px-2 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
-        <div className="flex flex-col items-center gap-1">
+      {/* Mobile controls — overlaid in corners */}
+      <div className="md:hidden absolute inset-0 pointer-events-none select-none z-10">
+        {/* Bottom-left: ◀ ▶ */}
+        <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
           <button
-            className="w-[88px] h-[88px] rounded-2xl bg-white/10 border border-white/20 text-white text-3xl font-bold active:bg-[#F5C500]/30 active:border-[#F5C500]/50"
+            className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
             onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
           >◀</button>
-          <span className="text-transparent text-[10px] select-none">·</span>
-        </div>
-        <div className="flex flex-col items-center gap-1">
           <button
-            className="w-[88px] h-[88px] rounded-2xl bg-white/10 border border-white/20 text-white text-3xl font-bold active:bg-[#F5C500]/30 active:border-[#F5C500]/50"
+            className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
             onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
             onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
             onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
           >▶</button>
-          <span className="text-transparent text-[10px] select-none">·</span>
         </div>
-        <div className="flex flex-col items-center gap-1">
+        {/* Bottom-right: FIRE + JUMP */}
+        <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
           <button
-            className="w-[88px] h-[88px] rounded-2xl bg-[#FF6B00] text-white text-sm font-black tracking-widest active:bg-[#FF6B00]/60"
+            className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
             onTouchStart={startFire}
             onTouchEnd={stopFire}
             onTouchCancel={stopFire}
           >FIRE</button>
-          <span className="text-transparent text-[10px] select-none">·</span>
+          <div className="flex flex-col items-center gap-0.5">
+            <button
+              className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
+              onTouchStart={e => {
+                e.preventDefault(); notifyStart();
+                iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
+              }}
+            >JUMP</button>
+            <span className="text-white/20 text-[9px]">tap ×2</span>
+          </div>
         </div>
-        <div className="flex flex-col items-center gap-1">
-          <button
-            className="w-[88px] h-[88px] rounded-2xl bg-[#F5C500] text-[#111111] text-sm font-black tracking-widest active:bg-[#F5C500]/70"
-            onTouchStart={e => {
-              e.preventDefault(); notifyStart();
-              iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*");
-            }}
-          >JUMP</button>
-          <span className="text-white/30 text-[10px]">tap ×2</span>
-        </div>
+      </div>
       </div>
     </div>
   );
