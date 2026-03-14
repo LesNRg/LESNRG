@@ -154,7 +154,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA9';
+    const VERSION = 'BETA10';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -180,8 +180,8 @@
     const LOGO_W  = 270 * LOGO_SC;               // full logo width
 
     // ─── Row home level layout ────────────────────────────────────────────────
-    const WALL_L  = 40;   // left brick wall inner edge
-    const WALL_R  = 760;  // right brick wall inner edge
+    const WALL_L  = 52;   // left brick wall inner edge
+    const WALL_R  = 748;  // right brick wall inner edge
     const F1      = 795;  // basement ceiling / 1st floor surface
     const F2      = 532;  // 1st ceiling / 2nd floor surface
     const F3      = 269;  // 2nd ceiling / 3rd floor
@@ -934,70 +934,70 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     }
 
     function drawFrontDoor(floorY) {
-      const dw = 36, dh = 114;
+      const dw = 47, dh = 148;
       const dy = floorY - dh;
       // Frame
       ctx.fillStyle = '#2a1408';
-      ctx.fillRect(0, dy - 4, 40, dh + 4);
+      ctx.fillRect(0, dy - 4, 52, dh + 4);
       // Door panel (darker wood — classic Philly front door)
       ctx.fillStyle = '#3a1e08';
       ctx.fillRect(2, dy, dw, dh);
       // Upper glass pane
       ctx.fillStyle = '#a8d4ee';
-      ctx.fillRect(5, dy + 5, dw - 7, 30);
+      ctx.fillRect(5, dy + 7, dw - 7, 39);
       ctx.fillStyle = '#cce8f8';
-      ctx.fillRect(6, dy + 6, (dw - 9) / 2, 13);
+      ctx.fillRect(6, dy + 8, (dw - 9) / 2, 17);
       ctx.fillStyle = '#88b8d8';
-      ctx.fillRect(5, dy + 20, dw - 7, 15);
+      ctx.fillRect(5, dy + 26, dw - 7, 20);
       // Muntin cross
       ctx.fillStyle = '#2a1408';
-      ctx.fillRect(5 + (dw - 9) / 2, dy + 5, 2, 30);
-      ctx.fillRect(5, dy + 19, dw - 7, 2);
+      ctx.fillRect(5 + (dw - 9) / 2, dy + 7, 2, 39);
+      ctx.fillRect(5, dy + 25, dw - 7, 2);
       // Lower raised panels
       ctx.fillStyle = '#2e1606';
-      ctx.fillRect(5, dy + 40, dw - 7, 32);
-      ctx.fillRect(5, dy + 77, dw - 7, 32);
+      ctx.fillRect(5, dy + 52, dw - 7, 42);
+      ctx.fillRect(5, dy + 100, dw - 7, 42);
       ctx.fillStyle = '#201008';
-      ctx.fillRect(7, dy + 42, dw - 11, 28);
-      ctx.fillRect(7, dy + 79, dw - 11, 28);
+      ctx.fillRect(7, dy + 55, dw - 11, 36);
+      ctx.fillRect(7, dy + 103, dw - 11, 36);
       // Knob (on right/interior side)
       ctx.fillStyle = '#c8a020';
       ctx.beginPath();
-      ctx.arc(31, dy + 63, 3, 0, Math.PI * 2);
+      ctx.arc(42, dy + 82, 3, 0, Math.PI * 2);
       ctx.fill();
     }
 
     function drawBackDoor(floorY) {
-      const dx = 760, dw = 36, dh = 114;
+      const dx = 748, dw = 47, dh = 148;
       const dy = floorY - dh;
       // Frame
       ctx.fillStyle = '#2a1408';
-      ctx.fillRect(dx, dy - 4, 40, dh + 4);
+      ctx.fillRect(dx, dy - 4, 52, dh + 4);
       // Door panel (white)
       ctx.fillStyle = '#efefef';
       ctx.fillRect(dx + 2, dy, dw, dh);
       // Upper glass pane
       ctx.fillStyle = '#a8d4ee';
-      ctx.fillRect(dx + 5, dy + 5, dw - 7, 30);
+      ctx.fillRect(dx + 5, dy + 7, dw - 7, 39);
       ctx.fillStyle = '#cce8f8';
-      ctx.fillRect(dx + 6, dy + 6, (dw - 9) / 2, 13);
+      ctx.fillRect(dx + 6, dy + 8, (dw - 9) / 2, 17);
       ctx.fillStyle = '#88b8d8';
-      ctx.fillRect(dx + 5, dy + 20, dw - 7, 15);
+      ctx.fillRect(dx + 5, dy + 26, dw - 7, 20);
       // Muntin cross
       ctx.fillStyle = '#cccccc';
-      ctx.fillRect(dx + 5 + (dw - 9) / 2, dy + 5, 2, 30);
-      ctx.fillRect(dx + 5, dy + 19, dw - 7, 2);
+      ctx.fillRect(dx + 5 + (dw - 9) / 2, dy + 7, 2, 39);
+      ctx.fillRect(dx + 5, dy + 25, dw - 7, 2);
       // Lower raised panels
       ctx.fillStyle = '#e0e0e0';
-      ctx.fillRect(dx + 5, dy + 40, dw - 7, 32);
-      ctx.fillRect(dx + 5, dy + 77, dw - 7, 32);
+      ctx.fillRect(dx + 5, dy + 52, dw - 7, 42);
+      ctx.fillRect(dx + 5, dy + 100, dw - 7, 42);
       ctx.fillStyle = '#d0d0d0';
-      ctx.fillRect(dx + 7, dy + 42, dw - 11, 28);
-      ctx.fillRect(dx + 7, dy + 79, dw - 11, 28);
+      ctx.fillRect(dx + 7, dy + 55, dw - 11, 36);
+      ctx.fillRect(dx + 7, dy + 103, dw - 11, 36);
       // Knob
       ctx.fillStyle = '#c8a020';
       ctx.beginPath();
-      ctx.arc(dx + 7, dy + 63, 3, 0, Math.PI * 2);
+      ctx.arc(dx + 7, dy + 82, 3, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -1100,8 +1100,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     function drawInteriorWalls() {
       // Interior drywall assembly on inside face of each exterior wall
       // From outside in: [brick/stone] → [air gap] → [furring strips] → [drywall face]
-      const gapW  = 5;    // air gap width (px)
-      const dwW   = 4;    // drywall face thickness (px)
+      const gapW  = 7;    // air gap width (px)
+      const dwW   = 5;    // drywall face thickness (px)
       const top   = 40;   // start below roof drywall
       const bot   = F1 + FH; // stop at basement — no drywall below grade
       const span  = bot - top;
@@ -1323,11 +1323,11 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // ── 2nd floor rim joist gap — degraded sealant at wall/floor junction ──
       ctx.fillStyle = 'rgba(180,90,20,0.65)';
-      ctx.fillRect(WALL_L,     F2 + 5, 7, FH - 10);   // left rim
-      ctx.fillRect(WALL_R - 7, F2 + 5, 7, FH - 10);   // right rim
+      ctx.fillRect(WALL_L,      F2 + 5, 9, FH - 10);   // left rim
+      ctx.fillRect(WALL_R - 9,  F2 + 5, 9, FH - 10);   // right rim
       ctx.strokeStyle = 'rgba(220,130,50,0.5)'; ctx.lineWidth = 1;
-      ctx.strokeRect(WALL_L - 1,     F2 + 4, 9, FH - 8);
-      ctx.strokeRect(WALL_R - 8, F2 + 4, 9, FH - 8);
+      ctx.strokeRect(WALL_L - 1,  F2 + 4, 12, FH - 8);
+      ctx.strokeRect(WALL_R - 10, F2 + 4, 12, FH - 8);
 
       // Gap arrow hints
       ctx.fillStyle = '#ffffff10';
@@ -1449,12 +1449,12 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
       // Wall sleeve/collar at penetration
       ctx.fillStyle = '#505050';
-      ctx.fillRect(WALL_L - 5, ppY - 6, 10, 12);
+      ctx.fillRect(WALL_L - 7, ppY - 8, 13, 16);
       ctx.fillStyle = '#686868';
-      ctx.fillRect(WALL_L - 4, ppY - 5, 8, 10);
+      ctx.fillRect(WALL_L - 5, ppY - 7, 10, 13);
       // Degraded sealant (should be air-sealed, but isn't)
       ctx.fillStyle = 'rgba(160,100,40,0.7)';
-      ctx.fillRect(WALL_L - 2, ppY - 6, 4, 12);
+      ctx.fillRect(WALL_L - 3, ppY - 8, 5, 16);
 
       // ── Basement pipes ────────────────────────────────────────────────────
       ctx.strokeStyle = '#3c3c3c'; ctx.lineWidth = 7;
@@ -1738,14 +1738,14 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ── Windows ───────────────────────────────────────────────────────────
       // Left wall (front facade)
       // Windows — each centered vertically in its floor's room
-      drawGlassBlockWindow(4,   F1 + FH + 8, 34, 48);  // basement left
+      drawGlassBlockWindow(4,   F1 + FH + 8, 44, 62);  // basement left
       drawFrontDoor(F1);                  // 1st floor left — front door
-      drawWallWindow(3,   380, 34, 80);  // 2nd floor left
-      drawWallWindow(3,   115, 34, 80);  // 3rd floor left
+      drawWallWindow(3,   380, 44, 104);  // 2nd floor left
+      drawWallWindow(3,   115, 44, 104);  // 3rd floor left
       // Right wall
-      drawGlassBlockWindow(763, F1 + FH + 8, 34, 48);  // basement right
+      drawGlassBlockWindow(751, F1 + FH + 8, 44, 62);  // basement right
       drawBackDoor(F1);                   // 1st floor right — back door
-      drawWallWindow(763, 380, 34, 80);  // 2nd floor right
+      drawWallWindow(751, 380, 44, 104);  // 2nd floor right
 
       // ── Floor labels ──────────────────────────────────────────────────────
       ctx.fillStyle = 'rgba(255,255,255,0.13)';
@@ -1942,8 +1942,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(btX + 29, bot - 48, 3, 12);
 
       // ── Window AC unit — full 3rd floor left window, protrudes into room ──
-      const acX = 3, acY = 115, acW = 34, acH = 80; // full window
-      const acP = 14; // pixels protruding past wall into room
+      const acX = 3, acY = 115, acW = 44, acH = 104; // full window
+      const acP = 18; // pixels protruding past wall into room
       // Aged foam/seal in window gap (wall portion only)
       ctx.fillStyle = '#b89f60';
       ctx.fillRect(acX, acY, acW, acH);
@@ -2025,10 +2025,10 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // Cracks span full 40px wall thickness, outer face (x=0/800) to inner face (x=40/760)
       // pts = [dx_from_outer_face, dy_from_crack_center], dx goes 0 → 40
       const crackShapes = [
-        { pts: [[0,-4],[8,-8],[16,0],[24,-5],[32,2],[40,-1]],  branch: [2, [16,-13],[22,-19]] },
-        { pts: [[0,2],[8,-4],[16,5],[24,-2],[32,6],[40,1]],    branch: [3, [24,9],[30,15]]    },
-        { pts: [[0,-2],[8,4],[16,-3],[24,5],[32,-2],[40,1]],   branch: [2, [16,-9],[22,-17]]  },
-        { pts: [[0,3],[8,-5],[16,4],[24,-6],[32,5],[40,-2]],   branch: [3, [24,-11],[30,-18]] },
+        { pts: [[0,-5],[10,-10],[21,0],[31,-7],[42,3],[52,-1]],  branch: [2, [21,-17],[29,-25]] },
+        { pts: [[0,3],[10,-5],[21,7],[31,-3],[42,8],[52,1]],     branch: [3, [31,12],[39,20]]   },
+        { pts: [[0,-3],[10,5],[21,-4],[31,7],[42,-3],[52,1]],    branch: [2, [21,-12],[29,-22]] },
+        { pts: [[0,4],[10,-7],[21,5],[31,-8],[42,7],[52,-3]],    branch: [3, [31,-14],[39,-23]] },
       ];
 
       ctx.lineCap   = 'round';
