@@ -190,31 +190,6 @@ export default function GameContainer() {
                       onChange={e => setForm(f => ({ ...f, building: e.target.value }))}
                     />
                   </div>
-                  <div>
-                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Services interested in <span className="normal-case">(optional)</span></label>
-                    <select
-                      className="input-field"
-                      value={form.services}
-                      onChange={e => setForm(f => ({ ...f, services: e.target.value, otherService: "" }))}
-                    >
-                      <option value="">— Select a service —</option>
-                      <option value="Large Building Blower Door">Large Building Blower Door</option>
-                      <option value="Passive House Verification">Passive House Verification</option>
-                      <option value="Energy Star for Homes Certification">Energy Star for Homes Certification</option>
-                      <option value="Other">Other</option>
-                    </select>
-                  </div>
-                  {form.services === "Other" && (
-                    <div>
-                      <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Please describe</label>
-                      <input
-                        className="input-field"
-                        type="text" placeholder="Tell us what you need..."
-                        value={form.otherService}
-                        onChange={e => setForm(f => ({ ...f, otherService: e.target.value }))}
-                      />
-                    </div>
-                  )}
                   <button type="submit" disabled={submitting} className="btn-primary w-full justify-center mt-2">
                     {submitting ? "Saving…" : "Submit score"}
                     {!submitting && <ArrowRight size={16} />}
