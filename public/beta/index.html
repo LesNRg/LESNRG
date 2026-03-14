@@ -77,9 +77,39 @@
     }
     .ctrl-btn:active { background: rgba(245, 197, 0, 0.35); }
     #btn-jump { width: 84px; height: 84px; font-size: 13px; font-weight: bold; letter-spacing: 0.05em; }
+    /* ── Portrait lock overlay ── */
+    #rotate-msg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: #0a0a0a;
+      color: #F5C500;
+      font-size: 16px;
+      font-weight: bold;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 18px;
+      z-index: 999;
+      text-align: center;
+    }
+    #rotate-msg svg { opacity: 0.6; animation: spin90 1.8s ease-in-out infinite; }
+    @keyframes spin90 { 0%,40% { transform: rotate(0deg); } 60%,100% { transform: rotate(90deg); } }
+    @media (hover: none) and (pointer: coarse) and (orientation: portrait) {
+      #rotate-msg { display: flex; }
+    }
   </style>
 </head>
 <body>
+  <div id="rotate-msg">
+    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#F5C500" stroke-width="1.5">
+      <rect x="5" y="2" width="14" height="20" rx="2"/>
+      <circle cx="12" cy="17" r="1" fill="#F5C500"/>
+    </svg>
+    <span>Rotate your phone to play</span>
+  </div>
   <div id="game-wrap">
     <div id="game-col">
       <canvas id="game" width="800" height="700"></canvas>
@@ -119,12 +149,12 @@
     const WORLD_H = 1080;   // game world height (viewport scrolls)
 
     const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    if (isMobile) canvas.height = WORLD_H;
+    if (isMobile) canvas.height = 500;
 
     const CW = canvas.width;   // 800
-    const CH = canvas.height;  // 700 desktop, 1080 mobile
+    const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA8';
+    const VERSION = 'BETA9';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -158,7 +188,7 @@
     const FH      = 34;   // floor band thickness (framed floor depth)
 
     // ─── Camera ──────────────────────────────────────────────────────────────
-    const cam = { y: WORLD_H - 700 }; // start at bottom (basement)
+    const cam = { y: WORLD_H - CH }; // start at bottom (basement)
 
     // ─── Offscreen canvas for static background (drawn once at startup) ───────
     const bgCanvas = document.createElement('canvas');
@@ -390,7 +420,7 @@
     function resetPlayer() {
       player.x  = 76;
       player.y  = 1000;
-      cam.y = WORLD_H - 700;
+      cam.y = WORLD_H - CH;
       player.vx = 0;
       player.vy = 0;
       player.jumpsLeft = 2;

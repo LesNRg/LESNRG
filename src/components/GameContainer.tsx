@@ -114,7 +114,7 @@ export default function GameContainer() {
   return (
     <div style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
       {/* Game area */}
-      <div className="relative w-full rounded-xl overflow-hidden border-2 border-[#F5C500]/20 aspect-[800/1080] md:aspect-[800/700]">
+      <div className="relative w-full rounded-xl overflow-hidden border-2 border-[#F5C500]/20 aspect-[800/500] md:aspect-[800/700]">
 
         {/* Game iframe */}
         {!won && (
