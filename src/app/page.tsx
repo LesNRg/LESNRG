@@ -106,14 +106,16 @@ export default function HomePage() {
       {/* Hero — dark */}
       <section className="min-h-screen flex items-center pt-32 bg-[#111111] relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3458%202.JPG"
-            alt="Building blower door testing"
-            fill
-            className="object-cover opacity-50"
-            priority
-            sizes="100vw"
-          />
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover opacity-50"
+          >
+            <source src="/River.mov" type="video/mp4" />
+            <source src="/River.mov" type="video/quicktime" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#F5C500]/6 rounded-full blur-3xl pointer-events-none z-0" />
