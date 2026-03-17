@@ -113,8 +113,7 @@ export default function HomePage() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover opacity-50"
           >
-            <source src="/River.mov" type="video/mp4" />
-            <source src="/River.mov" type="video/quicktime" />
+            <source src="/river.mp4" type="video/mp4" />
           </video>
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
