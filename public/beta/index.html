@@ -455,6 +455,14 @@
     window.addEventListener('keydown', e => { keys[e.code] = true;  e.preventDefault(); });
     window.addEventListener('keyup',   e => { keys[e.code] = false; });
 
+    // ─── Orientation lock (best-effort — requires user gesture) ─────────────
+    function tryLockLandscape() {
+      if (screen.orientation && screen.orientation.lock) {
+        screen.orientation.lock('landscape').catch(() => {});
+      }
+    }
+    document.addEventListener('touchstart', tryLockLandscape, { once: true });
+
     // ─── Mobile touch controls ────────────────────────────────────────────────
     function bindBtn(id, key) {
       const el = document.getElementById(id);
@@ -774,12 +782,10 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       if (player.vx !== 0) player.frame++;
       tick++;
 
-      // Camera follows player — pulls to top when LES is in the top 35% of the level
-      const topThreshold = WORLD_H * 0.35;
-      const targetCamY = player.y < topThreshold ? 0 : player.y - CH * 0.4;
-      const lerpRate = player.y < topThreshold ? 0.4 : 0.2;
-      cam.y += (targetCamY - cam.y) * lerpRate;
-      cam.y = Math.max(0, Math.min(WORLD_H - CH, cam.y));
+      // Camera follows player — smooth scroll with no hard threshold jump
+      const targetCamY = Math.max(0, Math.min(WORLD_H - CH, player.y - CH * 0.4));
+      cam.y += (targetCamY - cam.y) * 0.15;
+      if (Math.abs(cam.y - targetCamY) < 0.5) cam.y = targetCamY;
     }
 
     // ─── Draw ─────────────────────────────────────────────────────────────────

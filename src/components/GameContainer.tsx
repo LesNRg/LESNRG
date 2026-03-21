@@ -55,6 +55,16 @@ export default function GameContainer() {
     };
   }, []);
 
+  useEffect(() => {
+    const tryLock = () => {
+      if (screen.orientation && (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock) {
+        (screen.orientation as ScreenOrientation & { lock?: (o: string) => Promise<void> }).lock!("landscape").catch(() => {});
+      }
+    };
+    document.addEventListener("touchstart", tryLock, { once: true });
+    return () => document.removeEventListener("touchstart", tryLock);
+  }, []);
+
   const sendKey = useCallback((key: string, down: boolean) => {
     iframeRef.current?.contentWindow?.postMessage(
       { type: down ? "KEY_DOWN" : "KEY_UP", key }, "*"
@@ -137,14 +147,17 @@ export default function GameContainer() {
             src="/beta/index.html?v=BETA10"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
-            allow="autoplay"
+            allow="autoplay; screen-wake-lock; screen-orientation"
           />
         )}
 
 
         {/* Win overlay */}
         {won && (
-          <div className="absolute inset-0 bg-[#111111]/95 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+          <div
+            className={`bg-[#111111] overflow-y-auto ${isMobileDevice && !isLandscape ? "fixed inset-0 z-50" : "absolute inset-0"}`}
+            style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}
+          >
           <div className="min-h-full flex items-center justify-center p-6">
             {!submitted ? (
               <div className="w-full max-w-sm">
