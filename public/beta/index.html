@@ -30,8 +30,11 @@
     #game-col { display: flex; flex-direction: column; }
     #game {
       display: block;
-      width: 100%;
+      width: auto;
       height: auto;
+      max-width: 100%;
+      max-height: 100dvh;
+      margin: auto;
       border: 2px solid #F5C500;
     }
     #controls {
@@ -2658,6 +2661,12 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
     // ─── Loop ─────────────────────────────────────────────────────────────────
     const isEmbedded = window !== window.parent;
+    if (isEmbedded) {
+      const mc = document.getElementById('mobile-controls');
+      if (mc) mc.style.display = 'none';
+      const ctrl = document.getElementById('controls');
+      if (ctrl) ctrl.style.display = 'none';
+    }
 
     function loop() {
       update();
