@@ -133,12 +133,27 @@ export default function GameContainer() {
     setSubmitted(true);
   }
 
+  const forceRotate = isMobileDevice && !isLandscape;
+
   return (
-    <div style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
+    <div
+      style={forceRotate ? {
+        position: "fixed",
+        width: "100dvh",
+        height: "100dvw",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%) rotate(-90deg)",
+        zIndex: 100,
+        background: "#0a0a0a",
+        touchAction: "manipulation",
+      } : { maxWidth: "800px", touchAction: "manipulation" }}
+      className={forceRotate ? "" : "w-full"}
+    >
       {/* Game + overlay wrapper */}
-      <div className="relative">
+      <div className={`relative ${forceRotate ? "h-full" : ""}`}>
       {/* Game area */}
-      <div className="relative w-full rounded-xl overflow-hidden border-2 border-[#F5C500]/20 aspect-[800/500] md:aspect-[800/700]">
+      <div className={`relative w-full overflow-hidden border-2 border-[#F5C500]/20 ${forceRotate ? "h-full" : "rounded-xl aspect-[800/500] md:aspect-[800/700]"}`}>
 
         {/* Game iframe */}
         {!won && (
@@ -154,10 +169,7 @@ export default function GameContainer() {
 
         {/* Win overlay */}
         {won && (
-          <div
-            className={`bg-[#111111] overflow-y-auto ${isMobileDevice && !isLandscape ? "fixed inset-0 z-50" : "absolute inset-0"}`}
-            style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}
-          >
+          <div className="absolute inset-0 bg-[#111111] overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
           <div className="min-h-full flex items-center justify-center p-6">
             {!submitted ? (
               <div className="w-full max-w-sm">
@@ -257,8 +269,8 @@ export default function GameContainer() {
         )}
       </div>
 
-      {/* Landscape mobile: overlay controls in corners */}
-      {isMobileDevice && isLandscape && (
+      {/* Mobile controls: overlay in corners (works for both real landscape + force-rotated portrait) */}
+      {isMobileDevice && (
         <div className="absolute inset-0 pointer-events-none select-none z-10">
           <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
             <button
@@ -291,38 +303,6 @@ export default function GameContainer() {
       )}
       </div>
 
-      {/* Portrait mobile: controls below game */}
-      {isMobileDevice && !isLandscape && (
-        <div className="flex justify-between items-start px-4 pt-3 pb-2 select-none" style={{ touchAction: "manipulation" }}>
-          <div className="flex gap-3">
-            <button
-              className="w-[72px] h-[72px] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25"
-              onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
-              onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-              onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-            >◀</button>
-            <button
-              className="w-[72px] h-[72px] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25"
-              onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
-              onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-              onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-            >▶</button>
-          </div>
-          <div className="flex gap-3 items-start">
-            <button
-              className="w-[72px] h-[72px] rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
-              onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
-            >FIRE</button>
-            <div className="flex flex-col items-center gap-0.5">
-              <button
-                className="w-[72px] h-[72px] rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
-                onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
-              >JUMP</button>
-              <span className="text-white/20 text-[9px]">tap ×2</span>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
