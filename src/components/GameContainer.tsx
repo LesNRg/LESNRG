@@ -191,13 +191,13 @@ export default function GameContainer() {
           <div className="absolute inset-0 pointer-events-none select-none z-10">
             <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
               <button
-                className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
                 onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
                 onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
                 onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
               >◀</button>
               <button
-                className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
                 onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
                 onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
                 onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
@@ -205,12 +205,12 @@ export default function GameContainer() {
             </div>
             <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
               <button
-                className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
+                className="w-[4.8rem] h-[4.8rem] rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
                 onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
               >FIRE</button>
               <div className="flex flex-col items-center gap-0.5">
                 <button
-                  className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
+                  className="w-[4.8rem] h-[4.8rem] rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
                   onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
                 >JUMP</button>
                 <span className="text-white/20 text-[9px]">tap ×2</span>
@@ -220,7 +220,69 @@ export default function GameContainer() {
         </div>
       )}
 
-      {/* ── In-page game area (splash, gameover, desktop gameplay) ── */}
+      {/* ── Mobile fullscreen gameover ── */}
+      {isMobileDevice && phase === "gameover" && (
+        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+          <div className="min-h-full flex items-center justify-center p-6">
+            {!submitted ? (
+              <div className="w-full max-w-sm">
+                <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore.toLocaleString()} <span className="text-2xl font-bold">CFM@50pa</span></p>
+                <p className="text-white/40 text-xs mb-3">Lower is better — seal more leaks to reduce infiltration.</p>
+                <h2 className="font-black text-white text-xl mb-5" style={{ letterSpacing: "-0.02em" }}>Submit your results to get on the leaderboard.</h2>
+                <form onSubmit={handleSubmit} className="space-y-3">
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Initials (3 letters)</label>
+                    <input className="input-field uppercase tracking-[0.3em] text-center text-lg font-black" type="text" maxLength={3} placeholder="AAA" required value={form.initials} onChange={e => setForm(f => ({ ...f, initials: e.target.value.replace(/[^a-zA-Z]/g, "") }))} />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Name</label>
+                    <input className="input-field" type="text" placeholder="Your name" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Email (for prize entry)</label>
+                    <input className="input-field" type="email" placeholder="your@email.com" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+                  </div>
+                  <div>
+                    <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Beta test comment</label>
+                    <input className="input-field" type="text" placeholder="Feedback, bugs, thoughts..." value={form.building} onChange={e => setForm(f => ({ ...f, building: e.target.value }))} />
+                  </div>
+                  <button type="submit" disabled={submitting} className="btn-primary w-full justify-center mt-2">
+                    {submitting ? "Saving…" : "Submit score"}
+                    {!submitting && <ArrowRight size={16} />}
+                  </button>
+                </form>
+                <button onClick={tryAgain} className="w-full font-mono text-sm font-bold tracking-widest py-2.5 rounded-lg border border-white/15 text-white/40 hover:text-white/60 hover:border-white/30 transition-colors mt-2">▶ TRY AGAIN</button>
+                <p className="text-white/20 text-xs mt-3 leading-relaxed">Terms apply. One prize per household. Valid for PA, NJ, or DE.</p>
+              </div>
+            ) : (
+              <div className="w-full max-w-sm font-mono">
+                <div className="text-center mb-4">
+                  <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ LOWEST CFM@50pa ◀</p>
+                  <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">THIS WEEK — LOWER IS BETTER</p>
+                </div>
+                <div className="bg-black border border-[#00ff41]/25 rounded-lg overflow-hidden mb-4">
+                  {board.length === 0 ? (
+                    <p className="text-[#00ff41]/40 text-xs text-center py-4">NO SCORES YET</p>
+                  ) : board.map((s, i) => {
+                    const isMe = s.name === form.initials.toUpperCase().slice(0, 3).padEnd(3, "_");
+                    return (
+                      <div key={i} className={`flex items-center gap-3 px-4 py-2 text-xs border-b border-[#00ff41]/10 last:border-0 ${isMe ? "bg-[#00ff41]/8" : ""}`}>
+                        <span className={`w-5 tabular-nums ${i === 0 ? "text-[#F5C500]" : i === 1 ? "text-white/50" : i === 2 ? "text-[#cd7f32]" : "text-[#00ff41]/30"}`}>{i + 1}</span>
+                        <span className={`flex-1 tracking-widest ${isMe ? "text-[#F5C500]" : "text-[#00ff41]/80"}`}>{s.name}</span>
+                        {s.company && <span className="text-[#00ff41]/30 text-[10px] truncate max-w-[80px]">{s.company}</span>}
+                        <span className={`tabular-nums font-bold ${isMe ? "text-[#F5C500]" : "text-[#00ff41]"}`}>{s.score.toLocaleString()}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+                <button onClick={tryAgain} className="w-full font-mono text-sm font-bold tracking-widest py-3 rounded-lg border border-[#F5C500]/60 text-[#F5C500] hover:bg-[#F5C500]/10 transition-colors">▶ PLAY AGAIN</button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ── In-page game area (splash, gameover on desktop, desktop gameplay) ── */}
       <div className="relative">
         <div className={`relative w-full overflow-hidden border-2 border-[#F5C500]/20 ${
           phase === "playing" && !isMobileDevice
@@ -260,8 +322,8 @@ export default function GameContainer() {
             />
           )}
 
-          {/* Game over */}
-          {phase === "gameover" && (
+          {/* Game over — desktop only (mobile uses fullscreen overlay above) */}
+          {phase === "gameover" && !isMobileDevice && (
             <div className="absolute inset-0 bg-[#111111] overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
               <div className="min-h-full flex items-center justify-center p-6">
                 {!submitted ? (
