@@ -164,68 +164,156 @@ export default function GameContainer() {
     setSubmitted(true);
   }
 
-  const mobileFullscreen = isMobileDevice && phase === "playing";
-
   return (
     <div style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
 
-      {/* ── Full-screen overlay for mobile gameplay ── */}
-      {mobileFullscreen && (
+      {/* ── Mobile: always fullscreen overlay ── */}
+      {isMobileDevice && (
         <div className="fixed inset-0 z-[9999] bg-[#0a0a0a]">
-          {/* Rotate overlay when portrait */}
-          {!isLandscape && (
-            <div className="absolute inset-0 z-10 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
-              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#F5C500" strokeWidth="1.5">
-                <rect x="5" y="2" width="14" height="20" rx="2"/>
-                <circle cx="12" cy="17" r="1" fill="#F5C500"/>
-              </svg>
-              <p className="text-[#F5C500] font-black tracking-widest uppercase text-lg">Rotate to play</p>
+
+          {/* Splash */}
+          {phase === "splash" && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-8 px-8">
+              <div className="text-center">
+                <p className="text-[#F5C500] font-black mb-3" style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)", letterSpacing: "-0.03em" }}>
+                  LES NRG: The Game
+                </p>
+                <p className="text-white/50 text-sm leading-relaxed max-w-xs mx-auto">
+                  Survive 60 seconds. Shoot the air leaks to seal them and lower your CFM@50pa score.
+                </p>
+              </div>
+              <button onClick={startGame} className="btn-primary text-base px-10 py-4 font-black tracking-widest">
+                ▶ PLAY GAME
+              </button>
+              <p className="text-white/20 text-xs">Rotate your phone to landscape for best experience</p>
             </div>
           )}
-          <iframe
-            ref={iframeRef}
-            src="/beta/index.html?v=BETA10"
-            className="w-full h-full border-0 block"
-            title="LES NRG: The Game"
-            allow="autoplay; screen-wake-lock; screen-orientation"
-          />
-          {/* Mobile controls */}
-          <div className="absolute inset-0 pointer-events-none select-none z-10">
-            <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
-              <button
-                className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
-                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
-                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-              >◀</button>
-              <button
-                className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
-                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
-                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-              >▶</button>
-            </div>
-            <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
-              <button
-                className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
-                onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
-              >FIRE</button>
-              <div className="flex flex-col items-center gap-0.5">
-                <button
-                  className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
-                  onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
-                >JUMP</button>
-                <span className="text-white/20 text-[9px]">tap ×2</span>
+
+          {/* Playing */}
+          {phase === "playing" && (
+            <>
+              {/* Rotate overlay when portrait */}
+              {!isLandscape && (
+                <div className="absolute inset-0 z-10 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
+                  <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#F5C500" strokeWidth="1.5">
+                    <rect x="5" y="2" width="14" height="20" rx="2"/>
+                    <circle cx="12" cy="17" r="1" fill="#F5C500"/>
+                  </svg>
+                  <p className="text-[#F5C500] font-black tracking-widest uppercase text-lg">Rotate to play</p>
+                </div>
+              )}
+              <iframe
+                ref={iframeRef}
+                src="/beta/index.html?v=BETA10"
+                className="w-full h-full border-0 block"
+                title="LES NRG: The Game"
+                allow="autoplay; screen-wake-lock; screen-orientation"
+              />
+              {/* Mobile controls */}
+              <div className="absolute inset-0 pointer-events-none select-none z-10">
+                <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
+                  <button
+                    className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                    onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
+                    onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+                    onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+                  >◀</button>
+                  <button
+                    className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                    onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
+                    onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+                    onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+                  >▶</button>
+                </div>
+                <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
+                  <button
+                    className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
+                    onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
+                  >FIRE</button>
+                  <div className="flex flex-col items-center gap-0.5">
+                    <button
+                      className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
+                      onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
+                    >JUMP</button>
+                    <span className="text-white/20 text-[9px]">tap ×2</span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Game over */}
+          {phase === "gameover" && (
+            <div className="absolute inset-0 overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+              <div className="min-h-full flex items-center justify-center p-6">
+                {!submitted ? (
+                  <div className="w-full max-w-sm">
+                    <p className="text-[#F5C500] text-4xl font-black mb-1 tabular-nums">{finalScore.toLocaleString()} <span className="text-2xl font-bold">CFM@50pa</span></p>
+                    <p className="text-white/40 text-xs mb-3">Lower is better — seal more leaks to reduce infiltration.</p>
+                    <h2 className="font-black text-white text-xl mb-5" style={{ letterSpacing: "-0.02em" }}>
+                      Submit your results to get on the leaderboard.
+                    </h2>
+                    <form onSubmit={handleSubmit} className="space-y-3">
+                      <div>
+                        <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Initials (3 letters)</label>
+                        <input className="input-field uppercase tracking-[0.3em] text-center text-lg font-black" type="text" maxLength={3} placeholder="AAA" required value={form.initials} onChange={e => setForm(f => ({ ...f, initials: e.target.value.replace(/[^a-zA-Z]/g, "") }))} />
+                      </div>
+                      <div>
+                        <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Name</label>
+                        <input className="input-field" type="text" placeholder="Your name" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} />
+                      </div>
+                      <div>
+                        <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Email (for prize entry)</label>
+                        <input className="input-field" type="email" placeholder="your@email.com" required value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
+                      </div>
+                      <div>
+                        <label className="text-white/40 text-xs uppercase tracking-widest block mb-1">Beta test comment</label>
+                        <input className="input-field" type="text" placeholder="Feedback, bugs, thoughts..." value={form.building} onChange={e => setForm(f => ({ ...f, building: e.target.value }))} />
+                      </div>
+                      <button type="submit" disabled={submitting} className="btn-primary w-full justify-center mt-2">
+                        {submitting ? "Saving…" : "Submit score"}
+                        {!submitting && <ArrowRight size={16} />}
+                      </button>
+                    </form>
+                    <button onClick={tryAgain} className="w-full font-mono text-sm font-bold tracking-widest py-2.5 rounded-lg border border-white/15 text-white/40 hover:text-white/60 hover:border-white/30 transition-colors mt-2">▶ TRY AGAIN</button>
+                    <p className="text-white/20 text-xs mt-3 leading-relaxed">Terms apply. One prize per household. Valid for PA, NJ, or DE.</p>
+                  </div>
+                ) : (
+                  <div className="w-full max-w-sm font-mono">
+                    <div className="text-center mb-4">
+                      <p className="text-[#00ff41] text-xs tracking-[0.4em] animate-pulse">▶ LOWEST CFM@50pa ◀</p>
+                      <p className="text-[#00ff41]/40 text-[10px] tracking-widest mt-1">THIS WEEK — LOWER IS BETTER</p>
+                    </div>
+                    <div className="bg-black border border-[#00ff41]/25 rounded-lg overflow-hidden mb-4">
+                      {board.length === 0 ? (
+                        <p className="text-[#00ff41]/40 text-xs text-center py-4">NO SCORES YET</p>
+                      ) : board.map((s, i) => {
+                        const isMe = s.name === form.initials.toUpperCase().slice(0, 3).padEnd(3, "_");
+                        return (
+                          <div key={i} className={`flex items-center gap-3 px-4 py-2 text-xs border-b border-[#00ff41]/10 last:border-0 ${isMe ? "bg-[#00ff41]/8" : ""}`}>
+                            <span className={`w-5 tabular-nums ${i === 0 ? "text-[#F5C500]" : i === 1 ? "text-white/50" : i === 2 ? "text-[#cd7f32]" : "text-[#00ff41]/30"}`}>{i + 1}</span>
+                            <span className={`flex-1 tracking-widest ${isMe ? "text-[#F5C500]" : "text-[#00ff41]/80"}`}>{s.name}</span>
+                            {s.company && <span className="text-[#00ff41]/30 text-[10px] truncate max-w-[80px]">{s.company}</span>}
+                            <span className={`tabular-nums font-bold ${isMe ? "text-[#F5C500]" : "text-[#00ff41]"}`}>{s.score.toLocaleString()}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    <button onClick={tryAgain} className="w-full font-mono text-sm font-bold tracking-widest py-3 rounded-lg border border-[#F5C500]/60 text-[#F5C500] hover:bg-[#F5C500]/10 transition-colors">▶ PLAY AGAIN</button>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
+          )}
+
         </div>
       )}
 
-      {/* ── In-page game area (splash, gameover, desktop gameplay) ── */}
+      {/* ── Desktop: in-page game area ── */}
+      {!isMobileDevice && (
       <div className="relative">
         <div className={`relative w-full overflow-hidden border-2 border-[#F5C500]/20 ${
-          phase === "playing" && !mobileFullscreen
+          phase === "playing"
             ? "rounded-xl aspect-[800/500] md:aspect-[800/700]"
             : "rounded-xl min-h-[55svh] md:aspect-[800/700] md:min-h-0"
         }`}>
@@ -252,7 +340,7 @@ export default function GameContainer() {
           )}
 
           {/* Desktop iframe */}
-          {phase === "playing" && !mobileFullscreen && (
+          {phase === "playing" && (
             <iframe
               ref={iframeRef}
               src="/beta/index.html?v=BETA10"
@@ -363,6 +451,7 @@ export default function GameContainer() {
           )}
         </div>
       </div>
+      )}
 
     </div>
   );
