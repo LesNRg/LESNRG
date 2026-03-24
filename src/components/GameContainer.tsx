@@ -28,6 +28,8 @@ export default function GameContainer() {
   const [form, setForm] = useState({ initials: "", name: "", email: "", building: "", company: "", services: "", otherService: "" });
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [vpW, setVpW] = useState(0);
+  const [vpH, setVpH] = useState(0);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -69,6 +71,14 @@ export default function GameContainer() {
     const handler = (e: MediaQueryListEvent) => setIsLandscape(e.matches);
     orientMq.addEventListener("change", handler);
     return () => orientMq.removeEventListener("change", handler);
+  }, []);
+
+  useEffect(() => {
+    const update = () => { setVpW(window.innerWidth); setVpH(window.innerHeight); };
+    update();
+    window.addEventListener("resize", update);
+    window.addEventListener("orientationchange", update);
+    return () => { window.removeEventListener("resize", update); window.removeEventListener("orientationchange", update); };
   }, []);
 
   useEffect(() => {
@@ -164,13 +174,13 @@ export default function GameContainer() {
       <>
         {/* Full-screen backdrop */}
         <div style={{ position: "fixed", inset: 0, zIndex: 99, background: "#0a0a0a" }} />
-        {/* Rotated game: centered in viewport, landscape dimensions, rotated 90deg */}
+        {/* Rotated game: sized to actual pixel viewport, centered, rotated 90deg */}
         <div style={{
           position: "fixed",
           top: "50%",
           left: "50%",
-          width: "100vh",
-          height: "100vw",
+          width: vpH || "100vh",
+          height: vpW || "100vw",
           transform: "translate(-50%, -50%) rotate(90deg)",
           zIndex: 100,
           touchAction: "manipulation",
