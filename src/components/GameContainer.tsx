@@ -33,7 +33,6 @@ export default function GameContainer() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const forcedRotateActive = useRef(false);
 
   const notifyStart = useCallback(() => {
     if (!gameStarted.current) {
@@ -47,14 +46,12 @@ export default function GameContainer() {
       if (e.data?.type === "GAME_WIN") {
         setFinalScore(e.data.score ?? 0);
         setSurvived(true);
-        forcedRotateActive.current = false;
         setPhase("gameover");
         unlockOrientation();
       }
       if (e.data?.type === "GAME_LOSE") {
         setFinalScore(e.data.score ?? 0);
         setSurvived(false);
-        forcedRotateActive.current = false;
         setPhase("gameover");
         unlockOrientation();
       }
@@ -94,7 +91,6 @@ export default function GameContainer() {
   function startGame() {
     gameStarted.current = false;
     notifyStart();
-    if (isMobileDevice && !isLandscape) forcedRotateActive.current = true;
     setPhase("playing");
     lockLandscape();
   }
@@ -120,7 +116,6 @@ export default function GameContainer() {
   }, []);
 
   function tryAgain() {
-    forcedRotateActive.current = false;
     setPhase("splash");
     setSurvived(false);
     setSubmitted(false);
@@ -165,9 +160,9 @@ export default function GameContainer() {
     setSubmitted(true);
   }
 
-  // Force-rotate: locked in when PLAY GAME is tapped in portrait, released on game over
-  // Using a ref prevents physical rotation mid-game from undoing the CSS rotation
-  const forceRotate = phase === "playing" && forcedRotateActive.current;
+  // Force-rotate when playing on a mobile device held in portrait
+  // Uses live isLandscape so physically rotating to landscape turns it off
+  const forceRotate = phase === "playing" && isMobileDevice && !isLandscape;
 
   if (forceRotate) {
     return (
