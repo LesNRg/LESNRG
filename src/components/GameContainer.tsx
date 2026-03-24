@@ -159,34 +159,72 @@ export default function GameContainer() {
   // Using a ref prevents physical rotation mid-game from undoing the CSS rotation
   const forceRotate = phase === "playing" && forcedRotateActive.current;
 
+  if (forceRotate) {
+    return (
+      <>
+        {/* Full-screen backdrop */}
+        <div style={{ position: "fixed", inset: 0, zIndex: 99, background: "#0a0a0a" }} />
+        {/* Rotated game: centered in viewport, landscape dimensions, rotated 90deg */}
+        <div style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          width: "100vh",
+          height: "100vw",
+          transform: "translate(-50%, -50%) rotate(90deg)",
+          zIndex: 100,
+          touchAction: "manipulation",
+        }}>
+          <div className="relative w-full h-full overflow-hidden border-2 border-[#F5C500]/20">
+            <iframe
+              ref={iframeRef}
+              src="/beta/index.html?v=BETA10"
+              className="w-full h-full border-0 block"
+              title="LES NRG: The Game"
+              allow="autoplay; screen-wake-lock; screen-orientation"
+            />
+          </div>
+          {/* Overlay controls inside rotated container */}
+          <div className="absolute inset-0 pointer-events-none select-none z-10">
+            <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
+              <button className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
+                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+              >◀</button>
+              <button className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
+                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+              >▶</button>
+            </div>
+            <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
+              <button className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
+                onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
+              >FIRE</button>
+              <div className="flex flex-col items-center gap-0.5">
+                <button className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
+                  onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
+                >JUMP</button>
+                <span className="text-white/20 text-[9px]">tap ×2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
-    <>
-    {/* Backdrop behind rotated game so page doesn't bleed through */}
-    {forceRotate && <div style={{ position: "fixed", inset: 0, background: "#0a0a0a", zIndex: 99 }} />}
-    <div
-      style={forceRotate ? {
-        position: "fixed",
-        width: "100dvh",
-        height: "100dvw",
-        top: "calc((100dvh - 100dvw) / 2)",
-        left: "calc((100dvw - 100dvh) / 2)",
-        transform: "rotate(-90deg)",
-        zIndex: 100,
-        background: "#0a0a0a",
-        touchAction: "manipulation",
-      } : { maxWidth: "800px", touchAction: "manipulation" }}
-      className={forceRotate ? "" : "w-full"}
-    >
+    <div style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
       {/* Game + overlay wrapper */}
-      <div className={`relative ${forceRotate ? "h-full" : ""}`}>
+      <div className="relative">
 
         {/* Game area */}
         <div className={`relative w-full overflow-hidden border-2 border-[#F5C500]/20 ${
-          forceRotate
-            ? "h-full"
-            : phase === "playing"
-              ? "rounded-xl aspect-[800/500] md:aspect-[800/700]"
-              : "rounded-xl min-h-[55svh] md:aspect-[800/700] md:min-h-0"
+          phase === "playing"
+            ? "rounded-xl aspect-[800/500] md:aspect-[800/700]"
+            : "rounded-xl min-h-[55svh] md:aspect-[800/700] md:min-h-0"
         }`}>
 
           {/* Splash screen */}
@@ -358,6 +396,5 @@ export default function GameContainer() {
       </div>
 
     </div>
-    </>
   );
 }
