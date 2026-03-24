@@ -31,6 +31,7 @@ export default function GameContainer() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const forcedRotateActive = useRef(false);
 
   const notifyStart = useCallback(() => {
     if (!gameStarted.current) {
@@ -44,12 +45,14 @@ export default function GameContainer() {
       if (e.data?.type === "GAME_WIN") {
         setFinalScore(e.data.score ?? 0);
         setSurvived(true);
+        forcedRotateActive.current = false;
         setPhase("gameover");
         unlockOrientation();
       }
       if (e.data?.type === "GAME_LOSE") {
         setFinalScore(e.data.score ?? 0);
         setSurvived(false);
+        forcedRotateActive.current = false;
         setPhase("gameover");
         unlockOrientation();
       }
@@ -68,7 +71,6 @@ export default function GameContainer() {
     return () => orientMq.removeEventListener("change", handler);
   }, []);
 
-
   useEffect(() => {
     const prevent = (e: TouchEvent) => { if (e.touches.length > 1) e.preventDefault(); };
     document.addEventListener("touchstart", prevent, { passive: false });
@@ -82,6 +84,7 @@ export default function GameContainer() {
   function startGame() {
     gameStarted.current = false;
     notifyStart();
+    if (isMobileDevice && !isLandscape) forcedRotateActive.current = true;
     setPhase("playing");
     lockLandscape();
   }
@@ -107,6 +110,7 @@ export default function GameContainer() {
   }, []);
 
   function tryAgain() {
+    forcedRotateActive.current = false;
     setPhase("splash");
     setSurvived(false);
     setSubmitted(false);
@@ -151,21 +155,70 @@ export default function GameContainer() {
     setSubmitted(true);
   }
 
+  // Force-rotate: locked in when PLAY GAME is tapped in portrait, released on game over
+  // Using a ref prevents physical rotation mid-game from undoing the CSS rotation
+  const forceRotate = phase === "playing" && forcedRotateActive.current;
+
+  if (forceRotate) {
+    return (
+      <>
+        {/* Full-screen backdrop */}
+        <div style={{ position: "fixed", inset: 0, zIndex: 99, background: "#0a0a0a" }} />
+        {/* Rotated game: centered in viewport, landscape dimensions, rotated 90deg */}
+        <div style={{
+          position: "fixed",
+          top: "50%",
+          left: "50%",
+          width: "100vh",
+          height: "100vw",
+          transform: "translate(-50%, -50%) rotate(90deg)",
+          zIndex: 100,
+          touchAction: "manipulation",
+        }}>
+          <div className="relative w-full h-full overflow-hidden border-2 border-[#F5C500]/20">
+            <iframe
+              ref={iframeRef}
+              src="/beta/index.html?v=BETA10"
+              className="w-full h-full border-0 block"
+              title="LES NRG: The Game"
+              allow="autoplay; screen-wake-lock; screen-orientation"
+            />
+          </div>
+          {/* Overlay controls inside rotated container */}
+          <div className="absolute inset-0 pointer-events-none select-none z-10">
+            <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
+              <button className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
+                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+              >◀</button>
+              <button className="w-16 h-16 rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
+                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
+                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+              >▶</button>
+            </div>
+            <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
+              <button className="w-16 h-16 rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
+                onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
+              >FIRE</button>
+              <div className="flex flex-col items-center gap-0.5">
+                <button className="w-16 h-16 rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
+                  onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
+                >JUMP</button>
+                <span className="text-white/20 text-[9px]">tap ×2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <div style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
       {/* Game + overlay wrapper */}
       <div className="relative">
-
-        {/* Rotate-your-phone overlay — shown when playing on mobile in portrait */}
-        {phase === "playing" && isMobileDevice && !isLandscape && (
-          <div className="fixed inset-0 z-50 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
-            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#F5C500" strokeWidth="1.5">
-              <rect x="5" y="2" width="14" height="20" rx="2"/>
-              <circle cx="12" cy="17" r="1" fill="#F5C500"/>
-            </svg>
-            <p className="text-[#F5C500] font-black tracking-widest uppercase text-lg">Rotate to play</p>
-          </div>
-        )}
 
         {/* Game area */}
         <div className={`relative w-full overflow-hidden border-2 border-[#F5C500]/20 ${
