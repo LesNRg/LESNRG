@@ -82,14 +82,18 @@ export default function GameContainer() {
 
 
   useEffect(() => {
-    const prevent = (e: TouchEvent) => { if (e.touches.length > 1) e.preventDefault(); };
+    // During gameplay lock all touch gestures (prevents pinch-zoom + scroll on overlay).
+    // Outside gameplay only block multi-touch pinch.
+    const prevent = (e: TouchEvent) => {
+      if (phase === "playing" || e.touches.length > 1) e.preventDefault();
+    };
     document.addEventListener("touchstart", prevent, { passive: false });
     document.addEventListener("touchmove", prevent, { passive: false });
     return () => {
       document.removeEventListener("touchstart", prevent);
       document.removeEventListener("touchmove", prevent);
     };
-  }, []);
+  }, [phase]);
 
   function startGame() {
     gameStarted.current = false;
@@ -169,7 +173,7 @@ export default function GameContainer() {
 
       {/* ── Mobile fullscreen overlay — only during active play ── */}
       {isMobileDevice && phase === "playing" && (
-        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a]">
+        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
           {/* Rotate overlay when portrait */}
           {!isLandscape && (
             <div className="absolute inset-0 z-10 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
@@ -222,7 +226,7 @@ export default function GameContainer() {
 
       {/* ── Mobile fullscreen gameover ── */}
       {isMobileDevice && phase === "gameover" && (
-        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] overflow-y-auto" style={{ WebkitOverflowScrolling: "touch" } as React.CSSProperties}>
+        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] overflow-y-auto" style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-y" } as React.CSSProperties}>
           <div className="min-h-full flex items-center justify-center p-6">
             {!submitted ? (
               <div className="w-full max-w-sm">
