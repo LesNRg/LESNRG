@@ -31,6 +31,7 @@ export default function GameContainer() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const forcedRotateActive = useRef(false);
 
   const notifyStart = useCallback(() => {
     if (!gameStarted.current) {
@@ -44,12 +45,14 @@ export default function GameContainer() {
       if (e.data?.type === "GAME_WIN") {
         setFinalScore(e.data.score ?? 0);
         setSurvived(true);
+        forcedRotateActive.current = false;
         setPhase("gameover");
         unlockOrientation();
       }
       if (e.data?.type === "GAME_LOSE") {
         setFinalScore(e.data.score ?? 0);
         setSurvived(false);
+        forcedRotateActive.current = false;
         setPhase("gameover");
         unlockOrientation();
       }
@@ -81,6 +84,7 @@ export default function GameContainer() {
   function startGame() {
     gameStarted.current = false;
     notifyStart();
+    if (isMobileDevice && !isLandscape) forcedRotateActive.current = true;
     setPhase("playing");
     lockLandscape();
   }
@@ -106,6 +110,7 @@ export default function GameContainer() {
   }, []);
 
   function tryAgain() {
+    forcedRotateActive.current = false;
     setPhase("splash");
     setSurvived(false);
     setSubmitted(false);
@@ -150,10 +155,14 @@ export default function GameContainer() {
     setSubmitted(true);
   }
 
-  // Only force-rotate during active gameplay — splash and gameover show in normal orientation
-  const forceRotate = isMobileDevice && !isLandscape && phase === "playing";
+  // Force-rotate: locked in when PLAY GAME is tapped in portrait, released on game over
+  // Using a ref prevents physical rotation mid-game from undoing the CSS rotation
+  const forceRotate = phase === "playing" && forcedRotateActive.current;
 
   return (
+    <>
+    {/* Backdrop behind rotated game so page doesn't bleed through */}
+    {forceRotate && <div style={{ position: "fixed", inset: 0, background: "#0a0a0a", zIndex: 99 }} />}
     <div
       style={forceRotate ? {
         position: "fixed",
@@ -172,7 +181,13 @@ export default function GameContainer() {
       <div className={`relative ${forceRotate ? "h-full" : ""}`}>
 
         {/* Game area */}
-        <div className={`relative w-full overflow-hidden border-2 border-[#F5C500]/20 ${forceRotate ? "h-full" : "rounded-xl aspect-[800/500] md:aspect-[800/700]"}`}>
+        <div className={`relative w-full overflow-hidden border-2 border-[#F5C500]/20 ${
+          forceRotate
+            ? "h-full"
+            : phase === "playing"
+              ? "rounded-xl aspect-[800/500] md:aspect-[800/700]"
+              : "rounded-xl min-h-[55svh] md:aspect-[800/700] md:min-h-0"
+        }`}>
 
           {/* Splash screen */}
           {phase === "splash" && (
@@ -343,5 +358,6 @@ export default function GameContainer() {
       </div>
 
     </div>
+    </>
   );
 }
