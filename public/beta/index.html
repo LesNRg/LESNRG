@@ -163,7 +163,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA13';
+    const VERSION = 'BETA14';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -2437,12 +2437,17 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.save();
       ctx.textBaseline = 'top';
 
+      // On desktop the HUD tracks LES vertically so it stays visible when the
+      // page is scrolled. On mobile it's fixed at the top (canvas is fullscreen).
+      const lesScreenY = player.y - cam.y;
+      const hudY = isMobile ? 0 : Math.max(8, Math.min(lesScreenY - 65, CH - 78));
+
       // ── Lives (hearts) ────────────────────────────────────────────────────
       ctx.font = 'bold 22px Arial';
       for (let i = 0; i < MAX_LIVES; i++) {
         ctx.fillStyle = i < lives ? '#ff3355' : 'rgba(255,255,255,0.18)';
         ctx.textAlign = 'left';
-        ctx.fillText('♥', 16 + i * 28, 14);
+        ctx.fillText('♥', 16 + i * 28, hudY + 14);
       }
 
       // ── Timer (center) ────────────────────────────────────────────────────
@@ -2453,7 +2458,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.font = 'bold 20px monospace';
       ctx.fillStyle = framesLeft < 600 ? '#ff3355' : 'rgba(255,255,255,0.9)';
       ctx.textAlign = 'center';
-      ctx.fillText(timeStr, CW / 2, 16);
+      ctx.fillText(timeStr, CW / 2, hudY + 16);
 
       // ── Controls key — desktop only (mobile uses overlay buttons) ────────
       if (!isMobile) {
@@ -2464,7 +2469,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         ctx.textBaseline = 'top';
         const keyW = ctx.measureText(keyStr).width + 18;
         const keyX = CW / 2 - keyW / 2;
-        const keyY = 40;
+        const keyY = hudY + 40;
         ctx.fillStyle = 'rgba(0,0,0,0.45)';
         ctx.beginPath(); ctx.roundRect(keyX, keyY, keyW, 16, 4); ctx.fill();
         ctx.fillStyle = 'rgba(255,255,255,0.35)';
@@ -2472,7 +2477,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       // ── Manometer (top right) ─────────────────────────────────────────────
-      const mw = 135, mh = 68, mx = CW - 12, my = 8;
+      const mw = 135, mh = 68, mx = CW - 12, my = hudY + 8;
       const mgx = mx - mw;
       // Background
       ctx.fillStyle = '#060e0a';
