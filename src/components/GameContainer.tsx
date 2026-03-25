@@ -25,7 +25,10 @@ function lockPortrait() {
 }
 function requestFullscreen() {
   try {
-    document.documentElement.requestFullscreen?.().catch(() => {});
+    const el = document.documentElement;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const req = (el as any).requestFullscreen ?? (el as any).webkitRequestFullscreen ?? (el as any).mozRequestFullScreen;
+    req?.call(el, { navigationUI: "hide" })?.catch?.(() => {});
   } catch {}
 }
 function exitFullscreen() {
