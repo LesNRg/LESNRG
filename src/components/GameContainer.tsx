@@ -318,9 +318,27 @@ export default function GameContainer() {
                 <p className="text-[#F5C500] font-black mb-3" style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)", letterSpacing: "-0.03em" }}>
                   LES NRG: The Game
                 </p>
-                <p className="text-white/50 text-sm leading-relaxed max-w-xs mx-auto">
+                <p className="text-white/50 text-sm leading-relaxed max-w-xs mx-auto mb-5">
                   Survive 60 seconds. Shoot the air leaks to seal them and lower your CFM@50pa score.
                 </p>
+                <p className="text-white/30 text-[10px] uppercase tracking-widest mb-2">23 leak sources to find &amp; seal</p>
+                <div className="grid grid-cols-2 gap-1.5 max-w-[260px] mx-auto text-left">
+                  {[
+                    ["Doors", "2"],
+                    ["Windows", "5"],
+                    ["Wall cracks", "4"],
+                    ["Duct leaks", "5"],
+                    ["Rim joists", "2"],
+                    ["Can lights", "3"],
+                    ["Pipe penetration", "1"],
+                    ["Electrical", "1"],
+                  ].map(([label, count]) => (
+                    <div key={label} className="flex items-center justify-between bg-white/5 rounded px-2.5 py-1.5">
+                      <span className="text-white/50 text-[11px]">{label}</span>
+                      <span className="text-[#F5C500] text-[11px] font-black tabular-nums">×{count}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
               <button
                 onClick={startGame}
