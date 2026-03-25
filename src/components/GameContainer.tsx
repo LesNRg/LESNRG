@@ -86,7 +86,7 @@ export default function GameContainer() {
       setIsLandscape(e.matches);
       // Reset viewport scale on rotation — iOS Safari can carry over incorrect zoom
       const mv = document.querySelector('meta[name=viewport]') as HTMLMetaElement | null;
-      if (mv) mv.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+      if (mv) mv.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover');
     };
     orientMq.addEventListener("change", handler);
     return () => orientMq.removeEventListener("change", handler);
@@ -123,11 +123,13 @@ export default function GameContainer() {
   });
 
   function startGame() {
+    // requestFullscreen must be called first — before any async work that could
+    // break the browser's user-gesture tracking (dispatching events, state updates)
+    if (isMobileDevice) requestFullscreen();
+    lockLandscape();
     gameStarted.current = false;
     notifyStart();
     setPhase("playing");
-    lockLandscape();
-    if (isMobileDevice) requestFullscreen();
   }
 
   const sendKey = useCallback((key: string, down: boolean) => {
@@ -199,7 +201,7 @@ export default function GameContainer() {
 
       {/* ── Mobile fullscreen overlay — only during active play ── */}
       {isMobileDevice && phase === "playing" && (
-        <div ref={overlayRef} className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
+        <div ref={overlayRef} className="fixed z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none", top: 0, left: 0, width: "100dvw", height: "100dvh" }}>
           {/* Rotate overlay when portrait */}
           {!isLandscape && (
             <div className="absolute inset-0 z-10 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
@@ -219,7 +221,7 @@ export default function GameContainer() {
           />
           {/* Mobile controls — only shown in landscape so they don't bleed over the rotate prompt */}
           {isLandscape && <div className="absolute inset-0 pointer-events-none select-none z-10">
-            <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
+            <div className="absolute flex gap-3 pointer-events-auto" style={{ bottom: "max(1rem, env(safe-area-inset-bottom))", left: "max(1rem, env(safe-area-inset-left))" }}>
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
                 style={{ touchAction: "none" }}
@@ -235,7 +237,7 @@ export default function GameContainer() {
                 onPointerCancel={() => sendKey("ArrowRight", false)}
               >▶</button>
             </div>
-            <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
+            <div className="absolute flex gap-3 items-end pointer-events-auto" style={{ bottom: "max(1rem, env(safe-area-inset-bottom))", right: "max(1rem, env(safe-area-inset-right))" }}>
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
                 style={{ touchAction: "none" }}
