@@ -163,7 +163,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA12';
+    const VERSION = 'BETA13';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -2178,7 +2178,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       // ── Pipe penetration ───────────────────────────────────────────────────
-      if (!SE.has(22)) emit(WALL_L, F1 + FH + 132, 0.85, 0.52, 4, 2, 0.80, SC * 0.9, 2);
+      if (!SE.has(22)) emit(WALL_L, F1 + FH + 132, 0.4, -0.92, 4, 2, 0.80, SC * 0.9, 2);
 
       // ── Caulk beads at sealed sources ──────────────────────────────────────
       ctx.globalAlpha = 1;
