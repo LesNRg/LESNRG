@@ -2229,7 +2229,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       ctx.save();
       ctx.translate(sx + w / 2, sy + h / 2);
-      ctx.scale(facing, 1);
+      ctx.scale(facing * 1.25, 1.25);
 
       const s28 = fsin(frame * 0.28);
       const bob = s28 * 1.5;
