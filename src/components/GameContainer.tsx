@@ -107,12 +107,6 @@ export default function GameContainer() {
     };
   }, [phase]);
 
-  // Go fullscreen on mobile when landscape + playing
-  useEffect(() => {
-    if (isMobileDevice && phase === "playing" && isLandscape) {
-      requestFullscreen();
-    }
-  }, [isMobileDevice, phase, isLandscape]);
 
   // Native non-passive touch lock on the mobile overlay itself — iOS Safari ignores
   // user-scalable=no, so we must preventDefault directly on the element.
@@ -133,6 +127,7 @@ export default function GameContainer() {
     notifyStart();
     setPhase("playing");
     lockLandscape();
+    if (isMobileDevice) requestFullscreen();
   }
 
   const sendKey = useCallback((key: string, down: boolean) => {
