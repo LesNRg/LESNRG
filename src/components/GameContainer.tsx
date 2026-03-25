@@ -17,6 +17,12 @@ function unlockOrientation() {
     screen.orientation?.unlock?.();
   } catch {}
 }
+function lockPortrait() {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (screen.orientation as any)?.lock?.("portrait").catch(() => {});
+  } catch {}
+}
 function requestFullscreen() {
   try {
     document.documentElement.requestFullscreen?.().catch(() => {});
@@ -56,14 +62,14 @@ export default function GameContainer() {
         setFinalScore(e.data.score ?? 0);
         setSurvived(true);
         setPhase("gameover");
-        unlockOrientation();
+        lockPortrait();
         exitFullscreen();
       }
       if (e.data?.type === "GAME_LOSE") {
         setFinalScore(e.data.score ?? 0);
         setSurvived(false);
         setPhase("gameover");
-        unlockOrientation();
+        lockPortrait();
         exitFullscreen();
       }
     };
