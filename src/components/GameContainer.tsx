@@ -99,11 +99,19 @@ export default function GameContainer() {
     const prevent = (e: TouchEvent) => {
       if (phase === "playing" || e.touches.length > 1) e.preventDefault();
     };
+    // iOS Safari fires gesturestart/change/end for pinch-zoom — block those too
+    const blockGesture = (e: Event) => e.preventDefault();
     document.addEventListener("touchstart", prevent, { passive: false });
     document.addEventListener("touchmove", prevent, { passive: false });
+    document.addEventListener("gesturestart", blockGesture, { passive: false } as EventListenerOptions);
+    document.addEventListener("gesturechange", blockGesture, { passive: false } as EventListenerOptions);
+    document.addEventListener("gestureend", blockGesture, { passive: false } as EventListenerOptions);
     return () => {
       document.removeEventListener("touchstart", prevent);
       document.removeEventListener("touchmove", prevent);
+      document.removeEventListener("gesturestart", blockGesture);
+      document.removeEventListener("gesturechange", blockGesture);
+      document.removeEventListener("gestureend", blockGesture);
     };
   }, [phase]);
 
@@ -214,7 +222,7 @@ export default function GameContainer() {
           )}
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=BETA16"
+            src="/beta/index.html?v=BETA17"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay; screen-wake-lock; screen-orientation"
@@ -351,7 +359,7 @@ export default function GameContainer() {
           {phase === "playing" && !isMobileDevice && (
             <iframe
               ref={iframeRef}
-              src="/beta/index.html?v=BETA16"
+              src="/beta/index.html?v=BETA17"
               className="w-full h-full border-0 block"
               title="LES NRG: The Game"
               allow="autoplay; screen-wake-lock; screen-orientation"
