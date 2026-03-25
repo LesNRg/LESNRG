@@ -39,6 +39,7 @@ export default function GameContainer() {
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const overlayRef = useRef<HTMLDivElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -94,6 +95,20 @@ export default function GameContainer() {
       document.removeEventListener("touchmove", prevent);
     };
   }, [phase]);
+
+  // Native non-passive touch lock on the mobile overlay itself — iOS Safari ignores
+  // user-scalable=no, so we must preventDefault directly on the element.
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+    const block = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener("touchstart", block, { passive: false });
+    el.addEventListener("touchmove", block, { passive: false });
+    return () => {
+      el.removeEventListener("touchstart", block);
+      el.removeEventListener("touchmove", block);
+    };
+  });
 
   function startGame() {
     gameStarted.current = false;
@@ -171,7 +186,7 @@ export default function GameContainer() {
 
       {/* ── Mobile fullscreen overlay — only during active play ── */}
       {isMobileDevice && phase === "playing" && (
-        <div className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
+        <div ref={overlayRef} className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
           {/* Rotate overlay when portrait */}
           {!isLandscape && (
             <div className="absolute inset-0 z-10 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
