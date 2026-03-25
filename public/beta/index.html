@@ -163,7 +163,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA14';
+    const VERSION = 'BETA15';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -2440,7 +2440,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // On desktop the HUD tracks LES vertically so it stays visible when the
       // page is scrolled. On mobile it's fixed at the top (canvas is fullscreen).
       const lesScreenY = player.y - cam.y;
-      const hudY = isMobile ? 0 : Math.max(8, Math.min(lesScreenY - 65, CH - 78));
+      // HUD stays fixed at top (y=8); only follows LES upward when he's near the top of the canvas
+      const hudY = isMobile ? 0 : Math.max(2, Math.min(8, lesScreenY - 78));
 
       // ── Lives (hearts) ────────────────────────────────────────────────────
       ctx.font = 'bold 22px Arial';
