@@ -214,7 +214,7 @@ export default function GameContainer() {
           )}
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=BETA15"
+            src="/beta/index.html?v=BETA16"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay; screen-wake-lock; screen-orientation"
@@ -351,7 +351,7 @@ export default function GameContainer() {
           {phase === "playing" && !isMobileDevice && (
             <iframe
               ref={iframeRef}
-              src="/beta/index.html?v=BETA15"
+              src="/beta/index.html?v=BETA16"
               className="w-full h-full border-0 block"
               title="LES NRG: The Game"
               allow="autoplay; screen-wake-lock; screen-orientation"
