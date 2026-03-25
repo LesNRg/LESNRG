@@ -201,7 +201,7 @@ export default function GameContainer() {
 
       {/* ── Mobile fullscreen overlay — only during active play ── */}
       {isMobileDevice && phase === "playing" && (
-        <div ref={overlayRef} className="fixed z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none", top: 0, left: 0, width: "100dvw", height: "100dvh" }}>
+        <div ref={overlayRef} className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
           {/* Rotate overlay when portrait */}
           {!isLandscape && (
             <div className="absolute inset-0 z-10 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
