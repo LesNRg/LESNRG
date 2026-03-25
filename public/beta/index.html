@@ -163,7 +163,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA10';
+    const VERSION = 'BETA12';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -208,7 +208,7 @@
 
     // ─── Player ──────────────────────────────────────────────────────────────
     const player = {
-      x: 376,   // start just left of hot water heater (left edge at x=408)
+      x: 376,   // start just right of hot water heater (left edge at x=258)
       y: 1000,  // start in basement
       w: 28, h: 38,
       vx: 0, vy: 0,
@@ -255,7 +255,7 @@
 
     // ─── Solid obstacles (full 4-direction collision) ─────────────────────────
     const solidObstacles = [
-      { x: 408, y: 973, w: 40, h: 85 },   // hot water heater
+      { x: 258, y: 973, w: 40, h: 85 },   // hot water heater
       { x: 656, y: 978, w: 90, h: 80 },   // furnace
     ];
 
@@ -1166,7 +1166,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const bFloor = 1058;
 
       // ── Hot Water Heater ────────────────────────────────────────────────────
-      const hx = 408, hy = 973, hw = 40, hh = 85;
+      const hx = 258, hy = 973, hw = 40, hh = 85;
 
       // Plumbing lines going up through ceiling
       ctx.strokeStyle = '#3d7fa8'; ctx.lineWidth = 4;   // cold water (blue)
@@ -1180,7 +1180,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillText('H', hx + 28, F1 + FH + 12);
 
       // Tank body (insulation jacket — off-white cylinder)
-      const hGrad = ctx.createLinearGradient(408, 0, 448, 0);
+      const hGrad = ctx.createLinearGradient(258, 0, 298, 0);
       hGrad.addColorStop(0,    '#b0aca6');
       hGrad.addColorStop(0.25, '#d8d4ce');
       hGrad.addColorStop(0.75, '#d4d0ca');
