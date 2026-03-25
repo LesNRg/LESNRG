@@ -213,16 +213,6 @@ export default function GameContainer() {
       {/* ── Mobile fullscreen overlay — only during active play ── */}
       {isMobileDevice && phase === "playing" && (
         <div ref={overlayRef} className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
-          {/* Rotate overlay when portrait */}
-          {!isLandscape && (
-            <div className="absolute inset-0 z-10 bg-[#0a0a0a] flex flex-col items-center justify-center gap-6">
-              <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#F5C500" strokeWidth="1.5">
-                <rect x="5" y="2" width="14" height="20" rx="2"/>
-                <circle cx="12" cy="17" r="1" fill="#F5C500"/>
-              </svg>
-              <p className="text-[#F5C500] font-black tracking-widest uppercase text-lg">Rotate to play</p>
-            </div>
-          )}
           <iframe
             ref={iframeRef}
             src="/beta/index.html?v=BETA17"
@@ -230,7 +220,7 @@ export default function GameContainer() {
             title="LES NRG: The Game"
             allow="autoplay; screen-wake-lock; screen-orientation"
           />
-          {/* Mobile controls — only shown in landscape so they don't bleed over the rotate prompt */}
+          {/* Mobile controls — only shown in landscape */}
           {isLandscape && <div className="absolute inset-0 pointer-events-none select-none z-10">
             <div className="absolute flex gap-3 pointer-events-auto" style={{ bottom: "max(1rem, env(safe-area-inset-bottom))", left: "max(1rem, env(safe-area-inset-left))" }}>
               <button
@@ -349,12 +339,11 @@ export default function GameContainer() {
                 </p>
               </div>
               <button
-                onClick={startGame}
+                onClick={e => { requestFullscreen(); startGame(); }}
                 className="btn-primary text-base px-10 py-4 font-black tracking-widest"
               >
                 ▶ PLAY GAME
               </button>
-              <p className="text-white/20 text-xs md:hidden">Rotate your phone to landscape for best experience</p>
             </div>
           )}
 
