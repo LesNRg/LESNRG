@@ -100,7 +100,6 @@ export default function GameContainer() {
     notifyStart();
     setPhase("playing");
     lockLandscape();
-    requestFullscreen();
   }
 
   const sendKey = useCallback((key: string, down: boolean) => {
