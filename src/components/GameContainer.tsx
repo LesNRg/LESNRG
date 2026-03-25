@@ -108,8 +108,8 @@ export default function GameContainer() {
     );
   }, []);
 
-  const startFire = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
+  const startFire = useCallback((e: React.PointerEvent) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
     notifyStart();
     iframeRef.current?.contentWindow?.postMessage({ type: "SHOOT" }, "*");
     fireIntervalRef.current = setInterval(() => {
@@ -117,8 +117,7 @@ export default function GameContainer() {
     }, 150);
   }, [notifyStart]);
 
-  const stopFire = useCallback((e: React.TouchEvent) => {
-    e.preventDefault();
+  const stopFire = useCallback(() => {
     if (fireIntervalRef.current) { clearInterval(fireIntervalRef.current); fireIntervalRef.current = null; }
   }, []);
 
@@ -195,26 +194,30 @@ export default function GameContainer() {
             <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
-                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowLeft", true); }}
-                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
-                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowLeft", false); }}
+                style={{ touchAction: "none" }}
+                onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); notifyStart(); sendKey("ArrowLeft", true); }}
+                onPointerUp={() => sendKey("ArrowLeft", false)}
+                onPointerCancel={() => sendKey("ArrowLeft", false)}
               >◀</button>
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
-                onTouchStart={e => { e.preventDefault(); notifyStart(); sendKey("ArrowRight", true); }}
-                onTouchEnd={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
-                onTouchCancel={e => { e.preventDefault(); sendKey("ArrowRight", false); }}
+                style={{ touchAction: "none" }}
+                onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); notifyStart(); sendKey("ArrowRight", true); }}
+                onPointerUp={() => sendKey("ArrowRight", false)}
+                onPointerCancel={() => sendKey("ArrowRight", false)}
               >▶</button>
             </div>
             <div className="absolute bottom-4 right-4 flex gap-3 items-end pointer-events-auto">
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
-                onTouchStart={startFire} onTouchEnd={stopFire} onTouchCancel={stopFire}
+                style={{ touchAction: "none" }}
+                onPointerDown={startFire} onPointerUp={stopFire} onPointerCancel={stopFire}
               >FIRE</button>
               <div className="flex flex-col items-center gap-0.5">
                 <button
                   className="w-[4.8rem] h-[4.8rem] rounded-full bg-[#F5C500]/20 border border-[#F5C500]/30 text-[#F5C500]/70 text-[11px] font-black tracking-widest active:bg-[#F5C500]/45"
-                  onTouchStart={e => { e.preventDefault(); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
+                  style={{ touchAction: "none" }}
+                  onPointerDown={e => { e.currentTarget.setPointerCapture(e.pointerId); notifyStart(); iframeRef.current?.contentWindow?.postMessage({ type: "JUMP" }, "*"); }}
                 >JUMP</button>
                 <span className="text-white/20 text-[9px]">tap ×2</span>
               </div>
