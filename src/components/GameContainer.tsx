@@ -82,7 +82,12 @@ export default function GameContainer() {
     const orientMq = window.matchMedia("(orientation: landscape)");
     setIsMobileDevice(mobileMq.matches);
     setIsLandscape(orientMq.matches);
-    const handler = (e: MediaQueryListEvent) => setIsLandscape(e.matches);
+    const handler = (e: MediaQueryListEvent) => {
+      setIsLandscape(e.matches);
+      // Reset viewport scale on rotation — iOS Safari can carry over incorrect zoom
+      const mv = document.querySelector('meta[name=viewport]') as HTMLMetaElement | null;
+      if (mv) mv.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    };
     orientMq.addEventListener("change", handler);
     return () => orientMq.removeEventListener("change", handler);
   }, []);
@@ -210,8 +215,8 @@ export default function GameContainer() {
             title="LES NRG: The Game"
             allow="autoplay; screen-wake-lock; screen-orientation"
           />
-          {/* Mobile controls */}
-          <div className="absolute inset-0 pointer-events-none select-none z-10">
+          {/* Mobile controls — only shown in landscape so they don't bleed over the rotate prompt */}
+          {isLandscape && <div className="absolute inset-0 pointer-events-none select-none z-10">
             <div className="absolute bottom-4 left-4 flex gap-3 pointer-events-auto">
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
@@ -243,7 +248,7 @@ export default function GameContainer() {
                 <span className="text-white/20 text-[9px]">tap ×2</span>
               </div>
             </div>
-          </div>
+          </div>}
         </div>
       )}
 
