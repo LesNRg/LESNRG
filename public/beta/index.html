@@ -165,7 +165,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA17';
+    const VERSION = 'BETA18';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -234,7 +234,7 @@
       { x: LOGO_BX, y: LOGO_BY + 20 * LOGO_SC, w: LOGO_W, h: 12, invisible: true },
 
       // ── Basement platforms ──────────────────────────────────────────────────
-      { x: 325, y: 845, w: 150, h: 12 },   // above logo
+      { x: 325, y: 895, w: 150, h: 12 },   // above logo
 
       // ── 1st floor platforms ─────────────────────────────────────────────────
       { x:  55, y:  790, w: 150, h: 12 },   // left lower
@@ -271,6 +271,7 @@
     const GAME_DURATION    = 60 * 60;  // 60 seconds at 60 fps
     const MAX_LIVES        = 3;
     const INVINCIBLE_FRAMES = 90;      // 1.5s invincibility after hit
+    const START_SHIELD_FRAMES = 600;   // 10s invincibility at game start
 
     let gameOver  = false;
     let gameWon   = false;
@@ -278,6 +279,7 @@
     let cfm       = 3141; // CFM50 infiltration — starts high, player reduces it
     let framesLeft = GAME_DURATION;
     let invincible = 0;               // countdown frames of invincibility
+    let startShield = 0;              // countdown frames of start invincibility
     let loseReason = '';              // 'time' | 'lives' | 'fan'
     let bonusFlash = 0;               // countdown frames for full-seal bonus flash
     let floatTexts = [];              // [{wx, wy, text, life}] floating score popups
@@ -448,6 +450,7 @@
       cfm          = 3141;
       framesLeft   = GAME_DURATION;
       invincible   = 0;
+      startShield  = START_SHIELD_FRAMES;
       fireCooldown = 0;
       loseReason   = '';
       bonusFlash   = 0;
@@ -637,7 +640,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         player.vx += (pdx / pDist) * pull;
         player.vy += (pdy / pDist) * pull;
       }
-      if (pDist < 22) {
+      if (pDist < 22 && startShield === 0) {
         lives--;
         invincible = INVINCIBLE_FRAMES;
         resetPlayer();
@@ -651,7 +654,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       // ─── Leak hit detection ───────────────────────────────────────────────────
-      if (invincible === 0) {
+      if (invincible === 0 && startShield === 0) {
         const px = player.x + 6, py = player.y + 6, pw = player.w - 12, ph = player.h - 12;
         for (const l of leaks) {
           if (overlaps(px, py, pw, ph, l.x + l.w * 0.2, l.y + l.h * 0.2, l.w * 0.6, l.h * 0.6)) {
@@ -669,6 +672,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         }
       }
       if (invincible > 0) invincible--;
+      if (startShield > 0) startShield--;
 
       // ─── Caulk gun ───────────────────────────────────────────────────────────
       if (fireCooldown > 0) fireCooldown--;
@@ -2234,6 +2238,19 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const sx = player.x;
       const sy = player.y - cam.y;
       const { w, h, facing, frame } = player;
+
+      // Gold shield glow during start invincibility
+      if (startShield > 0) {
+        const pulse = 0.3 + 0.25 * Math.sin(startShield * 0.15);
+        ctx.save();
+        ctx.globalAlpha = pulse;
+        ctx.strokeStyle = '#F5C500';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(sx + w / 2, sy + h / 2, 28, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
 
       ctx.save();
       ctx.translate(sx + w / 2, sy + h / 2);
