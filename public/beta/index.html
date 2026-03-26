@@ -117,6 +117,11 @@
     function fsin(x) {
       return SIN_TABLE[((x * SIN_K % SIN_N) + SIN_N) % SIN_N | 0];
     }
+    // Shorthand for repeated line-drawing (pipes, ducts, structural lines)
+    function strokeLine(x1, y1, x2, y2, color, width) {
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
+    }
 
 // ─── Logo blade image (real SVG path from navbar) ─────────────────────────
     const imgBlades = new Image();
@@ -135,7 +140,7 @@
     const CW = canvas.width;   // 800
     const CH = canvas.height;  // 700 desktop, 500 mobile
 
-    const VERSION = 'BETA20';
+    const VERSION = 'BETA21';
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
@@ -690,6 +695,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
             const em = EMITTERS[e];
             if (Math.abs(bCX - em.ox) < 40 && Math.abs(bCY - em.oy) < 40) {
               sealedEmitters.add(e);
+              seals.push({ x: em.ox, y: em.oy }); // caulk bead at sealed location
               cfm = Math.max(0, cfm - 100); // LL seal: -100 CFM
               floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−100', life: 65 });
               // Bonus: seal ALL emitters → -2000 CFM
@@ -930,71 +936,36 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
     }
 
-    function drawFrontDoor(floorY) {
-      const dw = 47, dh = 148;
-      const dy = floorY - dh;
-      // Frame
+    // isDark=true: front door (dark wood), isDark=false: back door (white)
+    function drawDoor(doorX, floorY, isDark) {
+      const dw = 47, dh = 148, dy = floorY - dh;
+      const panelC  = isDark ? '#3a1e08' : '#efefef';
+      const muntinC = isDark ? '#2a1408' : '#cccccc';
+      const raisedC = isDark ? '#2e1606' : '#e0e0e0';
+      const innerC  = isDark ? '#201008' : '#d0d0d0';
+      const knobX   = isDark ? doorX + 42 : doorX + 7;
       ctx.fillStyle = '#2a1408';
-      ctx.fillRect(0, dy - 4, 52, dh + 4);
-      // Door panel (darker wood — classic Philly front door)
-      ctx.fillStyle = '#3a1e08';
-      ctx.fillRect(2, dy, dw, dh);
-      // Upper glass pane
+      ctx.fillRect(doorX, dy - 4, 52, dh + 4);
+      ctx.fillStyle = panelC;
+      ctx.fillRect(doorX + 2, dy, dw, dh);
       ctx.fillStyle = '#a8d4ee';
-      ctx.fillRect(5, dy + 7, dw - 7, 39);
+      ctx.fillRect(doorX + 5, dy + 7, dw - 7, 39);
       ctx.fillStyle = '#cce8f8';
-      ctx.fillRect(6, dy + 8, (dw - 9) / 2, 17);
+      ctx.fillRect(doorX + 6, dy + 8, (dw - 9) / 2, 17);
       ctx.fillStyle = '#88b8d8';
-      ctx.fillRect(5, dy + 26, dw - 7, 20);
-      // Muntin cross
-      ctx.fillStyle = '#2a1408';
-      ctx.fillRect(5 + (dw - 9) / 2, dy + 7, 2, 39);
-      ctx.fillRect(5, dy + 25, dw - 7, 2);
-      // Lower raised panels
-      ctx.fillStyle = '#2e1606';
-      ctx.fillRect(5, dy + 52, dw - 7, 42);
-      ctx.fillRect(5, dy + 100, dw - 7, 42);
-      ctx.fillStyle = '#201008';
-      ctx.fillRect(7, dy + 55, dw - 11, 36);
-      ctx.fillRect(7, dy + 103, dw - 11, 36);
-      // Knob (on right/interior side)
+      ctx.fillRect(doorX + 5, dy + 26, dw - 7, 20);
+      ctx.fillStyle = muntinC;
+      ctx.fillRect(doorX + 5 + (dw - 9) / 2, dy + 7, 2, 39);
+      ctx.fillRect(doorX + 5, dy + 25, dw - 7, 2);
+      ctx.fillStyle = raisedC;
+      ctx.fillRect(doorX + 5, dy + 52, dw - 7, 42);
+      ctx.fillRect(doorX + 5, dy + 100, dw - 7, 42);
+      ctx.fillStyle = innerC;
+      ctx.fillRect(doorX + 7, dy + 55, dw - 11, 36);
+      ctx.fillRect(doorX + 7, dy + 103, dw - 11, 36);
       ctx.fillStyle = '#c8a020';
       ctx.beginPath();
-      ctx.arc(42, dy + 82, 3, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function drawBackDoor(floorY) {
-      const dx = 748, dw = 47, dh = 148;
-      const dy = floorY - dh;
-      // Frame
-      ctx.fillStyle = '#2a1408';
-      ctx.fillRect(dx, dy - 4, 52, dh + 4);
-      // Door panel (white)
-      ctx.fillStyle = '#efefef';
-      ctx.fillRect(dx + 2, dy, dw, dh);
-      // Upper glass pane
-      ctx.fillStyle = '#a8d4ee';
-      ctx.fillRect(dx + 5, dy + 7, dw - 7, 39);
-      ctx.fillStyle = '#cce8f8';
-      ctx.fillRect(dx + 6, dy + 8, (dw - 9) / 2, 17);
-      ctx.fillStyle = '#88b8d8';
-      ctx.fillRect(dx + 5, dy + 26, dw - 7, 20);
-      // Muntin cross
-      ctx.fillStyle = '#cccccc';
-      ctx.fillRect(dx + 5 + (dw - 9) / 2, dy + 7, 2, 39);
-      ctx.fillRect(dx + 5, dy + 25, dw - 7, 2);
-      // Lower raised panels
-      ctx.fillStyle = '#e0e0e0';
-      ctx.fillRect(dx + 5, dy + 52, dw - 7, 42);
-      ctx.fillRect(dx + 5, dy + 100, dw - 7, 42);
-      ctx.fillStyle = '#d0d0d0';
-      ctx.fillRect(dx + 7, dy + 55, dw - 11, 36);
-      ctx.fillRect(dx + 7, dy + 103, dw - 11, 36);
-      // Knob
-      ctx.fillStyle = '#c8a020';
-      ctx.beginPath();
-      ctx.arc(dx + 7, dy + 82, 3, 0, Math.PI * 2);
+      ctx.arc(knobX, dy + 82, 3, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -1151,10 +1122,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const hx = 258, hy = 973, hw = 40, hh = 85;
 
       // Plumbing lines going up through ceiling
-      ctx.strokeStyle = '#3d7fa8'; ctx.lineWidth = 4;   // cold water (blue)
-      ctx.beginPath(); ctx.moveTo(hx + 10, hy + 4); ctx.lineTo(hx + 10, F1 + FH); ctx.stroke();
-      ctx.strokeStyle = '#a85520'; ctx.lineWidth = 4;   // hot water (copper)
-      ctx.beginPath(); ctx.moveTo(hx + 30, hy + 4); ctx.lineTo(hx + 30, F1 + FH); ctx.stroke();
+      strokeLine(hx + 10, hy + 4, hx + 10, F1 + FH, '#3d7fa8', 4);  // cold water (blue)
+      strokeLine(hx + 30, hy + 4, hx + 30, F1 + FH, '#a85520', 4);  // hot water (copper)
       // Pipe C/H labels
       ctx.fillStyle = '#3d7fa8'; ctx.font = '5px monospace';
       ctx.fillText('C', hx + 8,  F1 + FH + 12);
@@ -1209,10 +1178,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const fx = 656, fy = 978, fw = 90, fh = 80;
 
       // Flue pipe (right side, going up through ceiling)
-      ctx.strokeStyle = '#404040'; ctx.lineWidth = 10;
-      ctx.beginPath(); ctx.moveTo(fx + fw - 18, fy); ctx.lineTo(fx + fw - 18, F1 + FH); ctx.stroke();
-      ctx.strokeStyle = '#545450'; ctx.lineWidth = 8;
-      ctx.beginPath(); ctx.moveTo(fx + fw - 18, fy); ctx.lineTo(fx + fw - 18, F1 + FH); ctx.stroke();
+      strokeLine(fx + fw - 18, fy, fx + fw - 18, F1 + FH, '#404040', 10);
+      strokeLine(fx + fw - 18, fy, fx + fw - 18, F1 + FH, '#545450', 8);
       // Elbow collar
       ctx.fillStyle = '#404040';
       ctx.fillRect(fx + fw - 22, F1 + FH - 2, 8, 8);
@@ -1424,12 +1391,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ── Pipe penetration through left basement wall + across room ───────
       const ppY = F1 + FH + 126;
       // Pipe continues across basement room (background, slightly dimmer)
-      ctx.strokeStyle = '#7a4c10'; ctx.lineWidth = 7;
-      ctx.beginPath(); ctx.moveTo(WALL_L + 35, ppY); ctx.lineTo(650, ppY); ctx.stroke();
-      ctx.strokeStyle = '#a06820'; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.moveTo(WALL_L + 35, ppY); ctx.lineTo(650, ppY); ctx.stroke();
-      ctx.strokeStyle = '#c8902c'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(WALL_L + 35, ppY); ctx.lineTo(650, ppY); ctx.stroke();
+      strokeLine(WALL_L + 35, ppY, 650, ppY, '#7a4c10', 7);
+      strokeLine(WALL_L + 35, ppY, 650, ppY, '#a06820', 5);
+      strokeLine(WALL_L + 35, ppY, 650, ppY, '#c8902c', 2);
       // Pipe support straps along the run
       ctx.fillStyle = '#484440';
       for (let sx = WALL_L + 80; sx < 650; sx += 120) {
@@ -1438,12 +1402,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         ctx.fillRect(sx - 1, ppY - 9, 2, 18);  // mounting rod
       }
       // Copper pipe through stone wall into basement
-      ctx.strokeStyle = '#9a6018'; ctx.lineWidth = 7;
-      ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
-      ctx.strokeStyle = '#c88828'; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
-      ctx.strokeStyle = '#e8aa40'; ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
+      strokeLine(0, ppY, WALL_L + 35, ppY, '#9a6018', 7);
+      strokeLine(0, ppY, WALL_L + 35, ppY, '#c88828', 5);
+      strokeLine(0, ppY, WALL_L + 35, ppY, '#e8aa40', 2);
       // Wall sleeve/collar at penetration
       ctx.fillStyle = '#505050';
       ctx.fillRect(WALL_L - 7, ppY - 8, 13, 16);
@@ -1454,11 +1415,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(WALL_L - 3, ppY - 8, 5, 16);
 
       // ── Basement pipes ────────────────────────────────────────────────────
-      ctx.strokeStyle = '#3c3c3c'; ctx.lineWidth = 7;
-      ctx.beginPath(); ctx.moveTo(WALL_L, F1 + 38); ctx.lineTo(420, F1 + 38); ctx.stroke();
-      ctx.beginPath(); ctx.moveTo(420, F1 + 38); ctx.lineTo(420, 1058); ctx.stroke();
-      ctx.strokeStyle = '#333'; ctx.lineWidth = 5;
-      ctx.beginPath(); ctx.moveTo(WALL_L, F1 + 55); ctx.lineTo(340, F1 + 55); ctx.stroke();
+      strokeLine(WALL_L, F1 + 38, 420,    F1 + 38, '#3c3c3c', 7);
+      strokeLine(420,    F1 + 38, 420,    1058,    '#3c3c3c', 7);
+      strokeLine(WALL_L, F1 + 55, 340,    F1 + 55, '#333',    5);
       // pipe collar
       ctx.fillStyle = '#484848';
       ctx.beginPath(); ctx.arc(420, F1 + 38, 6, 0, Math.PI * 2); ctx.fill();
@@ -1736,12 +1695,12 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // Left wall (front facade)
       // Windows — each centered vertically in its floor's room
       drawGlassBlockWindow(4,   F1 + FH + 8, 44, 62);  // basement left
-      drawFrontDoor(F1);                  // 1st floor left — front door
+      drawDoor(0,   F1, true);            // 1st floor left — front door (dark wood)
       drawWallWindow(3,   380, 44, 104);  // 2nd floor left
       drawWallWindow(3,   115, 44, 104);  // 3rd floor left
       // Right wall
       drawGlassBlockWindow(751, F1 + FH + 8, 44, 62);  // basement right
-      drawBackDoor(F1);                   // 1st floor right — back door
+      drawDoor(748, F1, false);           // 1st floor right — back door (white)
       drawWallWindow(751, 380, 44, 104);  // 2nd floor right
 
       // ── Floor labels ──────────────────────────────────────────────────────
@@ -1973,6 +1932,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     function drawCalderMobile() {
       const b2C = F3 + FH;
       const mCX = 590, mCY = b2C;
+      // Skip entirely when off-screen
+      if (cam.y > mCY + 150 || cam.y + CH < mCY) return;
       const o1 = Math.sin(tick * 0.014) * 10;
       const o2 = Math.sin(tick * 0.020 + 1.1) * 7;
       const o3 = Math.sin(tick * 0.017 + 2.4) * 6;
@@ -2710,75 +2671,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
   </script>
 
   <script>
-    // ─── Horizontal rulers (top & bottom) ────────────────────────────────────
-    function drawRulerH(id) {
-      const rc = document.getElementById(id);
-      const rx = rc.getContext('2d');
-      const W = 800, H = 24;
-      const ticksDown = (id === 'rulerBot'); // rulerTop ticks point down, rulerBot ticks point up
-
-      rx.fillStyle = '#111';
-      rx.fillRect(0, 0, W, H);
-      rx.font = '9px monospace';
-      rx.textAlign = 'center';
-
-      for (let x = 0; x <= W; x += 10) {
-        const isMaj = x % 100 === 0;
-        const isMid = x % 50 === 0;
-        const tickH = isMaj ? 14 : isMid ? 9 : 5;
-        const tickY = ticksDown ? 0 : (H - tickH);
-
-        rx.fillStyle = isMaj ? '#aaa' : isMid ? '#666' : '#444';
-        rx.fillRect(x, tickY, 1, tickH);
-
-        if (isMaj && x > 0 && x < W) {
-          rx.fillStyle = '#F5C500';
-          const labelY = ticksDown ? tickH + 9 : H - tickH - 3;
-          rx.fillText(x, x, labelY);
-        }
-      }
-      rx.fillStyle = '#F5C500';
-      rx.textAlign = 'left';  rx.fillText('0',   3,     ticksDown ? 21 : H - 16);
-      rx.textAlign = 'right'; rx.fillText('800', W - 2, ticksDown ? 21 : H - 16);
-    }
-
-    // ─── Vertical rulers (left & right) ──────────────────────────────────────
-    function drawRulerV(id) {
-      const rc = document.getElementById(id);
-      const rx = rc.getContext('2d');
-      const W = 36, H = 1080;
-      const ticksRight = (id === 'rulerLeft'); // left ruler ticks point right toward canvas
-
-      rx.fillStyle = '#111';
-      rx.fillRect(0, 0, W, H);
-      rx.font = '9px monospace';
-
-      for (let y = 0; y <= H; y += 10) {
-        const isMaj = y % 100 === 0;
-        const isMid = y % 50 === 0;
-        const tickW = isMaj ? 14 : isMid ? 9 : 5;
-        const tickX = ticksRight ? (W - tickW) : 0;
-
-        rx.fillStyle = isMaj ? '#aaa' : isMid ? '#666' : '#444';
-        rx.fillRect(tickX, y, tickW, 1);
-
-        if (isMaj) {
-          rx.fillStyle = '#F5C500';
-          if (ticksRight) {
-            rx.textAlign = 'right';
-            rx.fillText(y, tickX - 2, y + 3);
-          } else {
-            rx.textAlign = 'left';
-            rx.fillText(y, tickW + 2, y + 3);
-          }
-        }
-      }
-    }
-
-    drawRulerH('rulerTop');
-    drawRulerH('rulerBot');
-    drawRulerV('rulerLeft');
-    drawRulerV('rulerRight');
   </script>
 </body>
 </html>
