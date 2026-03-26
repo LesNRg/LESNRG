@@ -2239,19 +2239,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const sy = player.y - cam.y;
       const { w, h, facing, frame } = player;
 
-      // Gold shield glow during start invincibility
-      if (startShield > 0) {
-        const pulse = 0.3 + 0.25 * Math.sin(startShield * 0.15);
-        ctx.save();
-        ctx.globalAlpha = pulse;
-        ctx.strokeStyle = '#F5C500';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.arc(sx + w / 2, sy + h / 2, 28, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-      }
-
       ctx.save();
       ctx.translate(sx + w / 2, sy + h / 2);
       ctx.scale(facing * 1.25, 1.25);
