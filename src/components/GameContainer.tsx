@@ -110,7 +110,9 @@ export default function GameContainer() {
   useEffect(() => {
     // During gameplay lock all touch gestures (prevents pinch-zoom + scroll on overlay).
     // Outside gameplay only block multi-touch pinch.
+    // Never prevent default on buttons — iOS Safari suppresses pointerdown if touchstart is cancelled.
     const prevent = (e: TouchEvent) => {
+      if ((e.target as Element)?.closest?.("button")) return;
       if (phase === "playing" || e.touches.length > 1) e.preventDefault();
     };
     // iOS Safari fires gesturestart/change/end for pinch-zoom — block those too
@@ -132,17 +134,21 @@ export default function GameContainer() {
 
   // Native non-passive touch lock on the mobile overlay itself — iOS Safari ignores
   // user-scalable=no, so we must preventDefault directly on the element.
+  // Skip preventDefault on buttons — iOS Safari suppresses pointerdown if touchstart is cancelled.
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
-    const block = (e: TouchEvent) => e.preventDefault();
+    const block = (e: TouchEvent) => {
+      if ((e.target as Element)?.closest?.("button")) return;
+      e.preventDefault();
+    };
     el.addEventListener("touchstart", block, { passive: false });
     el.addEventListener("touchmove", block, { passive: false });
     return () => {
       el.removeEventListener("touchstart", block);
       el.removeEventListener("touchmove", block);
     };
-  });
+  }, [phase]);
 
   function startGame() {
     requestFullscreen();
