@@ -47,6 +47,7 @@ export default function GameContainer() {
   const [form, setForm] = useState({ initials: "", name: "", email: "", building: "", company: "", services: "", otherService: "" });
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const [waitingForLandscape, setWaitingForLandscape] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const gameStarted = useRef(false);
@@ -95,6 +96,16 @@ export default function GameContainer() {
     return () => orientMq.removeEventListener("change", handler);
   }, []);
 
+  // Auto-start once phone rotates to landscape
+  useEffect(() => {
+    if (isLandscape && waitingForLandscape) {
+      setWaitingForLandscape(false);
+      gameStarted.current = false;
+      notifyStart();
+      setPhase("playing");
+    }
+  }, [isLandscape, waitingForLandscape, notifyStart]);
+
 
   useEffect(() => {
     // During gameplay lock all touch gestures (prevents pinch-zoom + scroll on overlay).
@@ -134,10 +145,13 @@ export default function GameContainer() {
   });
 
   function startGame() {
-    // requestFullscreen must be called first — before any async work that could
-    // break the browser's user-gesture tracking (dispatching events, state updates)
-    if (isMobileDevice) requestFullscreen();
+    requestFullscreen();
     lockLandscape();
+    if (isMobileDevice && !isLandscape) {
+      // Portrait on mobile: wait for rotation, then auto-start
+      setWaitingForLandscape(true);
+      return;
+    }
     gameStarted.current = false;
     notifyStart();
     setPhase("playing");
@@ -164,6 +178,7 @@ export default function GameContainer() {
 
   function tryAgain() {
     setPhase("splash");
+    setWaitingForLandscape(false);
     setSurvived(false);
     setSubmitted(false);
     setForm({ initials: "", name: "", email: "", building: "", company: "", services: "", otherService: "" });
@@ -215,7 +230,7 @@ export default function GameContainer() {
         <div ref={overlayRef} className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=BETA19"
+            src="/beta/index.html?v=BETA20"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay; screen-wake-lock; screen-orientation"
@@ -330,20 +345,26 @@ export default function GameContainer() {
           {/* Splash screen */}
           {phase === "splash" && (
             <div className="absolute inset-0 bg-[#111111] flex flex-col items-center justify-center gap-8">
-              <div className="text-center px-8">
-                <p className="text-[#F5C500] font-black mb-3" style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)", letterSpacing: "-0.03em" }}>
-                  LES NRG: The Game
-                </p>
-                <p className="text-white/50 text-sm leading-relaxed max-w-xs mx-auto">
-                  Survive 60 seconds. Shoot the air leaks to seal them and lower your CFM@50pa score. Look for leaks in the walls, windows, plugs, duct work, can lights, and more.
-                </p>
-              </div>
-              <button
-                onClick={startGame}
-                className="btn-primary text-base px-10 py-4 font-black tracking-widest"
-              >
-                ▶ PLAY GAME
-              </button>
+              {waitingForLandscape ? (
+                <p className="text-[#F5C500] font-black tracking-widest uppercase text-lg">Rotate to play</p>
+              ) : (
+                <>
+                  <div className="text-center px-8">
+                    <p className="text-[#F5C500] font-black mb-3" style={{ fontSize: "clamp(1.5rem, 5vw, 2.5rem)", letterSpacing: "-0.03em" }}>
+                      LES NRG: The Game
+                    </p>
+                    <p className="text-white/50 text-sm leading-relaxed max-w-xs mx-auto">
+                      Survive 60 seconds. Shoot the air leaks to seal them and lower your CFM@50pa score. Look for leaks in the walls, windows, plugs, duct work, can lights, and more.
+                    </p>
+                  </div>
+                  <button
+                    onClick={startGame}
+                    className="btn-primary text-base px-10 py-4 font-black tracking-widest"
+                  >
+                    ▶ PLAY GAME
+                  </button>
+                </>
+              )}
             </div>
           )}
 
@@ -351,7 +372,7 @@ export default function GameContainer() {
           {phase === "playing" && !isMobileDevice && (
             <iframe
               ref={iframeRef}
-              src="/beta/index.html?v=BETA19"
+              src="/beta/index.html?v=BETA20"
               className="w-full h-full border-0 block"
               title="LES NRG: The Game"
               allow="autoplay; screen-wake-lock; screen-orientation"
