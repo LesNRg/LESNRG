@@ -145,8 +145,10 @@ export default function GameContainer() {
   });
 
   function startGame() {
-    requestFullscreen();
-    lockLandscape();
+    if (isMobileDevice) {
+      requestFullscreen();
+      lockLandscape();
+    }
     if (isMobileDevice && !isLandscape) {
       // Portrait on mobile: wait for rotation, then auto-start
       setWaitingForLandscape(true);
