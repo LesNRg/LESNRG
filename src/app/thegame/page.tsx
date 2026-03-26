@@ -18,7 +18,7 @@ export default function GamePage() {
   return (
     <div className="min-h-screen bg-[#111111]">
       {/* Page Header */}
-      <div className="pt-32 pb-8 max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+      <div className="pt-8 pb-8 max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <span className="section-label">Play</span>
         <h1
           className="font-black text-white mb-2 leading-tight"

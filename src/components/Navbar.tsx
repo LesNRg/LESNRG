@@ -45,13 +45,19 @@ export default function Navbar() {
     return () => window.removeEventListener("game-started", handleGameStart);
   }, []);
 
+  const isGamePage = pathname === "/thegame";
+
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 nav-blur translate-y-0 ${
-        scrolled
-          ? "bg-[#111111]/97 border-b border-white/8 shadow-lg shadow-black/20"
-          : "bg-[#111111]"
-      } ${!visible ? "md:-translate-y-full" : ""}`}
+      className={
+        isGamePage
+          ? "relative z-50 bg-[#111111] border-b border-white/8"
+          : `fixed top-0 left-0 right-0 z-50 transition-all duration-300 nav-blur translate-y-0 ${
+              scrolled
+                ? "bg-[#111111]/97 border-b border-white/8 shadow-lg shadow-black/20"
+                : "bg-[#111111]"
+            } ${!visible ? "md:-translate-y-full" : ""}`
+      }
     >
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="flex items-center justify-between h-32">
