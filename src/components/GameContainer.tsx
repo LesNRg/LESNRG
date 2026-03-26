@@ -215,7 +215,7 @@ export default function GameContainer() {
         <div ref={overlayRef} className="fixed inset-0 z-[9999] bg-[#0a0a0a]" style={{ touchAction: "none" }}>
           <iframe
             ref={iframeRef}
-            src="/beta/index.html?v=BETA18"
+            src="/beta/index.html?v=BETA19"
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay; screen-wake-lock; screen-orientation"
@@ -339,7 +339,7 @@ export default function GameContainer() {
                 </p>
               </div>
               <button
-                onClick={e => { requestFullscreen(); startGame(); }}
+                onClick={startGame}
                 className="btn-primary text-base px-10 py-4 font-black tracking-widest"
               >
                 ▶ PLAY GAME
@@ -351,7 +351,7 @@ export default function GameContainer() {
           {phase === "playing" && !isMobileDevice && (
             <iframe
               ref={iframeRef}
-              src="/beta/index.html?v=BETA18"
+              src="/beta/index.html?v=BETA19"
               className="w-full h-full border-0 block"
               title="LES NRG: The Game"
               allow="autoplay; screen-wake-lock; screen-orientation"
