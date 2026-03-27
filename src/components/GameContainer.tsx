@@ -48,6 +48,7 @@ export default function GameContainer() {
   const [isLandscape, setIsLandscape] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const [waitingForLandscape, setWaitingForLandscape] = useState(false);
+  const [iframeReady, setIframeReady] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -193,6 +194,7 @@ export default function GameContainer() {
   function tryAgain() {
     setPhase("splash");
     setWaitingForLandscape(false);
+    setIframeReady(false);
     setSurvived(false);
     setSubmitted(false);
     setForm({ initials: "", name: "", email: "", building: "", company: "", services: "", otherService: "" });
@@ -248,9 +250,10 @@ export default function GameContainer() {
             className="w-full h-full border-0 block"
             title="LES NRG: The Game"
             allow="autoplay; screen-wake-lock; screen-orientation"
+            onLoad={() => setIframeReady(true)}
           />
-          {/* Mobile controls — only shown in landscape */}
-          {isLandscape && <div className="absolute inset-0 pointer-events-none select-none z-10">
+          {/* Mobile controls — only shown once iframe is loaded and in landscape */}
+          {isLandscape && iframeReady && <div className="absolute inset-0 pointer-events-none select-none z-10">
             <div className="absolute flex gap-3 pointer-events-auto" style={{ bottom: "max(1rem, env(safe-area-inset-bottom))", left: "max(1rem, env(safe-area-inset-left))" }}>
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
