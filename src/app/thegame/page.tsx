@@ -41,7 +41,7 @@ export default function GamePage() {
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 mb-4">
         <GameContainer />
         <p className="text-[#F5C500] text-sm font-mono font-bold text-center mt-4">
-          🏆 Prize awarded Sunday 10pm
+          🏆 Prize awarded 10pm Sunday April 12th
         </p>
       </div>
 
