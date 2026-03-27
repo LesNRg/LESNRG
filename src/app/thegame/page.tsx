@@ -27,7 +27,12 @@ export default function GamePage() {
           LESNRG{" "}
           <span className="text-[#F5C500]">The Game.</span>
         </h1>
-        <p className="text-white/50 text-lg max-w-xl">
+        {/* Mobile instructions */}
+        <p className="md:hidden text-white/50 text-lg max-w-xl">
+          Survive 60 seconds. Use <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">◀ ▶</kbd> to move, <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">JUMP</kbd> to jump, and <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">FIRE</kbd> to seal air leaks. Lowest CFM@50pa wins.
+        </p>
+        {/* Desktop instructions */}
+        <p className="hidden md:block text-white/50 text-lg max-w-xl">
           Survive 60 seconds. Shoot the air leaks in the house with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">F</kbd> to seal them up and lower your CFM@50pa score. Lowest score wins.
         </p>
       </div>
