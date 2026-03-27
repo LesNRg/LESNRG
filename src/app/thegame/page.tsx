@@ -27,6 +27,9 @@ export default function GamePage() {
           LESNRG{" "}
           <span className="text-[#F5C500]">The Game.</span>
         </h1>
+        <p className="text-[#F5C500] font-black text-2xl mb-2" style={{ letterSpacing: "-0.02em" }}>
+          Win a Free Blower Door Test.
+        </p>
         {/* Mobile instructions */}
         <p className="md:hidden text-white/50 text-lg max-w-xl">
           Survive 60 seconds. Use <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">◀ ▶</kbd> to move, <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">JUMP</kbd> to jump, and <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">FIRE</kbd> to seal air leaks. Lowest CFM@50pa wins.
