@@ -59,7 +59,7 @@ export default function HeroBigFans() {
   }, []);
 
   return (
-    <div>
+    <div className="mb-10">
       <p className="text-[#F5C500] text-2xl font-bold" style={{ letterSpacing: "-0.02em" }}>
         We&apos;re big fans
       </p>
