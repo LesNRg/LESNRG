@@ -106,18 +106,31 @@ export default function HomePage() {
       {/* Hero — dark */}
       <section className="min-h-screen flex items-center pt-32 bg-[#111111] relative overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <Image
-            src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3458%202.JPG"
-            alt="Building blower door testing"
-            fill
-            className="object-cover opacity-50"
-            priority
-            sizes="100vw"
-          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="w-full h-full object-cover opacity-70"
+          >
+            <source src="/river3.mp4" type="video/mp4" />
+          </video>
           <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
         </div>
         <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#F5C500]/6 rounded-full blur-3xl pointer-events-none z-0" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10 relative w-full z-10">
+          {/* Game button — desktop only, floated to right at "Comfort" line */}
+          <Link
+            href="/thegame"
+            className="hidden lg:flex group flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-2xl px-8 py-5 transition-all duration-200 absolute right-5 sm:right-8 xl:right-12"
+            style={{ top: "calc(2.5rem + 1.5rem + 2 * 1.25 * clamp(2.5rem, 6vw, 4.25rem))" }}
+          >
+            <span className="text-[#111111]/60 text-base font-bold uppercase tracking-widest mb-1">Play &amp; Win</span>
+            <span className="text-[#111111] font-black text-2xl leading-tight">Free Blower</span>
+            <span className="text-[#111111] font-black text-2xl leading-tight">Door Test</span>
+            <span className="text-[#111111]/50 text-base mt-1.5">Top score wins →</span>
+          </Link>
+
           <div className="max-w-3xl">
             <span className="section-label">Located in Philadelphia, PA</span>
             <h1
@@ -133,6 +146,16 @@ export default function HomePage() {
               Building science isn&apos;t what we do, it&apos;s who we are. New or existing, commercial or residential, small or large. We bring the same relentless precision and passion to every envelope we pressurize.
             </p>
             <HeroBigFans />
+            {/* Mobile game button — shown below HeroBigFans on small screens */}
+            <Link
+              href="/thegame"
+              className="lg:hidden inline-flex flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-2xl px-8 py-5 transition-all duration-200 mb-6"
+            >
+              <span className="text-[#111111]/60 text-base font-bold uppercase tracking-widest mb-1">Play &amp; Win</span>
+              <span className="text-[#111111] font-black text-2xl leading-tight">Free Blower</span>
+              <span className="text-[#111111] font-black text-2xl leading-tight">Door Test</span>
+              <span className="text-[#111111]/50 text-base mt-1.5">Top score wins →</span>
+            </Link>
             <div className="flex flex-wrap gap-3">
               <Link href="/services" className="btn-primary">
                 Our Services
