@@ -112,7 +112,9 @@ export default function GameContainer() {
   useEffect(() => {
     // During gameplay lock all touch gestures (prevents pinch-zoom + scroll on overlay).
     // Outside gameplay only block multi-touch pinch.
+    // Never preventDefault on buttons — iOS Safari suppresses pointerdown when touchstart is cancelled.
     const prevent = (e: TouchEvent) => {
+      if ((e.target as Element)?.closest?.("button")) return;
       if (phase === "playing" || e.touches.length > 1) e.preventDefault();
     };
     // iOS Safari fires gesturestart/change/end for pinch-zoom — block those too
@@ -134,17 +136,21 @@ export default function GameContainer() {
 
   // Native non-passive touch lock on the mobile overlay itself — iOS Safari ignores
   // user-scalable=no, so we must preventDefault directly on the element.
+  // Skip buttons — iOS Safari suppresses pointerdown if touchstart is cancelled.
   useEffect(() => {
     const el = overlayRef.current;
     if (!el) return;
-    const block = (e: TouchEvent) => e.preventDefault();
+    const block = (e: TouchEvent) => {
+      if ((e.target as Element)?.closest?.("button")) return;
+      e.preventDefault();
+    };
     el.addEventListener("touchstart", block, { passive: false });
     el.addEventListener("touchmove", block, { passive: false });
     return () => {
       el.removeEventListener("touchstart", block);
       el.removeEventListener("touchmove", block);
     };
-  });
+  }, [phase]);
 
   function startGame() {
     if (isMobileDevice) {
@@ -254,7 +260,7 @@ export default function GameContainer() {
           />
           {/* Mobile controls — only shown once iframe is loaded and in landscape */}
           {isLandscape && iframeReady && <div className="absolute inset-0 pointer-events-none select-none z-10">
-            <div className="absolute flex gap-3 pointer-events-auto" style={{ bottom: "max(1rem, env(safe-area-inset-bottom))", left: "max(1rem, env(safe-area-inset-left))" }}>
+            <div className="absolute flex gap-5 pointer-events-auto" style={{ bottom: "max(1.5rem, env(safe-area-inset-bottom))", left: "max(1.5rem, env(safe-area-inset-left))" }}>
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-white/10 border border-white/15 text-white/60 text-xl active:bg-white/25 active:border-white/30"
                 style={{ touchAction: "none" }}
@@ -270,7 +276,7 @@ export default function GameContainer() {
                 onPointerCancel={() => sendKey("ArrowRight", false)}
               >▶</button>
             </div>
-            <div className="absolute flex gap-3 items-end pointer-events-auto" style={{ bottom: "max(1rem, env(safe-area-inset-bottom))", right: "max(1rem, env(safe-area-inset-right))" }}>
+            <div className="absolute flex gap-5 items-end pointer-events-auto" style={{ bottom: "max(1.5rem, env(safe-area-inset-bottom))", right: "max(1.5rem, env(safe-area-inset-right))" }}>
               <button
                 className="w-[4.8rem] h-[4.8rem] rounded-full bg-[#FF6B00]/25 border border-[#FF6B00]/35 text-white/70 text-[11px] font-black tracking-widest active:bg-[#FF6B00]/50"
                 style={{ touchAction: "none" }}
