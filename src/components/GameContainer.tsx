@@ -50,6 +50,7 @@ export default function GameContainer() {
   const [waitingForLandscape, setWaitingForLandscape] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const gameStarted = useRef(false);
   const fireIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -148,10 +149,21 @@ export default function GameContainer() {
     if (isMobileDevice) {
       requestFullscreen();
       lockLandscape();
-    }
-    if (isMobileDevice && !isLandscape) {
-      // Portrait on mobile: wait for rotation, then auto-start
-      setWaitingForLandscape(true);
+      // Scroll the game area to the top of the viewport, then open the game
+      const el = containerRef.current;
+      if (el) {
+        const top = window.scrollY + el.getBoundingClientRect().top;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+      if (!isLandscape) {
+        setWaitingForLandscape(true);
+        return;
+      }
+      setTimeout(() => {
+        gameStarted.current = false;
+        notifyStart();
+        setPhase("playing");
+      }, 350);
       return;
     }
     gameStarted.current = false;
@@ -225,7 +237,7 @@ export default function GameContainer() {
   }
 
   return (
-    <div style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
+    <div ref={containerRef} style={{ maxWidth: "800px", touchAction: "manipulation" }} className="w-full">
 
       {/* ── Mobile fullscreen overlay — only during active play ── */}
       {isMobileDevice && phase === "playing" && (
