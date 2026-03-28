@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import GameContainer from "@/components/GameContainer";
 import Leaderboard from "./Leaderboard";
+import InstagramBrowserWarning from "@/components/InstagramBrowserWarning";
 
 export const metadata: Metadata = {
   title: "LESNRG The Game",
@@ -17,6 +18,7 @@ export const viewport: Viewport = {
 export default function GamePage() {
   return (
     <div className="min-h-screen bg-[#111111]">
+      <InstagramBrowserWarning />
       {/* Page Header */}
       <div className="pt-8 pb-8 max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <span className="section-label">Play</span>
