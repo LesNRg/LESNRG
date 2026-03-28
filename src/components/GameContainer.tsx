@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { ArrowRight } from "lucide-react";
+import { track } from "@vercel/analytics";
 
 type GamePhase = "splash" | "playing" | "gameover";
 type BoardEntry = { name: string; company: string; score: number };
@@ -153,6 +154,7 @@ export default function GameContainer() {
   }, [phase]);
 
   function startGame() {
+    track("game_start", { device: isMobileDevice ? "mobile" : "desktop" });
     if (isMobileDevice) {
       requestFullscreen();
       lockLandscape();
@@ -212,6 +214,7 @@ export default function GameContainer() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    track("score_submitted", { score: finalScore, survived });
     const name = form.initials.toUpperCase().slice(0, 3).padEnd(3, "_");
     await Promise.all([
       fetch("/api/scores", {
