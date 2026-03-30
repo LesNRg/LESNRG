@@ -3,14 +3,9 @@ import { Trophy } from "lucide-react";
 type Score = { name: string; company: string; score: number };
 
 async function getWeeklyScores(): Promise<Score[]> {
-  const d = new Date();
-  const day = d.getDay();
-  d.setDate(d.getDate() + (day === 0 ? -6 : 1 - day));
-  d.setHours(0, 0, 0, 0);
-
   try {
     const res = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/scores?select=name,company,score&created_at=gte.${d.toISOString()}&order=score.asc&limit=10`,
+      `${process.env.SUPABASE_URL}/rest/v1/scores?select=name,company,score&order=score.asc&limit=10`,
       {
         headers: {
           apikey: process.env.SUPABASE_ANON_KEY!,
@@ -39,13 +34,13 @@ export default async function Leaderboard() {
           className="font-black text-white text-xl"
           style={{ letterSpacing: "-0.02em" }}
         >
-          This Week&apos;s Top 10
+          Top 10 Scores
         </h2>
       </div>
 
       {scores.length === 0 ? (
         <p className="text-white/30 text-sm">
-          No scores yet this week — play the game to get on the board.
+          No scores yet — play the game to get on the board.
         </p>
       ) : (
         <div className="rounded-xl overflow-hidden border border-white/8 max-w-xl">
