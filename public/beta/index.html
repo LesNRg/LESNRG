@@ -705,16 +705,16 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         if (hit) { bullets.splice(i, 1); }
       }
 
-      // ─── Big leaks — 7–12 on screen, more frequent near the top ─────────
+      // ─── Big leaks — max 2 on screen ─────────────────────────────────────
       const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
       const dynInterval = Math.round(70 - heightFrac * 30); // 70 frames at bottom → 40 at top
       leakTimer++;
-      if (leakTimer >= dynInterval && leaks.length < 4) {
+      if (leakTimer >= dynInterval && leaks.length < 2) {
         spawnLeak();
         leakTimer = 0;
       }
-      // Keep minimum 2 on screen
-      if (leaks.length < 2) {
+      // Keep minimum 1 on screen
+      if (leaks.length < 1) {
         spawnLeak();
       }
 
