@@ -11,7 +11,7 @@ async function getTopScores(): Promise<Score[]> {
           apikey: process.env.SUPABASE_ANON_KEY!,
           Authorization: `Bearer ${process.env.SUPABASE_ANON_KEY!}`,
         },
-        next: { revalidate: 60 },
+        cache: "no-store",
       }
     );
     if (!res.ok) return [];
