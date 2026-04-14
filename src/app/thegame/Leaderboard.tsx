@@ -2,7 +2,7 @@ import { Trophy } from "lucide-react";
 
 type Score = { name: string; company: string; score: number };
 
-async function getWeeklyScores(): Promise<Score[]> {
+async function getTopScores(): Promise<Score[]> {
   try {
     const res = await fetch(
       `${process.env.SUPABASE_URL}/rest/v1/scores?select=name,company,score&order=score.asc&limit=10`,
@@ -24,7 +24,7 @@ async function getWeeklyScores(): Promise<Score[]> {
 const RANK_COLORS = ["text-[#F5C500]", "text-white/50", "text-[#cd7f32]"];
 
 export default async function Leaderboard() {
-  const scores = await getWeeklyScores();
+  const scores = await getTopScores();
 
   return (
     <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 pb-20">
