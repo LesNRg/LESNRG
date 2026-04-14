@@ -19,7 +19,7 @@ function getWeekStart() {
 
 export async function GET() {
   const res = await fetch(
-    `${SB_URL}/rest/v1/scores?select=name,company,score&created_at=gte.${getWeekStart()}&order=score.asc&limit=10`,
+    `${SB_URL}/rest/v1/scores?select=name,score&order=score.asc&limit=10`,
     { headers: hdrs, cache: "no-store" }
   );
   if (!res.ok) return NextResponse.json([]);
@@ -27,14 +27,14 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const { name, company, score } = await req.json();
+  const { name, score } = await req.json();
   if (!name || typeof score !== "number") {
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
   const res = await fetch(`${SB_URL}/rest/v1/scores`, {
     method: "POST",
     headers: { ...hdrs, Prefer: "return=minimal" },
-    body: JSON.stringify({ name, company: company || "", score }),
+    body: JSON.stringify({ name, score }),
   });
   return res.ok
     ? NextResponse.json({ ok: true })

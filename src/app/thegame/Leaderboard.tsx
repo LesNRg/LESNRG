@@ -1,11 +1,11 @@
 import { Trophy } from "lucide-react";
 
-type Score = { name: string; company: string; score: number };
+type Score = { name: string; score: number };
 
 async function getTopScores(): Promise<Score[]> {
   try {
     const res = await fetch(
-      `${process.env.SUPABASE_URL}/rest/v1/scores?select=name,company,score&order=score.asc&limit=10`,
+      `${process.env.SUPABASE_URL}/rest/v1/scores?select=name,score&order=score.asc&limit=10`,
       {
         headers: {
           apikey: process.env.SUPABASE_ANON_KEY!,
@@ -62,9 +62,6 @@ export default async function Leaderboard() {
                 <span className="text-white text-sm font-semibold truncate">
                   {s.name}
                 </span>
-                {s.company && (
-                  <span className="text-white/35 text-sm ml-2">{s.company}</span>
-                )}
               </div>
               <span className="text-[#F5C500] font-black text-sm tabular-nums">
                 {s.score.toLocaleString()} CFM
