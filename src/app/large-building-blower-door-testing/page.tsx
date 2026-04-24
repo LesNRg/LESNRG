@@ -5,10 +5,10 @@ import { Wind, CheckCircle, ArrowRight, Building2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Large Building Blower Door Testing | Commercial Air Leakage | LES NRG",
-  description: "Whole building blower door testing for commercial and industrial facilities. Multi-fan arrays for ASTM E779 & E1827 compliance. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
+  description: "Whole building blower door testing for commercial and industrial facilities. Multi-fan arrays for ASTM E3158 compliance. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
   openGraph: {
     title: "Large Building Blower Door Testing | LES NRG",
-    description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E779 & E1827 compliant.",
+    description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E3158 compliant.",
     url: "https://www.lesnrg.com/large-building-blower-door-testing",
     siteName: "LES NRG",
     locale: "en_US",
@@ -18,24 +18,28 @@ export const metadata: Metadata = {
 
 const standards = [
   {
-    name: "ASTM E779",
-    desc: "Primary protocol for large commercial envelope testing via fan pressurization.",
+    name: "ASTM E3158-18",
+    desc: "Primary standard for measuring the air leakage rate of large or multizone buildings. Evolved from the USACE protocol and ABAA standard. Provides multi-point, repeated two-point, and repeated single-point procedures. Recommended reporting pressure: 75 Pa.",
   },
   {
-    name: "ASTM E1827",
-    desc: "Pulse-technique alternative for shorter tests in occupied or time-sensitive facilities.",
+    name: "ASTM E779-19",
+    desc: "Standard test method for determining air leakage rate by fan pressurization. The default standard in IECC and many North American jurisdictions. Limited to single-zone buildings; requires interior doors to be open. Multi-point method only, test range 10–60 Pa.",
   },
   {
-    name: "ASHRAE 90.1",
-    desc: "Mandates air leakage thresholds for new commercial construction and major renovations.",
+    name: "ASTM E1827-11",
+    desc: "Standard test methods for determining airtightness of buildings using an orifice blower door. Listed as an optional compliance method under ASHRAE 90.1. Provides occupied and closed building preparation options. Reports at 50 Pa.",
   },
   {
-    name: "IECC / Local Codes",
-    desc: "International Energy Conservation Code and local variants for new construction compliance.",
+    name: "CGSB 149.10-2019",
+    desc: "Canadian standard for determination of the airtightness of building envelopes by the fan depressurization method. Includes closed-up and as-operated preparations. Maximum 60 Pa for multi-point; 50 ± 3 Pa for single- and two-point methods.",
   },
   {
-    name: "2021 IECC R402.4.1.2",
-    desc: "Requires individual unit compartmentalization testing for attached multifamily dwellings, max 0.3 CFM50/ft² at 50 Pa.",
+    name: "ISO 9972:2015",
+    desc: "International standard for thermal performance of buildings — determination of air permeability by fan pressurization. Commonly specified in European projects. Multi-point method, test range up to 100 Pa, reporting reference at 50 Pa.",
+  },
+  {
+    name: "USACE (2012)",
+    desc: "US Army Corps of Engineers Air Leakage Test Protocol for Building Envelopes. Developed for large military buildings; the precursor to ASTM E3158. Multi-point method, induced test pressure 50–85 Pa, reporting reference at 75 Pa.",
   },
 ];
 
@@ -98,7 +102,7 @@ const faqs = [
   },
   {
     q: "How is this different from a residential blower door test?",
-    a: "A residential test uses one fan producing 2,000–5,000 CFM. A large building may require 50,000–200,000+ CFM to reach 50 Pa. We deploy arrays of 2–20+ calibrated fans with centralized data acquisition built for large volumes.",
+    a: "Residential testing follows ASTM E779, using one fan producing 2,000–5,000 CFM. Large building testing follows ASTM E3158, which may require 50,000–200,000+ CFM. We deploy arrays of 2–20+ calibrated fans with centralized data acquisition built for large volumes.",
   },
 ];
 
@@ -130,7 +134,7 @@ export default function BlowerDoorTestingPage() {
           </h1>
           <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
             Multi-fan air leakage testing for new and existing commercial and multifamily facilities of any size.
-            ASTM E779 and E1827 compliant.
+            ASTM E3158 compliant.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/contact" className="btn-primary">
@@ -145,7 +149,8 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* New Construction */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <div>
             <span className="section-label">New Construction</span>
@@ -155,7 +160,7 @@ export default function BlowerDoorTestingPage() {
               requirements for new large commercial buildings. Under Section C402.5, buildings exceeding
               25,000 sq ft of conditioned floor area must demonstrate a maximum whole-building air leakage
               rate of <strong className="text-[#111111]">0.40 CFM75 per square foot</strong> of gross above-grade
-              wall area, tested at 75 Pascals per ASTM E779 or ASTM E1827.
+              wall area, tested at 75 Pascals per ASTM E3158.
             </p>
             <p className="text-[#6b6b62] leading-relaxed mb-6">
               For attached multifamily buildings up to three stories, Section R402.4.1.2 requires individual
@@ -164,7 +169,7 @@ export default function BlowerDoorTestingPage() {
             </p>
             <ul className="space-y-2">
               {[
-                "Whole-building testing per ASTM E779 / ASTM E1827",
+                "Whole-building testing per ASTM E3158",
                 "Unit compartmentalization per 2021 IECC § R402.4.1.2",
                 "ASHRAE 90.1 compliance for commercial construction",
                 "Signed engineering report accepted by AHJ",
@@ -185,7 +190,7 @@ export default function BlowerDoorTestingPage() {
                 { label: "Max Leakage", value: "0.40 CFM75/ft²", sub: "Gross above-grade wall area" },
                 { label: "Test Pressure", value: "75 Pa", sub: "Commercial buildings" },
                 { label: "Threshold", value: "> 25,000 ft²", sub: "Conditioned floor area" },
-                { label: "Test Methods", value: "E779 / E1827", sub: "ASTM compliant" },
+                { label: "Test Method", value: "E3158", sub: "ASTM compliant" },
               ].map((item) => (
                 <div key={item.label} className="bg-white/5 rounded-xl p-4 text-center">
                   <div className="text-white/40 text-xs uppercase tracking-wider mb-1.5">{item.label}</div>
@@ -199,6 +204,7 @@ export default function BlowerDoorTestingPage() {
               code for your jurisdiction and deliver a report that satisfies your Authority Having Jurisdiction (AHJ).
             </p>
           </div>
+        </div>
         </div>
       </section>
 
@@ -242,48 +248,10 @@ export default function BlowerDoorTestingPage() {
         </div>
       </section>
 
-      {/* Overview */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          <div>
-            <span className="section-label">The Challenge</span>
-            <h2 className="section-title mb-5">Purpose-Built Equipment for Large Volumes</h2>
-            <p className="text-[#6b6b62] leading-relaxed mb-6">
-              A standard residential blower door produces 2,000–5,000 CFM. A large commercial building may
-              require 50,000–200,000+ CFM to reach the 50 Pascal differential required by ASTM E779.
-              We deploy arrays of 2–20+ calibrated fans synchronized through centralized data acquisition,
-              accurate and code-compliant on facilities of any size.
-            </p>
-            <ul className="space-y-2">
-              {[
-                "Multi-fan arrays up to 20+ units",
-                "Centralized data acquisition across all fans",
-                "Zone-by-zone analysis for phased construction",
-                "Occupied building protocols available",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-[#6b6b62] text-sm">
-                  <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="relative rounded-2xl overflow-hidden aspect-[3/2]">
-            <Image
-              src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_0813.JPG"
-              alt="Large building blower door testing setup"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
-          </div>
-        </div>
-      </section>
-
       {/* Building Types */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
-        <div className="grid md:grid-cols-2 gap-12 items-start">
-          <div>
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="mb-8">
             <span className="section-label">Facility Types</span>
             <h2 className="section-title mb-6">Building Types We Test</h2>
             <div className="flex flex-wrap gap-2">
@@ -295,14 +263,25 @@ export default function BlowerDoorTestingPage() {
               ))}
             </div>
           </div>
-          <div className="relative rounded-2xl overflow-hidden aspect-[3/2]">
-            <Image
-              src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1664.JPG"
-              alt="Large commercial building exterior"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 50vw"
-            />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1664.JPG", alt: "Large commercial building" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_0813.JPG", alt: "Blower door fan setup" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3195.JPG", alt: "Large building testing" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3445.JPG", alt: "Commercial air leakage test" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7551.JPG", alt: "Building envelope testing" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_9316.JPG", alt: "Multi-fan array deployment" },
+            ].map((photo) => (
+              <div key={photo.src} className="relative rounded-xl overflow-hidden aspect-[4/3]">
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 640px) 50vw, 33vw"
+                />
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -390,7 +369,8 @@ export default function BlowerDoorTestingPage() {
       </section>
 
       {/* Unit Compartmentalization */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="mb-10">
           <span className="section-label">2021 IECC § R402.4.1.2</span>
           <h2 className="section-title mb-4">Multifamily Unit Compartmentalization Testing</h2>
@@ -452,10 +432,12 @@ export default function BlowerDoorTestingPage() {
             </ul>
           </div>
         </div>
+        </div>
       </section>
 
       {/* FAQ */}
-      <section className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="mb-10">
           <span className="section-label">FAQ</span>
           <h2 className="section-title">Common Questions</h2>
@@ -468,6 +450,37 @@ export default function BlowerDoorTestingPage() {
             </div>
           ))}
         </div>
+        </div>
+      </section>
+
+      {/* Stack Effect */}
+      <section className="bg-white py-8">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+        <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <span className="section-label">Stack Effect</span>
+            <h2 className="section-title mb-5">A Challenge Unique to Tall Buildings</h2>
+            <p className="text-[#6b6b62] leading-relaxed mb-4">
+              Stack effect is the pressure-driven movement of air through a building caused by temperature differences between inside and outside. In taller buildings, warm air rises and escapes through upper floors and the roof while cold outside air is drawn in at lower levels — or vice versa in summer. The taller the building, the greater the pressure differential.
+            </p>
+            <p className="text-[#6b6b62] leading-relaxed mb-4">
+              This constant pressure gradient masks air leakage measurements and can make it impossible to accurately test the building envelope without accounting for it. A test performed without correcting for stack effect will produce unreliable results — either overstating or understating actual leakage.
+            </p>
+            <p className="text-[#6b6b62] leading-relaxed">
+              ASTM E3158 addresses this directly. By deploying manometers at multiple floors simultaneously — typically at grade level and at the roof — we measure the actual pressure differential across the building height during the test. This data is used to correct the fan pressurization readings and produce a true, stack-effect-compensated air leakage result.
+            </p>
+          </div>
+          <div className="relative rounded-2xl overflow-hidden bg-white p-6 border border-[#e4e4de]">
+            <Image
+              src="/stack-effect.png"
+              alt="Stack effect diagram showing positive and negative pressure across building floors"
+              width={800}
+              height={520}
+              className="w-full h-auto"
+            />
+          </div>
+        </div>
+      </div>
       </section>
 
       {/* CTA */}

@@ -144,7 +144,8 @@ export default function ServicesPage() {
       </section>
 
       {/* Services */}
-      <section id="services" className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
+      <section id="services" className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="space-y-5">
           {services.map((s) => (
             <div key={s.title} className="card">
@@ -171,6 +172,7 @@ export default function ServicesPage() {
               </div>
             </div>
           ))}
+        </div>
         </div>
       </section>
 

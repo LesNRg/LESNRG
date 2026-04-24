@@ -121,13 +121,12 @@ export default function HomePage() {
           {/* Game button — desktop only, floated to right at "Comfort" line */}
           <Link
             href="/thegame"
-            className="hidden lg:flex group flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-2xl px-8 py-5 transition-all duration-200 absolute right-5 sm:right-8 xl:right-12"
+            className="hidden lg:flex group flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-xl px-5 py-3 transition-all duration-200 absolute right-5 sm:right-8 xl:right-12"
             style={{ top: "calc(2.5rem + 1.5rem + 2 * 1.25 * clamp(2.5rem, 6vw, 4.25rem))" }}
           >
-            <span className="text-[#111111]/60 text-base font-bold uppercase tracking-widest mb-1">Play &amp; Win</span>
-            <span className="text-[#111111] font-black text-2xl leading-tight">Free Blower</span>
-            <span className="text-[#111111] font-black text-2xl leading-tight">Door Test</span>
-            <span className="text-[#111111]/50 text-base mt-1.5">Top score wins →</span>
+            <span className="text-[#111111]/60 text-xs font-bold uppercase tracking-widest mb-0.5">Play &amp; Win</span>
+            <span className="text-[#111111] font-black text-lg leading-tight">Free Blower Door Test</span>
+            <span className="text-[#111111]/50 text-xs mt-1">Top score wins →</span>
           </Link>
 
           <div className="max-w-3xl">
@@ -148,12 +147,11 @@ export default function HomePage() {
             {/* Mobile game button — shown below HeroBigFans on small screens */}
             <Link
               href="/thegame"
-              className="lg:hidden inline-flex flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-2xl px-8 py-5 transition-all duration-200 mb-6"
+              className="lg:hidden inline-flex flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-xl px-5 py-3 transition-all duration-200 mb-6"
             >
-              <span className="text-[#111111]/60 text-base font-bold uppercase tracking-widest mb-1">Play &amp; Win</span>
-              <span className="text-[#111111] font-black text-2xl leading-tight">Free Blower</span>
-              <span className="text-[#111111] font-black text-2xl leading-tight">Door Test</span>
-              <span className="text-[#111111]/50 text-base mt-1.5">Top score wins →</span>
+              <span className="text-[#111111]/60 text-xs font-bold uppercase tracking-widest mb-0.5">Play &amp; Win</span>
+              <span className="text-[#111111] font-black text-lg leading-tight">Free Blower Door Test</span>
+              <span className="text-[#111111]/50 text-xs mt-1">Top score wins →</span>
             </Link>
             <div className="flex flex-wrap gap-3">
               <Link href="/services" className="btn-primary">
@@ -281,7 +279,8 @@ export default function HomePage() {
       </section>
 
       {/* Credentials */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">Credentials</span>
@@ -309,6 +308,7 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
         </div>
       </section>
 

@@ -172,7 +172,8 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Why PHIUS */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">The Standard</span>
@@ -226,6 +227,7 @@ export default function PhiusVerificationPage() {
             ))}
           </div>
         </div>
+        </div>
       </section>
 
       {/* Photo Strip */}
@@ -266,7 +268,8 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Process */}
-      <section id="process" className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section id="process" className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="mb-12">
           <span className="section-label">How It Works</span>
           <h2 className="section-title">Our Verification Process</h2>
@@ -282,6 +285,7 @@ export default function PhiusVerificationPage() {
               <p className="text-[#6b6b62] text-sm leading-relaxed">{step.desc}</p>
             </div>
           ))}
+        </div>
         </div>
       </section>
 
@@ -304,7 +308,8 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Building Types */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="mb-12">
           <span className="section-label">Project Types</span>
           <h2 className="section-title">Buildings We Certify</h2>
@@ -321,6 +326,7 @@ export default function PhiusVerificationPage() {
               </div>
             </div>
           ))}
+        </div>
         </div>
       </section>
 
@@ -383,7 +389,8 @@ export default function PhiusVerificationPage() {
       </section>
 
       {/* Credentials Callout */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div>
           <div>
             <span className="section-label">Why Us</span>
@@ -415,6 +422,7 @@ export default function PhiusVerificationPage() {
               ))}
             </div>
           </div>
+        </div>
         </div>
       </section>
 

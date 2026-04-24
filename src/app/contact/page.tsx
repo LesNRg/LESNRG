@@ -44,7 +44,8 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Info */}
           <div className="lg:col-span-1 space-y-6">
@@ -106,6 +107,7 @@ export default function ContactPage() {
           <div className="lg:col-span-2">
             <ContactForm />
           </div>
+        </div>
         </div>
       </section>
     </div>

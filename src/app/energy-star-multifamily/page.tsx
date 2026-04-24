@@ -158,7 +158,8 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* What is Energy Star */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">The Program</span>
@@ -187,6 +188,7 @@ export default function EnergyStarMultifamilyPage() {
               className="object-cover"
             />
           </div>
+        </div>
         </div>
       </section>
 
@@ -246,7 +248,8 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Energy Star for New Homes */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-8">
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">Single Family & Low-Rise</span>
@@ -286,6 +289,7 @@ export default function EnergyStarMultifamilyPage() {
               ))}
             </ul>
           </div>
+        </div>
         </div>
       </section>
 
@@ -383,7 +387,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Standards */}
-      <section className="py-8">
+      <section className="bg-white py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">Compliance</span>
@@ -425,7 +429,8 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* Photo Collage */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="mb-8">
           <span className="section-label">Our Work</span>
           <h2 className="section-title">In the Field</h2>
@@ -469,10 +474,11 @@ export default function EnergyStarMultifamilyPage() {
             </div>
           ))}
         </div>
+        </div>
       </section>
 
       {/* Deliverables */}
-      <section className="py-8">
+      <section className="bg-white py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="grid md:grid-cols-2 gap-16 items-start">
             <div>
@@ -580,7 +586,7 @@ export default function EnergyStarMultifamilyPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-8">
+      <section className="bg-white py-8">
         <div className="max-w-4xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
             <span className="section-label">FAQ</span>
