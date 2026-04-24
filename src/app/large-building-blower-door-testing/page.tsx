@@ -46,32 +46,32 @@ const standards = [
 const process = [
   {
     step: "01",
-    title: "Site Walk & Test Plan",
+    title: "Test Coordination",
     desc: "We walk the building with the project team, reviewing drawings, mechanical systems, and envelope details, then deliver a comprehensive testing plan covering fan array configuration, access points, preparation requirements, and scheduling.",
   },
   {
     step: "02",
-    title: "Contract & Building Preparation",
+    title: "Building Preparation",
     desc: "Once the scope is agreed upon, we execute a contract and coordinate with the project team to prepare the building for testing. This includes sealing intentional openings including HVAC dampers, exhaust fans, and penetrations, and establishing safe test zones.",
   },
   {
     step: "03",
-    title: "Fan Deployment",
+    title: "Equipment Setup",
     desc: "Deploy and calibrate the fan array across multiple openings, synced to centralized data acquisition.",
   },
   {
     step: "04",
-    title: "Pressurization Test",
+    title: "Running the Test",
     desc: "Run pressurization and depressurization sequences, collecting CFM at multiple pressure differentials.",
   },
   {
     step: "05",
-    title: "Leak Survey",
-    desc: "Systematic envelope survey under pressure, optionally combined with IR thermography.",
+    title: "Data & Results Interpretation",
+    desc: "Systematic envelope survey under pressure, optionally combined with IR thermography, followed by analysis of all collected data.",
   },
   {
     step: "06",
-    title: "Report",
+    title: "Reporting Test Results",
     desc: "Engineering report delivered within 5 business days with results, compliance status, and remediation guidance.",
   },
 ];
@@ -344,6 +344,111 @@ export default function BlowerDoorTestingPage() {
                
               />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Building Preparation */}
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="mb-10">
+            <span className="section-label">Building Preparation</span>
+            <h2 className="section-title mb-4">Two Test Preparation Types</h2>
+            <p className="text-[#6b6b62] leading-relaxed max-w-2xl">
+              ASTM E3158 provides two preparation options depending on the purpose of the test. The correct preparation is determined by the applicable code, specification, or green standard — and must be agreed upon before testing begins.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <div className="card border-l-4 border-l-[#F5C500]">
+              <h3 className="text-[#111111] font-bold mb-1">Building Envelope Preparation</h3>
+              <p className="text-[#6b6b62] text-sm mb-4">Used when the goal is to test the air barrier itself — the most common method for code compliance. All intentional openings in the building envelope are sealed.</p>
+              <ul className="space-y-2">
+                {[
+                  "All HVAC dampers closed; openings sealed",
+                  "Natural ventilation openings sealed",
+                  "Exhaust fans, dryer vents, and penetrations sealed",
+                  "Floor drains and plumbing traps filled with water",
+                  "Windows, exterior doors, and roof hatches closed and latched",
+                  "Interior doors left open to ensure uniform pressure",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-[#6b6b62] text-sm">
+                    <CheckCircle size={12} className="text-[#F5C500] mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="card">
+              <h3 className="text-[#111111] font-bold mb-1">Operational Envelope Preparation</h3>
+              <p className="text-[#6b6b62] text-sm mb-4">Used when the goal is to test the building in its as-operated condition — typical for energy benchmarking, commissioning, or occupied building tests.</p>
+              <ul className="space-y-2">
+                {[
+                  "HVAC dampers closed as they would be during normal operation",
+                  "Openings without dampers left as found",
+                  "Interior doors that are normally closed remain closed and latched",
+                  "Other interior doors left open",
+                  "Dryers left as found; vent sealed only if dryer not installed",
+                  "Floor drains and plumbing traps filled with water",
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-[#6b6b62] text-sm">
+                    <CheckCircle size={12} className="text-[#F5C500] mt-0.5 shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div className="bg-[#f9f9f7] border border-[#e4e4de] rounded-2xl p-6">
+            <h3 className="text-[#111111] font-bold mb-3">Safety Requirements on Test Day</h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { title: "Combustion Appliances", desc: "All gas appliances, furnaces, fireplaces, and boilers must be powered off. Depressurization can cause backdrafting and draw combustion gases into the building." },
+                { title: "Fire Alarms", desc: "Set fire alarm systems to test mode before starting. Construction dust or diagnostic smoke machines can trigger alarms during pressurization." },
+                { title: "Plumbing Traps", desc: "Fill all floor drains and plumbing fixture traps with water prior to testing. Pressure differentials can draw sewer gases through dry traps." },
+                { title: "Fan Guards & Power", desc: "Confirm all fan blade guards are undamaged. Use one fan per electrical circuit to avoid tripped breakers. Keep cords clear of foot traffic." },
+              ].map((item) => (
+                <div key={item.title}>
+                  <div className="text-[#111111] font-semibold text-sm mb-1">{item.title}</div>
+                  <p className="text-[#6b6b62] text-xs leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Jurisdictional Requirements */}
+      <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="mb-10">
+            <span className="section-label">Jurisdictional Requirements</span>
+            <h2 className="section-title mb-4">Air Leakage Thresholds by Code & Standard</h2>
+            <p className="text-[#6b6b62] leading-relaxed max-w-2xl">
+              Requirements vary by jurisdiction, building type, and intended use. Where jurisdictional requirements and project specifications conflict, the more conservative requirement governs. Always verify the applicable code before testing.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[
+              { name: "IECC (2018)", type: "Commercial & Multifamily", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Compliance option; applies to most jurisdictions adopting the 2018 IECC or later." },
+              { name: "ASHRAE 90.1 (2016)", type: "Commercial, all except low-rise residential", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Energy standard compliance option. ASTM E779 or E1827 accepted." },
+              { name: "Washington State (2018)", type: "All building types", req: "0.25 CFM75/ft²", pressure: "@ 75 Pa", note: "Mandatory energy code requirement; among the most stringent in the US. Failure requires repair and retest." },
+              { name: "New York City (2020)", type: "Commercial, 10,000–50,000 ft², ≤75 ft", req: "0.25 CFM75/ft²", pressure: "@ 75 Pa", note: "Mandatory energy code requirement. Larger or taller buildings have separate requirements." },
+              { name: "USACE (2012)", type: "US military buildings", req: "0.25 CFM75/ft²", pressure: "@ 75 Pa", note: "Army Corps of Engineers protocol. Multi-point test required; test pressure 50–85 Pa, reported at 75 Pa." },
+              { name: "LEED v4.1", type: "All building types", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "0.40 CFM75/ft² earns points; higher performance (0.25 CFM75/ft²) earns additional credits. Retest required if over 0.60." },
+              { name: "PHIUS (2018)", type: "All building types", req: "0.06–0.10 CFM75/ft²", pressure: "@ 75 Pa or 50 Pa", note: "≥5 stories: 0.10 CFM75/ft² or 0.08 CFM50/ft². Lower buildings: 0.08 CFM75/ft² or 0.06 CFM50/ft²." },
+              { name: "ABAA Spec 01410", type: "Commercial", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Standard specification language for projects without a jurisdictional requirement. Repair and retest if exceeded." },
+              { name: "GSA (2018)", type: "Federal government buildings", req: "0.10–0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Tiered requirements: T1 = 0.25, T2 = 0.15, T3 = 0.10 CFM75/ft² depending on project type." },
+            ].map((j) => (
+              <div key={j.name} className="card">
+                <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-2.5 py-1 mb-3">
+                  <span className="text-[#111111] font-bold text-xs">{j.name}</span>
+                </div>
+                <div className="text-[#6b6b62] text-xs uppercase tracking-wider mb-1">{j.type}</div>
+                <div className="text-[#111111] font-black text-lg mb-0.5" style={{ letterSpacing: "-0.02em" }}>{j.req}</div>
+                <div className="text-[#F5C500] text-xs font-semibold mb-3">{j.pressure}</div>
+                <p className="text-[#6b6b62] text-xs leading-relaxed">{j.note}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
