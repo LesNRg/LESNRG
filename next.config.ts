@@ -14,6 +14,16 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/whole-building-blower-door-test",
+        destination: "/large-building-blower-door-testing",
+        permanent: true,
+      },
+      {
+        source: "/whole-building-blower-door-testing",
+        destination: "/large-building-blower-door-testing",
+        permanent: true,
+      },
+      {
         source: "/les-nrg-game",
         destination: "/thegame",
         permanent: true,

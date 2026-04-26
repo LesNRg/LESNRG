@@ -4,11 +4,11 @@ import Image from "next/image";
 import { Wind, CheckCircle, ArrowRight, Building2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Large Building Blower Door Testing | Commercial Air Leakage | LES NRG",
+  title: "Whole Building Blower Door Testing | Large Building Air Leakage | LES NRG",
   description: "Whole building blower door testing for commercial and industrial facilities. Multi-fan arrays for ASTM E3158 compliance. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
-  keywords: "large building blower door testing, commercial air leakage testing, ASTM E3158, whole building pressurization, commercial energy code compliance, multifamily blower door testing, IECC C402.5, Philadelphia commercial testing, building envelope air leakage",
+  keywords: "whole building blower door test, whole building blower door testing, large building blower door testing, commercial air leakage testing, ASTM E3158, whole building pressurization, commercial energy code compliance, multifamily blower door testing, IECC C402.5, Philadelphia commercial testing, building envelope air leakage",
   openGraph: {
-    title: "Large Building Blower Door Testing | LES NRG",
+    title: "Whole Building Blower Door Testing | LES NRG",
     description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E3158 compliant.",
     url: "https://www.lesnrg.com/large-building-blower-door-testing",
     siteName: "LES NRG",
@@ -165,7 +165,7 @@ export default function BlowerDoorTestingPage() {
             <span className="text-[#F5C500] text-[10px] font-bold tracking-[0.14em] uppercase">Commercial Testing</span>
           </div>
           <h1 className="font-black text-white mb-5 leading-tight" style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", letterSpacing: "-0.03em" }}>
-            Large Building<br />Blower Door<br />Testing
+            Whole Building<br />Blower Door<br />Testing
           </h1>
           <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
             Multi-fan air leakage testing for new and existing commercial and multifamily facilities of any size.
