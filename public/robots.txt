@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /notrack
+
+Sitemap: https://www.lesnrg.com/sitemap.xml

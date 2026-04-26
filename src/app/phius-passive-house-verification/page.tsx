@@ -9,6 +9,7 @@ import {
 export const metadata: Metadata = {
   title: "PHIUS Passive House Verification | LES NRG | Philadelphia, PA",
   description: "Independent PHIUS+ passive house verification and certification. Third-party inspections, airtightness testing, and full certification support from design through certificate. Philadelphia, PA.",
+  keywords: "PHIUS passive house verification, PHIUS certified verifier, passive house certification Philadelphia, airtightness testing, PHIUS+ 2021, passive house rowhouse, passive house multifamily, high performance building certification",
   openGraph: {
     title: "PHIUS Passive House Verification | LES NRG",
     description: "Independent PHIUS+ passive house verification. Third-party inspections, airtightness testing, and full certification support.",
@@ -116,9 +117,57 @@ const faqs = [
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What is a PHIUS Verifier and why do I need one?",
+      acceptedAnswer: { "@type": "Answer", text: "A PHIUS Certified Verifier is an independent third-party professional trained and credentialed by PHIUS to inspect and certify that a building meets the PHIUS+ standard. Certification cannot be self-reported. An approved verifier must conduct site inspections and airtightness testing and submit documentation directly to PHIUS." },
+    },
+    {
+      "@type": "Question",
+      name: "When should I bring a PHIUS verifier onto the project?",
+      acceptedAnswer: { "@type": "Answer", text: "As early as possible, ideally during design development. Early engagement allows us to review the energy model and construction details before they are locked in, catching potential compliance gaps before they become expensive field problems." },
+    },
+    {
+      "@type": "Question",
+      name: "How many site visits are required for PHIUS certification?",
+      acceptedAnswer: { "@type": "Answer", text: "PHIUS certification typically requires a minimum of two site visits: a rough-in inspection and a final inspection that includes blower door testing. Additional visits may be needed for complex projects or if corrections are required." },
+    },
+    {
+      "@type": "Question",
+      name: "What airtightness level does a PHIUS project need to achieve?",
+      acceptedAnswer: { "@type": "Answer", text: "PHIUS+ 2021 requires 0.06 CFM50/ft² of total enclosure area or better. This is significantly tighter than the IECC code minimum of 3 ACH50 for residential. Achieving this requires careful detailing of the air barrier at all penetrations and transitions." },
+    },
+    {
+      "@type": "Question",
+      name: "Can PHIUS certification satisfy other programs at the same time?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes. A PHIUS+ certified project can simultaneously qualify for Energy Star for New Homes, DOE Zero Energy Ready Home (ZERH), and EPA Indoor airPlus. We coordinate all required documentation across programs to minimize your overhead." },
+    },
+    {
+      "@type": "Question",
+      name: "How long does the PHIUS certification process take?",
+      acceptedAnswer: { "@type": "Answer", text: "Timeline varies by project complexity. Simple single-family projects with a clean design typically complete certification within 3–5 months of final inspection. We track all open items and communicate directly with PHIUS to keep your project moving." },
+    },
+  ],
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.lesnrg.com" },
+    { "@type": "ListItem", position: 2, name: "PHIUS Passive House Verification", item: "https://www.lesnrg.com/phius-passive-house-verification" },
+  ],
+};
+
 export default function PhiusVerificationPage() {
   return (
     <div className="min-h-screen pt-32">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Hero */}
       <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">

@@ -79,7 +79,7 @@ const specializedPages = [
   {
     icon: <Building2 size={22} className="text-[#F5C500]" />,
     title: "Large Building Testing",
-    desc: "Multi-fan blower door testing for commercial and industrial facilities. ASTM E779 & E1827 compliant.",
+    desc: "Multi-fan blower door testing for commercial and industrial facilities. ASTM E779 & E3158 compliant.",
     href: "/large-building-blower-door-testing",
     label: "Commercial Testing",
   },

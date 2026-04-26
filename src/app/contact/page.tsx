@@ -6,6 +6,7 @@ import ContactForm from "@/components/ContactForm";
 export const metadata: Metadata = {
   title: "Contact LES NRG | Building Performance Testing | Philadelphia, PA",
   description: "Get in touch with LES NRG for blower door testing, HERS ratings, energy audits, and program certification. Located in Philadelphia, PA, with response within one business day.",
+  keywords: "contact blower door tester Philadelphia, building performance testing contact, energy audit Philadelphia, blower door test PA NJ NY DE, LES NRG contact",
   openGraph: {
     title: "Contact LES NRG | Philadelphia, PA",
     description: "Get in touch for blower door testing, HERS ratings, energy audits, and program certification. Response within one business day.",
@@ -16,9 +17,19 @@ export const metadata: Metadata = {
   },
 };
 
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.lesnrg.com" },
+    { "@type": "ListItem", position: 2, name: "Contact", item: "https://www.lesnrg.com/contact" },
+  ],
+};
+
 export default function ContactPage() {
   return (
     <div className="min-h-screen pt-32">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Hero */}
       <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">

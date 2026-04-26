@@ -6,6 +6,7 @@ import { CheckCircle, ArrowRight, Award, FileText, Home } from "lucide-react";
 export const metadata: Metadata = {
   title: "Energy Star Multifamily Certification | LES NRG | Philadelphia, PA",
   description: "Authorized Energy Star Multifamily New Construction and DOE Zero Energy Ready Home verification. 347+ certified units. NJ and PA rebate programs available. Serving PA, NJ, NY, DE.",
+  keywords: "Energy Star multifamily certification, HERS rater, DOE Zero Energy Ready Home, Energy Star MFNC v2, Energy Star new homes, multifamily certification Philadelphia, NJ energy rebates, PA energy rebates, unit compartmentalization testing, RESNET accredited",
   openGraph: {
     title: "Energy Star Multifamily Certification | LES NRG",
     description: "Authorized Energy Star Multifamily New Construction verification. 347+ certified units. NJ and PA rebate programs available.",
@@ -107,9 +108,57 @@ const faqs = [
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "What changed with Energy Star MFNC v2?",
+      acceptedAnswer: { "@type": "Answer", text: "Energy Star Multifamily New Construction version 2 became required for projects with permits issued on or after January 1, 2025. The update introduced stricter airtightness requirements in colder climate zones, updated verification protocols, and improved alignment with DOE Zero Energy Ready Home. Projects that registered under v1 prior to the deadline may continue on that version." },
+    },
+    {
+      "@type": "Question",
+      name: "What is the DOE Zero Energy Ready Home program, and what happened to ZERH?",
+      acceptedAnswer: { "@type": "Answer", text: "The DOE Zero Energy Ready Home program is the current name for what was previously called ZERH (Zero Energy Ready Home). The DOE rebranded and expanded the program in 2024 as part of a national rollout. The requirements are largely the same: Energy Star certification as a prerequisite, a high-performance envelope, efficient mechanical systems, and solar-ready provisions." },
+    },
+    {
+      "@type": "Question",
+      name: "Do we need a HERS Rater, or can any third party verify Energy Star?",
+      acceptedAnswer: { "@type": "Answer", text: "Energy Star MFNC requires verification by either an accredited HERS Rater (for buildings three stories or fewer under residential provisions) or an approved Multifamily Rating Organization (MRO) for larger buildings. LES NRG is an accredited HERS Rater and works regularly with MROs for larger multifamily projects." },
+    },
+    {
+      "@type": "Question",
+      name: "Can Energy Star and DOE Zero Energy Ready Home be certified simultaneously?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes, and we recommend it. DOE Zero Energy Ready Home requires Energy Star as a prerequisite, so the field verification, testing, and documentation overlap significantly. Pursuing both programs together adds minimal overhead while substantially increasing the market value and recognition of the project." },
+    },
+    {
+      "@type": "Question",
+      name: "What airtightness is required for multifamily units under Energy Star?",
+      acceptedAnswer: { "@type": "Answer", text: "Energy Star MFNC requires individual unit compartmentalization testing. The 2021 IECC (§ R402.4.1.2) sets a maximum of 0.3 CFM50 per square foot of unit enclosure area at 50 Pa for buildings up to three stories. Each dwelling unit must pass independently. Sampling is not permitted." },
+    },
+    {
+      "@type": "Question",
+      name: "When should we bring LES NRG onto an Energy Star project?",
+      acceptedAnswer: { "@type": "Answer", text: "As early as possible, ideally during design development. Early engagement allows us to confirm program requirements, review the energy model for feasibility, and identify potential field verification challenges before construction locks in details that are costly to change." },
+    },
+  ],
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.lesnrg.com" },
+    { "@type": "ListItem", position: 2, name: "Energy Star Multifamily Certification", item: "https://www.lesnrg.com/energy-star-multifamily" },
+  ],
+};
+
 export default function EnergyStarMultifamilyPage() {
   return (
     <div className="min-h-screen pt-32">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Hero */}
       <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">

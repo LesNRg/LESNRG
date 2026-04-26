@@ -6,6 +6,7 @@ import { Wind, CheckCircle, ArrowRight, Building2 } from "lucide-react";
 export const metadata: Metadata = {
   title: "Large Building Blower Door Testing | Commercial Air Leakage | LES NRG",
   description: "Whole building blower door testing for commercial and industrial facilities. Multi-fan arrays for ASTM E3158 compliance. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
+  keywords: "large building blower door testing, commercial air leakage testing, ASTM E3158, whole building pressurization, commercial energy code compliance, multifamily blower door testing, IECC C402.5, Philadelphia commercial testing, building envelope air leakage",
   openGraph: {
     title: "Large Building Blower Door Testing | LES NRG",
     description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E3158 compliant.",
@@ -24,10 +25,6 @@ const standards = [
   {
     name: "ASTM E779-19",
     desc: "Standard test method for determining air leakage rate by fan pressurization. The default standard in IECC and many North American jurisdictions. Limited to single-zone buildings; requires interior doors to be open. Multi-point method only, test range 10–60 Pa.",
-  },
-  {
-    name: "ASTM E1827-11",
-    desc: "Standard test methods for determining airtightness of buildings using an orifice blower door. Listed as an optional compliance method under ASHRAE 90.1. Provides occupied and closed building preparation options. Reports at 50 Pa.",
   },
   {
     name: "CGSB 149.10-2019",
@@ -98,7 +95,7 @@ const faqs = [
   },
   {
     q: "Can you test occupied buildings?",
-    a: "Yes. We use the ASTM E1827 pulse technique with carefully managed pressurization protocols suited to partially or fully occupied facilities.",
+    a: "Yes. We use carefully managed pressurization protocols suited to partially or fully occupied facilities, coordinating with building management to minimize disruption.",
   },
   {
     q: "How is this different from a residential blower door test?",
@@ -106,9 +103,47 @@ const faqs = [
   },
 ];
 
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Can you perform unit compartmentalization testing for multifamily buildings?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes. The 2021 IECC (Section R402.4.1.2) requires each dwelling unit in attached multifamily buildings up to three stories to pass an individual compartmentalization test at 50 Pa. The limit is 0.3 CFM50 per square foot of unit enclosure area, including all floors, ceilings, and walls surrounding the unit. We test each unit individually and deliver per-unit results for code compliance." },
+    },
+    {
+      "@type": "Question",
+      name: "How long does large building blower door testing take?",
+      acceptedAnswer: { "@type": "Answer", text: "Large buildings (200,000–1,000,000 sq ft) typically require 1–3 days on-site including setup, testing, and leak survey. We schedule around your operations." },
+    },
+    {
+      "@type": "Question",
+      name: "Can you test occupied buildings?",
+      acceptedAnswer: { "@type": "Answer", text: "Yes. We use carefully managed pressurization protocols suited to partially or fully occupied facilities, coordinating with building management to minimize disruption." },
+    },
+    {
+      "@type": "Question",
+      name: "How is large building blower door testing different from residential testing?",
+      acceptedAnswer: { "@type": "Answer", text: "Residential testing follows ASTM E779, using one fan producing 2,000–5,000 CFM. Large building testing follows ASTM E3158, which may require 50,000–200,000+ CFM. We deploy arrays of 2–20+ calibrated fans with centralized data acquisition built for large volumes." },
+    },
+  ],
+};
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.lesnrg.com" },
+    { "@type": "ListItem", position: 2, name: "Large Building Blower Door Testing", item: "https://www.lesnrg.com/large-building-blower-door-testing" },
+  ],
+};
+
 export default function BlowerDoorTestingPage() {
   return (
     <div className="min-h-screen pt-32">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
       {/* Hero */}
       <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
@@ -430,7 +465,7 @@ export default function BlowerDoorTestingPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { name: "IECC (2018)", type: "Commercial & Multifamily", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Compliance option; applies to most jurisdictions adopting the 2018 IECC or later." },
-              { name: "ASHRAE 90.1 (2016)", type: "Commercial, all except low-rise residential", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Energy standard compliance option. ASTM E779 or E1827 accepted." },
+              { name: "ASHRAE 90.1 (2016)", type: "Commercial, all except low-rise residential", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Energy standard compliance option. ASTM E779 or E3158 accepted." },
               { name: "Washington State (2018)", type: "All building types", req: "0.25 CFM75/ft²", pressure: "@ 75 Pa", note: "Mandatory energy code requirement; among the most stringent in the US. Failure requires repair and retest." },
               { name: "New York City (2020)", type: "Commercial, 10,000–50,000 ft², ≤75 ft", req: "0.25 CFM75/ft²", pressure: "@ 75 Pa", note: "Mandatory energy code requirement. Larger or taller buildings have separate requirements." },
               { name: "USACE (2012)", type: "US military buildings", req: "0.25 CFM75/ft²", pressure: "@ 75 Pa", note: "Army Corps of Engineers protocol. Multi-point test required; test pressure 50–85 Pa, reported at 75 Pa." },
@@ -438,6 +473,7 @@ export default function BlowerDoorTestingPage() {
               { name: "PHIUS (2018)", type: "All building types", req: "0.06–0.10 CFM75/ft²", pressure: "@ 75 Pa or 50 Pa", note: "≥5 stories: 0.10 CFM75/ft² or 0.08 CFM50/ft². Lower buildings: 0.08 CFM75/ft² or 0.06 CFM50/ft²." },
               { name: "ABAA Spec 01410", type: "Commercial", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Standard specification language for projects without a jurisdictional requirement. Repair and retest if exceeded." },
               { name: "GSA (2018)", type: "Federal government buildings", req: "0.10–0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "Tiered requirements: T1 = 0.25, T2 = 0.15, T3 = 0.10 CFM75/ft² depending on project type." },
+              { name: "Philadelphia, PA (2026)", type: "Commercial, all occupancies", req: "0.40 CFM75/ft²", pressure: "@ 75 Pa", note: "2021 IECC mandatory for permits filed on or after January 13, 2026. Section C401.3 requires a Thermal Envelope Certificate to be permanently posted in the building documenting insulation R-values, fenestration U-factors, and air leakage test results." },
             ].map((j) => (
               <div key={j.name} className="card">
                 <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-2.5 py-1 mb-3">
@@ -449,6 +485,67 @@ export default function BlowerDoorTestingPage() {
                 <p className="text-[#6b6b62] text-xs leading-relaxed">{j.note}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Philadelphia Thermal Envelope Certificate */}
+      <section className="bg-white py-8">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="grid md:grid-cols-2 gap-12 items-start">
+            <div>
+              <span className="section-label">Philadelphia, PA — Effective 2026</span>
+              <h2 className="section-title mb-5">Commercial Thermal Envelope Certificate</h2>
+              <p className="text-[#6b6b62] leading-relaxed mb-4">
+                Philadelphia adopted the 2021 International Energy Conservation Code, effective for permit applications
+                filed on or after January 13, 2026. Under Section C401.3, all new commercial construction must complete
+                a <strong className="text-[#111111]">Commercial Thermal Envelope Certificate</strong> — a permanent
+                document that must be posted in the building and submitted to the Authority Having Jurisdiction.
+              </p>
+              <p className="text-[#6b6b62] leading-relaxed mb-6">
+                The certificate documents the entire thermal envelope as built, including verified air leakage test
+                results. Testing must be conducted per ASTM E779, ASTM E3158, or an equivalent method
+                approved by the code official. The maximum permitted air leakage rate for commercial buildings is
+                <strong className="text-[#111111]"> 0.40 CFM75/ft²</strong> of gross above-grade wall area.
+              </p>
+              <ul className="space-y-2">
+                {[
+                  "Insulation R-values for all opaque envelope assemblies",
+                  "U-factors and SHGCs for all fenestration",
+                  "Verified air leakage test results from a qualified tester",
+                  "Area-weighted averages required where multiple values exist",
+                  "Certificate must be permanently posted in an approved location",
+                ].map((item) => (
+                  <li key={item} className="flex items-center gap-2 text-[#6b6b62] text-sm">
+                    <CheckCircle size={13} className="text-[#F5C500] shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-[#111111] rounded-2xl p-8">
+              <div className="inline-block bg-[#F5C500]/15 border border-[#F5C500]/25 rounded px-3 py-1.5 mb-6">
+                <span className="text-[#F5C500] font-bold text-sm">2021 IECC § C401.3 — Philadelphia</span>
+              </div>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                {[
+                  { label: "Max Leakage", value: "0.40 CFM75/ft²", sub: "Gross above-grade wall area" },
+                  { label: "Test Pressure", value: "75 Pa", sub: "Commercial buildings" },
+                  { label: "Test Methods", value: "E779 / E3158", sub: "ASTM or approved equivalent" },
+                  { label: "Effective", value: "Jan 2026", sub: "New permit applications" },
+                ].map((item) => (
+                  <div key={item.label} className="bg-white/5 rounded-xl p-4 text-center">
+                    <div className="text-white/40 text-xs uppercase tracking-wider mb-1.5">{item.label}</div>
+                    <div className="text-[#F5C500] font-black text-lg mb-0.5" style={{ letterSpacing: "-0.02em" }}>{item.value}</div>
+                    <div className="text-white/30 text-xs">{item.sub}</div>
+                  </div>
+                ))}
+              </div>
+              <p className="text-white/30 text-xs leading-relaxed">
+                We perform the air leakage testing required to complete the certificate and deliver results in the
+                format accepted by the Philadelphia Department of Licenses and Inspections.
+              </p>
+            </div>
           </div>
         </div>
       </section>

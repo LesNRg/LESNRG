@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = "https://www.lesnrg.com";
-  const lastModified = new Date("2026-03-06");
+  const lastModified = new Date("2026-04-26");
   return [
     { url: base, lastModified, changeFrequency: "monthly", priority: 1.0 },
     { url: `${base}/services`, lastModified, changeFrequency: "monthly", priority: 0.9 },

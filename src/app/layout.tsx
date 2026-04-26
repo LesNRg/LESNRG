@@ -31,9 +31,9 @@ export const metadata: Metadata = {
 
 const localBusinessSchema = {
   "@context": "https://schema.org",
-  "@type": "LocalBusiness",
+  "@type": ["LocalBusiness", "ProfessionalService"],
   name: "LES NRG",
-  description: "Building performance verification firm focused on blower door testing, HERS ratings, energy audits, PHIUS verification, and Energy Star certification.",
+  description: "Building performance verification firm providing blower door testing, HERS ratings, energy audits, PHIUS passive house verification, and Energy Star certification for residential and commercial buildings throughout PA, NJ, NY, and DE.",
   url: "https://www.lesnrg.com",
   address: {
     "@type": "PostalAddress",
@@ -41,8 +41,39 @@ const localBusinessSchema = {
     addressRegion: "PA",
     addressCountry: "US",
   },
-  areaServed: ["Pennsylvania", "New Jersey", "New York", "Delaware"],
+  areaServed: [
+    { "@type": "State", name: "Pennsylvania" },
+    { "@type": "State", name: "New Jersey" },
+    { "@type": "State", name: "New York" },
+    { "@type": "State", name: "Delaware" },
+  ],
   sameAs: ["https://www.instagram.com/les.nrg"],
+  knowsAbout: [
+    "Blower Door Testing",
+    "HERS Rating",
+    "Energy Audits",
+    "PHIUS Passive House Verification",
+    "Energy Star Multifamily Certification",
+    "Large Building Air Leakage Testing",
+    "ASTM E779",
+    "ASTM E3158",
+    "IECC Energy Code Compliance",
+    "Building Envelope Testing",
+    "Unit Compartmentalization Testing",
+    "Building Science Consulting",
+  ],
+  hasOfferCatalog: {
+    "@type": "OfferCatalog",
+    name: "Building Performance Testing Services",
+    itemListElement: [
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Blower Door Testing", description: "Air leakage testing per ASTM E779 and ASTM E3158 for code compliance and energy performance verification." } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "HERS Rating", description: "Home Energy Rating System assessments by an accredited RESNET HERS Rater for new construction and existing homes." } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "PHIUS Passive House Verification", description: "Independent third-party PHIUS+ passive house verification, inspections, airtightness testing, and certification support." } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Energy Star Multifamily Certification", description: "Authorized Energy Star Multifamily New Construction and DOE Zero Energy Ready Home verification and certification." } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Large Building Blower Door Testing", description: "Multi-fan air leakage testing for commercial and industrial buildings per ASTM E3158." } },
+      { "@type": "Offer", itemOffered: { "@type": "Service", name: "Residential Energy Audit", description: "Comprehensive whole-home energy audits with HERS score generation, energy modeling, and prioritized improvement recommendations." } },
+    ],
+  },
 };
 
 export default function RootLayout({

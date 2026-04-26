@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle, Wind, BarChart2, HomeIcon, ClipboardList, Awar
 export const metadata: Metadata = {
   title: "Building Performance Testing Services | LES NRG | Philadelphia, PA",
   description: "Blower door testing, HERS ratings, energy audits, duct blaster testing, PHIUS verification, Energy Star certification, and building science consulting. Serving PA, NJ, NY, DE and beyond.",
+  keywords: "blower door testing services, HERS rating Philadelphia, energy audit Philadelphia, duct blaster testing, PHIUS verification services, Energy Star certification services, thermal enclosure verification, building science consulting, code compliance testing",
   openGraph: {
     title: "Building Performance Testing Services | LES NRG",
     description: "Blower door testing, HERS ratings, energy audits, PHIUS verification, Energy Star certification, and building science consulting.",
@@ -22,7 +23,7 @@ const services = [
     title: "Blower Door Testing for Code Compliance",
     desc: "We measure building airtightness through envelope integrity testing to minimize heat loss and ensure code adherence. Testing is scheduled at convenient times with prompt report delivery.",
     details: [
-      "ASTM E779 & E1827 compliant",
+      "ASTM E779 & E3158 compliant",
       "Residential and light commercial",
       "New construction & existing homes",
       "Pass/fail and full CFM50 reporting",
@@ -105,9 +106,19 @@ const services = [
   },
 ];
 
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: "https://www.lesnrg.com" },
+    { "@type": "ListItem", position: 2, name: "Services", item: "https://www.lesnrg.com/services" },
+  ],
+};
+
 export default function ServicesPage() {
   return (
     <div className="min-h-screen pt-32">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {/* Hero */}
       <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -211,7 +222,7 @@ export default function ServicesPage() {
               </h3>
               <p className="text-white/50 text-sm max-w-xl">
                 Multi-fan air leakage testing for commercial and industrial facilities including warehouses, manufacturing plants,
-                schools, and large multifamily buildings. ASTM E779 and E1827 compliant.
+                schools, and large multifamily buildings. ASTM E779 and E3158 compliant.
               </p>
             </div>
             <Link href="/large-building-blower-door-testing" className="btn-primary shrink-0">
