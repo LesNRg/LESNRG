@@ -237,14 +237,13 @@ export default function ServicesPage() {
 
       {/* Photo Strip 2 */}
       <section>
-        <div className="grid grid-cols-3" style={{ height: "320px" }}>
+        <div className="grid grid-cols-2" style={{ height: "320px" }}>
           {[
             "/new%20website%20photo/mis/IMG_9094.JPG",
-            "/new%20website%20photo/mis/IMG_5429.JPG",
             "/new%20website%20photo/mis/IMG_5762.JPG",
           ].map((src, i) => (
             <div key={i} className="relative overflow-hidden">
-              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="33vw" />
+              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="50vw" />
             </div>
           ))}
         </div>
