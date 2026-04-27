@@ -246,39 +246,52 @@ export default function BlowerDoorTestingPage() {
       {/* Existing Buildings */}
       <section className="bg-[#f9f9f7] border-y border-[#e4e4de] py-8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-          <div className="mb-10">
-            <span className="section-label">Existing Buildings</span>
-            <h2 className="section-title mb-4">Why Test an Existing Building?</h2>
-            <p className="text-[#6b6b62] leading-relaxed max-w-2xl">
-              Air leakage testing is not just a code checkbox for new construction. It is one of the most
-              effective diagnostic tools available for identifying performance problems in existing buildings.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            {[
-              {
-                title: "Energy Conservation",
-                desc: "Uncontrolled air infiltration accounts for 25–40% of heating and cooling loads in commercial buildings. Whole building blower door testing quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements and measurable proof of savings afterward.",
-              },
-              {
-                title: "Moisture & Mold",
-                desc: "Air movement through the building envelope carries moisture into wall cavities and interstitial spaces. In cold climates this leads to condensation, rot, and mold growth that is often invisible until structural damage has occurred. Pressurization testing locates the breach before it becomes a costly repair.",
-              },
-              {
-                title: "Indoor Air Quality",
-                desc: "Uncontrolled infiltration introduces unconditioned, unfiltered outside air including pollutants, allergens, and vehicle exhaust, directly into occupied spaces. Identifying and sealing major air pathways improves occupant health and reduces the load on mechanical ventilation systems.",
-              },
-              {
-                title: "Renovation & Re-Commissioning",
-                desc: "After a major renovation, addition, or mechanical system upgrade, a post-construction blower door test confirms that the work performed actually improved the envelope. It also supports LEED, ENERGY STAR, and local incentive programs that require verified performance documentation.",
-              },
-            ].map((item) => (
-              <div key={item.title} className="card">
-                <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
-                <h3 className="text-[#111111] font-bold mb-2">{item.title}</h3>
-                <p className="text-[#6b6b62] text-sm leading-relaxed">{item.desc}</p>
+          <div className="grid md:grid-cols-3 gap-8 items-start">
+            <div className="md:col-span-2">
+              <div className="mb-8">
+                <span className="section-label">Existing Buildings</span>
+                <h2 className="section-title mb-4">Why Test an Existing Building?</h2>
+                <p className="text-[#6b6b62] leading-relaxed">
+                  Air leakage testing is not just a code checkbox for new construction. It is one of the most
+                  effective diagnostic tools available for identifying performance problems in existing buildings.
+                </p>
               </div>
-            ))}
+              <div className="grid sm:grid-cols-2 gap-5">
+                {[
+                  {
+                    title: "Energy Conservation",
+                    desc: "Uncontrolled air infiltration accounts for 25–40% of heating and cooling loads in commercial buildings. Whole building blower door testing quantifies the exact leakage rate, giving owners a clear baseline before investing in envelope improvements and measurable proof of savings afterward.",
+                  },
+                  {
+                    title: "Moisture & Mold",
+                    desc: "Air movement through the building envelope carries moisture into wall cavities and interstitial spaces. In cold climates this leads to condensation, rot, and mold growth that is often invisible until structural damage has occurred. Pressurization testing locates the breach before it becomes a costly repair.",
+                  },
+                  {
+                    title: "Indoor Air Quality",
+                    desc: "Uncontrolled infiltration introduces unconditioned, unfiltered outside air including pollutants, allergens, and vehicle exhaust, directly into occupied spaces. Identifying and sealing major air pathways improves occupant health and reduces the load on mechanical ventilation systems.",
+                  },
+                  {
+                    title: "Renovation & Re-Commissioning",
+                    desc: "After a major renovation, addition, or mechanical system upgrade, a post-construction blower door test confirms that the work performed actually improved the envelope. It also supports LEED, ENERGY STAR, and local incentive programs that require verified performance documentation.",
+                  },
+                ].map((item) => (
+                  <div key={item.title} className="card">
+                    <div className="w-1.5 h-6 bg-[#F5C500] rounded-full mb-4" />
+                    <h3 className="text-[#111111] font-bold mb-2">{item.title}</h3>
+                    <p className="text-[#6b6b62] text-sm leading-relaxed">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="relative rounded-2xl overflow-hidden hidden md:block" style={{ minHeight: "520px" }}>
+              <Image
+                src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1295.JPG"
+                alt="Dual blower door fan array installed in commercial doorway"
+                fill
+                className="object-cover object-center"
+                sizes="33vw"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -317,15 +330,6 @@ export default function BlowerDoorTestingPage() {
                 />
               </div>
             ))}
-            <div className="relative rounded-xl overflow-hidden aspect-[16/9] sm:col-span-3">
-              <Image
-                src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1295.JPG"
-                alt="Dual blower door fan array installed in commercial doorway"
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 640px) 100vw, 100vw"
-              />
-            </div>
           </div>
         </div>
       </section>
