@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, CheckCircle } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -21,6 +22,17 @@ export default function WhyItMattersPage() {
 
       {/* Hero */}
       <section className="bg-[#111111] py-8 min-h-[520px] border-b border-white/8 relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/new%20website%20photo/mis/IMG_9086.JPG"
+            alt="Building performance testing"
+            fill
+            className="object-cover opacity-50"
+            priority
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#111111]/90 via-[#111111]/60 to-[#111111]/20" />
+        </div>
         <div className="absolute top-1/2 right-0 w-[600px] h-[600px] bg-[#F5C500]/5 rounded-full blur-3xl pointer-events-none translate-x-1/3 -translate-y-1/2 z-0" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 relative z-10">
           <span className="section-label">Building Science</span>
