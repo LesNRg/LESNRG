@@ -154,55 +154,145 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Services */}
+      {/* Services — Group 1 */}
       <section id="services" className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
-        <div className="space-y-5">
-          {services.map((s) => (
-            <div key={s.title} className="card">
-              <div className="grid md:grid-cols-3 gap-8 items-start">
-                <div className="md:col-span-2">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-11 h-11 rounded-lg bg-[#F5C500]/10 flex items-center justify-center">
-                      {s.icon}
+          <div className="space-y-5">
+            {services.slice(0, 3).map((s) => (
+              <div key={s.title} className="card">
+                <div className="grid md:grid-cols-3 gap-8 items-start">
+                  <div className="md:col-span-2">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-11 h-11 rounded-lg bg-[#F5C500]/10 flex items-center justify-center">
+                        {s.icon}
+                      </div>
+                      <h2 className="text-[#111111] font-bold text-xl">{s.title}</h2>
                     </div>
-                    <h2 className="text-[#111111] font-bold text-xl">{s.title}</h2>
+                    <p className="text-[#6b6b62] leading-relaxed">{s.desc}</p>
                   </div>
-                  <p className="text-[#6b6b62] leading-relaxed">{s.desc}</p>
-                </div>
-                <div>
-                  <ul className="space-y-2">
-                    {s.details.map((d) => (
-                      <li key={d} className="flex items-start gap-2 text-[#6b6b62] text-sm">
-                        <CheckCircle size={13} className="text-[#F5C500] mt-0.5 shrink-0" />
-                        {d}
-                      </li>
-                    ))}
-                  </ul>
+                  <div>
+                    <ul className="space-y-2">
+                      {s.details.map((d) => (
+                        <li key={d} className="flex items-start gap-2 text-[#6b6b62] text-sm">
+                          <CheckCircle size={13} className="text-[#F5C500] mt-0.5 shrink-0" />
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Photo Strip */}
+      {/* Photo Strip 1 */}
       <section>
-        <div className="grid grid-cols-3 sm:grid-cols-9" style={{ height: "320px" }}>
+        <div className="grid grid-cols-3" style={{ height: "320px" }}>
           {[
             "/new%20website%20photo/mis/IMG_8966.JPG",
             "/new%20website%20photo/mis/IMG_8986.JPG",
             "/new%20website%20photo/mis/IMG_9091.JPG",
+          ].map((src, i) => (
+            <div key={i} className="relative overflow-hidden">
+              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="33vw" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Services — Group 2 */}
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="space-y-5">
+            {services.slice(3, 5).map((s) => (
+              <div key={s.title} className="card">
+                <div className="grid md:grid-cols-3 gap-8 items-start">
+                  <div className="md:col-span-2">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-11 h-11 rounded-lg bg-[#F5C500]/10 flex items-center justify-center">
+                        {s.icon}
+                      </div>
+                      <h2 className="text-[#111111] font-bold text-xl">{s.title}</h2>
+                    </div>
+                    <p className="text-[#6b6b62] leading-relaxed">{s.desc}</p>
+                  </div>
+                  <div>
+                    <ul className="space-y-2">
+                      {s.details.map((d) => (
+                        <li key={d} className="flex items-start gap-2 text-[#6b6b62] text-sm">
+                          <CheckCircle size={13} className="text-[#F5C500] mt-0.5 shrink-0" />
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Photo Strip 2 */}
+      <section>
+        <div className="grid grid-cols-3" style={{ height: "320px" }}>
+          {[
             "/new%20website%20photo/mis/IMG_9094.JPG",
             "/new%20website%20photo/mis/IMG_5429.JPG",
             "/new%20website%20photo/mis/IMG_5762.JPG",
+          ].map((src, i) => (
+            <div key={i} className="relative overflow-hidden">
+              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="33vw" />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Services — Group 3 */}
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
+          <div className="space-y-5">
+            {services.slice(5).map((s) => (
+              <div key={s.title} className="card">
+                <div className="grid md:grid-cols-3 gap-8 items-start">
+                  <div className="md:col-span-2">
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className="w-11 h-11 rounded-lg bg-[#F5C500]/10 flex items-center justify-center">
+                        {s.icon}
+                      </div>
+                      <h2 className="text-[#111111] font-bold text-xl">{s.title}</h2>
+                    </div>
+                    <p className="text-[#6b6b62] leading-relaxed">{s.desc}</p>
+                  </div>
+                  <div>
+                    <ul className="space-y-2">
+                      {s.details.map((d) => (
+                        <li key={d} className="flex items-start gap-2 text-[#6b6b62] text-sm">
+                          <CheckCircle size={13} className="text-[#F5C500] mt-0.5 shrink-0" />
+                          {d}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Photo Strip 3 */}
+      <section>
+        <div className="grid grid-cols-3" style={{ height: "320px" }}>
+          {[
             "/new%20website%20photo/mis/IMG_6094.JPG",
             "/new%20website%20photo/mis/IMG_8452.JPEG",
             "/new%20website%20photo/mis/IMG_8830.JPG",
           ].map((src, i) => (
             <div key={i} className="relative overflow-hidden">
-              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="(max-width: 640px) 33vw, 11vw" />
+              <Image src={src} alt="LES NRG field work" fill className="object-cover" sizes="33vw" />
             </div>
           ))}
         </div>

@@ -317,6 +317,15 @@ export default function BlowerDoorTestingPage() {
                 />
               </div>
             ))}
+            <div className="relative rounded-xl overflow-hidden aspect-[16/9] sm:col-span-3">
+              <Image
+                src="/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1295.JPG"
+                alt="Dual blower door fan array installed in commercial doorway"
+                fill
+                className="object-cover object-center"
+                sizes="(max-width: 640px) 100vw, 100vw"
+              />
+            </div>
           </div>
         </div>
       </section>
