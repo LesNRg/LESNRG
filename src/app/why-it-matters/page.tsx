@@ -56,7 +56,8 @@ export default function WhyItMattersPage() {
       </section>
 
       {/* Intro */}
-      <section className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 py-10">
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
         <div className="grid md:grid-cols-2 gap-16 items-start">
           <div>
             <span className="section-label">The Problem</span>
@@ -84,6 +85,7 @@ export default function WhyItMattersPage() {
               </div>
             ))}
           </div>
+        </div>
         </div>
       </section>
 
@@ -135,7 +137,7 @@ export default function WhyItMattersPage() {
       </section>
 
       {/* Durability */}
-      <section className="py-10">
+      <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">Impact 02</span>
@@ -285,7 +287,7 @@ export default function WhyItMattersPage() {
       </section>
 
       {/* The Solution */}
-      <section className="py-10">
+      <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
             <span className="section-label">The Solution</span>
