@@ -72,6 +72,7 @@ const credentials = [
   "NJCEP Partner (New Jersey Clean Energy Program)",
   "Indoor airPlus Verifier",
   "Zero Energy Ready Homes Verifier",
+  "ABAA Level I Certified Whole Building Airtightness Technician",
   "Master's Degree in Construction Management",
 ];
 
@@ -163,7 +164,7 @@ export default function HomePage() {
               </Link>
             </div>
             <div className="mt-12 flex flex-wrap gap-5">
-              {["HERS Certified Rater", "PHIUS Verifier", "Energy Star Partner", "ABAA Member"].map((badge) => (
+              {["HERS Certified Rater", "PHIUS Verifier", "Energy Star Partner", "ABAA Certified"].map((badge) => (
                 <div key={badge} className="flex items-center gap-1.5 text-white/40 text-sm">
                   <CheckCircle size={13} className="text-[#F5C500]/70" />
                   {badge}

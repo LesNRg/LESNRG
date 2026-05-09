@@ -458,6 +458,7 @@ export default function PhiusVerificationPage() {
               {[
                 "PHIUS Certified Verifier",
                 "HERS Certified Rater (RESNET)",
+                "ABAA Level I Certified Whole Building Airtightness Technician",
                 "Founding Member, Greater Philadelphia Passive House Association",
                 "Contributing Author, Passive House Rowhouse Manual",
                 "Construction Advisor, Philadelphia Habitat for Humanity",
