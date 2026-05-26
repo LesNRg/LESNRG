@@ -5,8 +5,8 @@ import { ArrowRight, CheckCircle, Wind, BarChart2, HomeIcon, ClipboardList, Awar
 
 export const metadata: Metadata = {
   title: "Building Performance Testing Services | LES NRG | Philadelphia, PA",
-  description: "Blower door testing, HERS ratings, energy audits, duct blaster testing, PHIUS verification, Energy Star certification, and building science consulting. Serving PA, NJ, NY, DE and beyond.",
-  keywords: "blower door testing services, HERS rating Philadelphia, energy audit Philadelphia, duct blaster testing, PHIUS verification services, Energy Star certification services, thermal enclosure verification, building science consulting, code compliance testing",
+  description: "Air leakage testing agency, envelope commissioning provider, and air leakage special inspection firm offering blower door testing, HERS ratings, energy audits, duct blaster testing, PHIUS verification, Energy Star certification, and building science consulting. Serving PA, NJ, NY, DE and beyond.",
+  keywords: "blower door testing services, HERS rating Philadelphia, energy audit Philadelphia, duct blaster testing, PHIUS verification services, Energy Star certification services, thermal enclosure verification, building science consulting, code compliance testing, air leakage testing agency, envelope commissioning provider, air leakage special inspection",
   openGraph: {
     title: "Building Performance Testing Services | LES NRG",
     description: "Blower door testing, HERS ratings, energy audits, PHIUS verification, Energy Star certification, and building science consulting.",

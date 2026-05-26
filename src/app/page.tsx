@@ -7,7 +7,7 @@ import HeroBigFans from "@/components/HeroBigFans";
 
 export const metadata: Metadata = {
   title: "LES NRG | Blower Door Testing, HERS Ratings & Building Performance | Philadelphia, PA",
-  description: "Expert blower door testing, envelope integrity testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Located in Philadelphia, PA, serving PA, NJ, NY, DE and beyond.",
+  description: "Expert air leakage testing agency, envelope commissioning provider, and air leakage special inspection firm offering blower door testing, envelope integrity testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Located in Philadelphia, PA, serving PA, NJ, NY, DE and beyond.",
   openGraph: {
     title: "LES NRG | Blower Door Testing & Building Performance | Philadelphia, PA",
     description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings.",

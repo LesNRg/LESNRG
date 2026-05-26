@@ -17,8 +17,8 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: "LES NRG | Building Performance Testing | Philadelphia, PA",
-  description: "Expert blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Philadelphia, PA.",
-  keywords: "blower door testing, HERS rating, energy audit, building performance, Philadelphia, passive house, energy star, code compliance, envelope integrity testing, whole building blower door testing",
+  description: "Expert air leakage testing agency, envelope commissioning provider, and air leakage special inspection firm offering blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Philadelphia, PA.",
+  keywords: "blower door testing, HERS rating, energy audit, building performance, Philadelphia, passive house, energy star, code compliance, envelope integrity testing, whole building blower door testing, air leakage testing agency, envelope commissioning provider, air leakage special inspection",
   metadataBase: new URL("https://www.lesnrg.com"),
   icons: {
     icon: [
@@ -33,7 +33,7 @@ const localBusinessSchema = {
   "@context": "https://schema.org",
   "@type": ["LocalBusiness", "ProfessionalService"],
   name: "LES NRG",
-  description: "Building performance verification firm providing blower door testing, HERS ratings, energy audits, PHIUS passive house verification, and Energy Star certification for residential and commercial buildings throughout PA, NJ, NY, and DE.",
+  description: "Air leakage testing agency, envelope commissioning provider, and air leakage special inspection firm offering blower door testing, HERS ratings, energy audits, PHIUS passive house verification, and Energy Star certification for residential and commercial buildings throughout PA, NJ, NY, and DE.",
   url: "https://www.lesnrg.com",
   address: {
     "@type": "PostalAddress",
