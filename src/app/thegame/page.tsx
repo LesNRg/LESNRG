@@ -15,6 +15,13 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
+const CONTROLS = [
+  { key: "◀ ▶", action: "Move" },
+  { key: "SPACE", action: "Jump" },
+  { key: "F", action: "Shoot" },
+  { key: "ENTER", action: "Start" },
+];
+
 export default function GamePage() {
   return (
     <div className="min-h-screen bg-[#111111]">
@@ -38,8 +45,40 @@ export default function GamePage() {
       </div>
 
       {/* Game Area */}
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 mb-4">
-        <GameContainer />
+      <div className="max-w-[1600px] mx-auto px-5 sm:px-8 xl:px-12 mb-4">
+        <div className="flex items-start justify-center gap-6 xl:gap-10">
+          {/* Controls reminder */}
+          <div className="hidden lg:block sticky top-6 w-[190px] shrink-0 rounded-xl border border-white/10 bg-white/4 p-5">
+            <p className="text-white/40 text-xs font-bold uppercase tracking-widest mb-4">Controls</p>
+            <ul className="space-y-3 font-mono text-sm">
+              {CONTROLS.map((c) => (
+                <li key={c.action} className="flex items-center justify-between gap-3">
+                  <kbd className="bg-white/10 text-white/80 px-2 py-1 rounded">{c.key}</kbd>
+                  <span className="text-white/45 uppercase tracking-widest text-xs">{c.action}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <GameContainer />
+
+          {/* Double jump reminder */}
+          <div className="hidden lg:flex sticky top-6 w-[240px] shrink-0 flex-col items-center text-center">
+            <span className="text-white/40 text-xs font-bold uppercase tracking-widest mb-3">Pro tip</span>
+            <p
+              className="text-[#F5C500] font-black leading-[0.92]"
+              style={{ fontSize: "clamp(2.25rem, 3.6vw, 3.5rem)", letterSpacing: "-0.03em" }}
+            >
+              Double
+              <br />
+              Jump!
+            </p>
+            <p className="text-white/50 text-sm leading-relaxed mt-4">
+              Tap <kbd className="bg-white/10 text-white/80 text-xs font-mono px-1.5 py-0.5 rounded">SPACE</kbd> a second
+              time in mid-air to reach the upper floors.
+            </p>
+          </div>
+        </div>
         <p className="text-white/30 text-xs font-mono text-center mt-4">
           Click the game, then press ENTER to start.
         </p>
