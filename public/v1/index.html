@@ -134,7 +134,7 @@
     </div>
     <button class="ctrl-btn" id="btn-jump">JUMP</button>
   </div>
-  <div id="controls">ARROW KEYS / WASD &nbsp;|&nbsp; SPACE to jump &nbsp;|&nbsp; R to restart</div>
+  <div id="controls">ARROW KEYS / WASD &nbsp;|&nbsp; SPACE to jump &nbsp;|&nbsp; F to shoot</div>
 
   <script>
     const canvas = document.getElementById('game');
@@ -3343,13 +3343,14 @@ const wantsLeft  = () => (gameState === 'attract' ? ai.moveDir < 0 : (keys['Arro
       // Controls
       ctx.font = '13px monospace';
       ctx.fillStyle = '#ffffff99';
-      ctx.fillText('D-PAD move  |  A jump  |  B shoot', CW / 2, boxY + 340);
+      ctx.fillText(IS_KIOSK ? 'D-PAD move  |  A jump  |  B shoot'
+                            : '◀ ▶ move  |  SPACE jump  |  F shoot', CW / 2, boxY + 340);
 
       attractBlink++;
       if (attractBlink % 60 < 40) {
         ctx.font = 'bold 22px monospace';
         ctx.fillStyle = '#F5C500';
-        ctx.fillText('PRESS START', CW / 2, boxY + 400);
+        ctx.fillText(IS_KIOSK ? 'PRESS START' : 'PRESS ENTER TO START', CW / 2, boxY + 400);
       }
       ctx.restore();
     }
@@ -3454,6 +3455,7 @@ const wantsLeft  = () => (gameState === 'attract' ? ai.moveDir < 0 : (keys['Arro
     function submitScore() {
       if (scoreEntry.submitted) return;
       scoreEntry.submitted = true;
+      keys['Enter'] = false; keys['Space'] = false;  // don't carry the submit press into the leaderboard
       const initials = scoreEntry.initials.map(i => String.fromCharCode(65 + i)).join('');
       const company = scoreEntry.company.map(i => ALPHABET[i]).join('').trim() || 'N/A';
       const email = scoreEntry.email.trim();
@@ -3596,14 +3598,19 @@ const wantsLeft  = () => (gameState === 'attract' ? ai.moveDir < 0 : (keys['Arro
         if (scoreEntry.blinkTimer % 60 < 40) {
           ctx.font = 'bold 22px monospace';
           ctx.fillStyle = '#F5C500';
-          ctx.fillText('PRESS B / ENTER TO SUBMIT', CW / 2, 680);
+          ctx.fillText(IS_KIOSK ? 'PRESS B / ENTER TO SUBMIT' : 'PRESS ENTER TO SUBMIT', CW / 2, 680);
         }
       }
 
       ctx.font = '14px monospace';
       ctx.fillStyle = '#ffffff66';
-      ctx.fillText('\u2191\u2193 change letter   \u2190\u2192 move   A confirm', CW / 2, CH - 60);
-      ctx.fillText('SELECT go back   START+SELECT skip', CW / 2, CH - 38);
+      if (IS_KIOSK) {
+        ctx.fillText('\u2191\u2193 change letter   \u2190\u2192 move   A confirm', CW / 2, CH - 60);
+        ctx.fillText('SELECT go back   START+SELECT skip', CW / 2, CH - 38);
+      } else {
+        ctx.fillText('TYPE or ↑↓ set letters   ←→ move', CW / 2, CH - 60);
+        ctx.fillText('ENTER continue   BACKSPACE erase   ESC back', CW / 2, CH - 38);
+      }
 
       ctx.restore();
     }
@@ -3741,7 +3748,7 @@ const wantsLeft  = () => (gameState === 'attract' ? ai.moveDir < 0 : (keys['Arro
         ctx.textAlign = 'center';
         ctx.font = 'bold 18px monospace';
         ctx.fillStyle = '#F5C500';
-        ctx.fillText('PRESS START TO CONTINUE', CW / 2, CH - 60);
+        ctx.fillText(IS_KIOSK ? 'PRESS START TO CONTINUE' : 'PRESS ENTER TO CONTINUE', CW / 2, CH - 60);
       }
 
       ctx.restore();
@@ -3865,7 +3872,8 @@ let startPrev = false;
       if (gameState === 'leaderboard') {
         leaderboardTimer--;
         if (shouldDraw) drawLeaderboardScreen();
-        if (leaderboardTimer <= 0 || startEdge) { startDemo(); return; }
+        const kbContinue = leaderboardTimer < 570 && (keys['Enter'] || keys['Space']);
+        if (leaderboardTimer <= 0 || startEdge || kbContinue) { startDemo(); return; }
         requestAnimationFrame(loop);
         return;
       }
