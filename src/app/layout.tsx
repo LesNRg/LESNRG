@@ -61,6 +61,9 @@ const localBusinessSchema = {
     "Building Envelope Testing",
     "Unit Compartmentalization Testing",
     "Building Science Consulting",
+    "Envelope Commissioning",
+    "Air Leakage Special Inspection",
+    "Commercial Air Leakage Testing",
   ],
   hasOfferCatalog: {
     "@type": "OfferCatalog",

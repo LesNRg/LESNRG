@@ -125,9 +125,9 @@ export default function HomePage() {
             className="hidden lg:flex group flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-xl px-5 py-3 transition-all duration-200 absolute right-5 sm:right-8 xl:right-12"
             style={{ top: "calc(2.5rem + 1.5rem + 2 * 1.25 * clamp(2.5rem, 6vw, 4.25rem))" }}
           >
-            <span className="text-[#111111]/60 text-xs font-bold uppercase tracking-widest mb-0.5">Play &amp; Win</span>
-            <span className="text-[#111111] font-black text-lg leading-tight">Free Blower Door Test</span>
-            <span className="text-[#111111]/50 text-xs mt-1">Top score wins →</span>
+            <span className="text-[#111111]/60 text-xs font-bold uppercase tracking-widest mb-0.5">Play</span>
+            <span className="text-[#111111] font-black text-lg leading-tight">LESNRG The Game</span>
+            <span className="text-[#111111]/50 text-xs mt-1">Seal the leaks →</span>
           </Link>
 
           <div className="max-w-3xl">
@@ -150,9 +150,9 @@ export default function HomePage() {
               href="/thegame"
               className="lg:hidden inline-flex flex-col items-center text-center bg-[#F5C500] hover:bg-[#d9ae00] rounded-xl px-5 py-3 transition-all duration-200 mb-6"
             >
-              <span className="text-[#111111]/60 text-xs font-bold uppercase tracking-widest mb-0.5">Play &amp; Win</span>
-              <span className="text-[#111111] font-black text-lg leading-tight">Free Blower Door Test</span>
-              <span className="text-[#111111]/50 text-xs mt-1">Top score wins →</span>
+              <span className="text-[#111111]/60 text-xs font-bold uppercase tracking-widest mb-0.5">Play</span>
+              <span className="text-[#111111] font-black text-lg leading-tight">LESNRG The Game</span>
+              <span className="text-[#111111]/50 text-xs mt-1">Seal the leaks →</span>
             </Link>
             <div className="flex flex-wrap gap-3">
               <Link href="/services" className="btn-primary">

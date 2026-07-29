@@ -4,12 +4,12 @@ import Image from "next/image";
 import { Wind, CheckCircle, ArrowRight, Building2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Whole Building Blower Door Testing | Large Building Air Leakage | LES NRG",
-  description: "Whole building blower door testing for commercial and industrial facilities. Multi-fan arrays for ASTM E3158 compliance. Warehouses, schools, large multifamily buildings, and more. Philadelphia, PA.",
-  keywords: "whole building blower door test, whole building blower door testing, large building blower door testing, commercial air leakage testing, ASTM E3158, whole building pressurization, commercial energy code compliance, multifamily blower door testing, IECC C402.5, Philadelphia commercial testing, building envelope air leakage",
+  title: "Commercial Air Leakage Testing Philadelphia | Whole Building Blower Door | LES NRG",
+  description: "LES NRG is a commercial air leakage testing agency based in Philadelphia, PA. We perform whole building blower door testing for commercial, industrial, and large multifamily buildings using multi-fan arrays per ASTM E3158. Over 4,000 tests completed. Serving PA, NJ, NY, and DE.",
+  keywords: "commercial air leakage testing Philadelphia, commercial air leakage testing, whole building blower door test, whole building blower door testing, large building blower door testing, air leakage testing agency Philadelphia, ASTM E3158, whole building pressurization, commercial energy code compliance, multifamily blower door testing, IECC C402.5, Philadelphia commercial testing, building envelope air leakage, envelope commissioning provider, air leakage special inspection",
   openGraph: {
-    title: "Whole Building Blower Door Testing | LES NRG",
-    description: "Multi-fan air leakage testing for commercial and industrial facilities. ASTM E3158 compliant.",
+    title: "Commercial Air Leakage Testing Philadelphia | LES NRG",
+    description: "LES NRG is a commercial air leakage testing agency in Philadelphia providing whole building blower door testing for commercial, industrial, and multifamily buildings per ASTM E3158.",
     url: "https://www.lesnrg.com/large-building-blower-door-testing",
     siteName: "LES NRG",
     locale: "en_US",
@@ -130,18 +130,51 @@ const faqSchema = {
   ],
 };
 
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  name: "Commercial Air Leakage Testing",
+  description: "LES NRG is a commercial air leakage testing agency based in Philadelphia, PA. We perform whole building blower door testing for commercial, industrial, and large multifamily buildings using multi-fan arrays per ASTM E3158 and ASTM E779. Over 4,000 blower door tests completed across PA, NJ, NY, and DE.",
+  provider: {
+    "@type": "ProfessionalService",
+    name: "LES NRG",
+    url: "https://www.lesnrg.com",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Philadelphia",
+      addressRegion: "PA",
+      addressCountry: "US",
+    },
+    areaServed: [
+      { "@type": "State", name: "Pennsylvania" },
+      { "@type": "State", name: "New Jersey" },
+      { "@type": "State", name: "New York" },
+      { "@type": "State", name: "Delaware" },
+    ],
+  },
+  serviceType: "Commercial Air Leakage Testing",
+  areaServed: [
+    { "@type": "City", name: "Philadelphia" },
+    { "@type": "State", name: "Pennsylvania" },
+    { "@type": "State", name: "New Jersey" },
+    { "@type": "State", name: "New York" },
+    { "@type": "State", name: "Delaware" },
+  ],
+};
+
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
     { "@type": "ListItem", position: 1, name: "Home", item: "https://www.lesnrg.com" },
-    { "@type": "ListItem", position: 2, name: "Large Building Blower Door Testing", item: "https://www.lesnrg.com/large-building-blower-door-testing" },
+    { "@type": "ListItem", position: 2, name: "Commercial Air Leakage Testing", item: "https://www.lesnrg.com/large-building-blower-door-testing" },
   ],
 };
 
 export default function BlowerDoorTestingPage() {
   return (
     <div className="min-h-screen pt-32">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
 
@@ -168,8 +201,9 @@ export default function BlowerDoorTestingPage() {
             Whole Building<br />Blower Door<br />Testing
           </h1>
           <p className="text-white/50 text-lg max-w-xl leading-relaxed mb-10">
-            Multi-fan air leakage testing for new and existing commercial and multifamily facilities of any size.
-            ASTM E3158 compliant.
+            LES NRG is a commercial air leakage testing agency based in Philadelphia, PA. We perform multi-fan
+            whole building blower door testing for new and existing commercial, industrial, and multifamily
+            facilities of any size. ASTM E3158 and ASTM E779 compliant. Over 4,000 tests completed across PA, NJ, NY, and DE.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link href="/contact" className="btn-primary">

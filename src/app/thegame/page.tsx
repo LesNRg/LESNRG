@@ -30,23 +30,18 @@ export default function GamePage() {
           <span className="text-[#F5C500]">The Game.</span>
         </h1>
         <p className="text-[#F5C500] font-black text-2xl mb-2" style={{ letterSpacing: "-0.02em" }}>
-          Win a Free Blower Door Test.
+          Seal the leaks. Post the lowest score.
         </p>
-        {/* Mobile instructions */}
-        <p className="md:hidden text-white/50 text-lg max-w-xl">
-          Survive 60 seconds. Use <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">◀ ▶</kbd> to move, <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">JUMP</kbd> to jump, and <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">FIRE</kbd> to seal air leaks. Lowest CFM@50pa wins.
-        </p>
-        {/* Desktop instructions */}
-        <p className="hidden md:block text-white/50 text-lg max-w-xl">
-          Survive 60 seconds. Shoot the air leaks in the house with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">F</kbd> to seal them up and lower your CFM@50pa score. Lowest score wins.
+        <p className="text-white/50 text-lg max-w-xl">
+          Survive 60 seconds. Move with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">◀ ▶</kbd>, jump with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">SPACE</kbd>, and shoot the air leaks with <kbd className="bg-white/10 text-white/80 text-sm font-mono px-1.5 py-0.5 rounded">F</kbd> to seal them up and lower your CFM@50pa score. Lowest score wins.
         </p>
       </div>
 
       {/* Game Area */}
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 mb-4">
         <GameContainer />
-        <p className="text-[#F5C500] text-sm font-mono font-bold text-center mt-4">
-          🏆 Prize awarded 10pm Sunday July 12th
+        <p className="text-white/30 text-xs font-mono text-center mt-4">
+          Click the game, then press ENTER to start.
         </p>
       </div>
 
@@ -59,22 +54,18 @@ export default function GamePage() {
         <Leaderboard />
       </Suspense>
 
-      {/* Prize Callout */}
+      {/* Callout */}
       <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 pb-20">
         <div className="bg-[#F5C500] rounded-2xl p-10 md:p-14 max-w-3xl">
           <h2
             className="font-black text-[#111111] mb-4 leading-tight"
             style={{ fontSize: "clamp(1.75rem, 4vw, 2.75rem)", letterSpacing: "-0.03em" }}
           >
-            Top score wins a free blower door test.
+            In the real world, we find the leaks for you.
           </h2>
-          <p className="text-[#111111]/70 text-lg leading-relaxed mb-6">
-            Play the game, submit your score, and enter to win. We&apos;ll come to your building and find exactly where it&apos;s losing energy — no charge.
-          </p>
-          <p className="text-[#111111]/50 text-sm mb-8">
-            Terms apply. One prize per household. Valid for residential properties in PA, NJ, or DE.
-            Prize has no cash value and may not be combined with other offers. LES NRG reserves the right
-            to verify game completion. Offer subject to scheduling availability.
+          <p className="text-[#111111]/70 text-lg leading-relaxed mb-8">
+            Every leak in the game is one we find in real buildings — rim joists, duct trunks, can lights, window edges.
+            We come out, pressurize the envelope, and show you exactly where the building is losing energy.
           </p>
           <Link href="/contact" className="btn-dark">
             Questions? Get in touch

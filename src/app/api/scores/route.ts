@@ -17,9 +17,11 @@ function getWeekStart() {
   return d.toISOString();
 }
 
-export async function GET() {
+export async function GET(req: Request) {
+  const requested = Number(new URL(req.url).searchParams.get("limit") ?? 10);
+  const limit = requested > 0 ? Math.min(requested, 50) : 10;
   const res = await fetch(
-    `${SB_URL}/rest/v1/scores?select=name,score&order=score.asc&limit=10`,
+    `${SB_URL}/rest/v1/scores?select=name,score&order=score.asc&limit=${limit}`,
     { headers: hdrs, cache: "no-store" }
   );
   if (!res.ok) return NextResponse.json([]);

@@ -10,6 +10,7 @@ const navLinks = [
   { href: "/services", label: "Services" },
   { href: "/why-it-matters", label: "Why It Matters" },
   { href: "/large-building-blower-door-testing", label: "Large Building Testing" },
+  { href: "/special-inspections", label: "Special Inspections" },
   { href: "/energy-star-multifamily", label: "Energy Star Certification" },
   { href: "/phius-passive-house-verification", label: "Passive House Verification" },
 ];

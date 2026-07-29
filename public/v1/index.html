@@ -12,25 +12,34 @@
       src: url('/fonts/peddana-regular.ttf');
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
+    html {
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
     body {
+      touch-action: none;
       background: #0a0a0a;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
+      width: 100%;
+      min-height: 100dvh;
       font-family: monospace;
-      overflow: hidden;
+      overflow: auto;
     }
     #game-wrap {
       position: relative;
-      width: min(800px, 100vw);
+      /* scale to fill the display width while fitting in viewport height */
+      width: min(100vw, calc((100dvh - 64px) * 800 / 1080));
       margin: 0 auto;
     }
     #game-col { display: flex; flex-direction: column; }
     #game {
       display: block;
       width: 100%;
+      aspect-ratio: 800 / 1080;
       height: auto;
       border: 2px solid #F5C500;
     }
@@ -77,12 +86,45 @@
     }
     .ctrl-btn:active { background: rgba(245, 197, 0, 0.35); }
     #btn-jump { width: 84px; height: 84px; font-size: 13px; font-weight: bold; letter-spacing: 0.05em; }
+    /* ── Score bar ── */
+    #score-bar {
+      width: 100%;
+      height: 60px;
+      background: #060e0a;
+      border: 2px solid #1a3a28;
+      border-bottom: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-sizing: border-box;
+      font-family: monospace;
+      flex-shrink: 0;
+    }
+    #sb-lives { font-size: 24px; min-width: 110px; letter-spacing: 4px; }
+    #sb-timer { font-size: 28px; font-weight: bold; color: rgba(255,255,255,0.9); text-align: center; }
+    #sb-cfm { display: flex; flex-direction: column; align-items: flex-end; min-width: 150px; }
+    #sb-cfm-row { display: flex; align-items: baseline; gap: 0; }
+    #sb-cfm-label { font-size: 30px; font-weight: bold; color: rgba(0,200,100,0.55); line-height: 1; }
+    #sb-cfm-value { font-size: 30px; font-weight: bold; line-height: 1; }
+    #sb-cfm-track { width: 130px; height: 7px; background: #0d1f15; border-radius: 3px; margin-top: 4px; }
+    #sb-cfm-fill { height: 100%; border-radius: 3px; width: 100%; }
   </style>
 </head>
 <body>
-  <div id="game-wrap">
+<div id="game-wrap">
     <div id="game-col">
-      <canvas id="game" width="800" height="700"></canvas>
+      <div id="score-bar">
+        <div id="sb-lives">♥ ♥ ♥</div>
+        <div id="sb-timer">1:00</div>
+        <div id="sb-cfm">
+          <div id="sb-cfm-row">
+            <span id="sb-cfm-value">5,000</span><span id="sb-cfm-label"> CFM@50pa</span>
+          </div>
+          <div id="sb-cfm-track"><div id="sb-cfm-fill"></div></div>
+        </div>
+      </div>
+      <canvas id="game" width="600" height="810"></canvas>
     </div>
   </div>
   <div id="mobile-controls">
@@ -96,7 +138,11 @@
 
   <script>
     const canvas = document.getElementById('game');
-    let ctx      = canvas.getContext('2d');
+    let ctx      = canvas.getContext('2d', { alpha: false });
+    // ─── Reduced-res rendering: canvas is 600×810, scale 0.75 so code uses 800×1080 coords ──
+    const RENDER_SCALE = 0.75;
+    ctx.scale(RENDER_SCALE, RENDER_SCALE);
+    canvas.style.imageRendering = 'auto';
 
     // ─── Fast sin lookup (1024-entry, avoids Math.sin in hot loops) ──────────
     const SIN_N = 1024;
@@ -107,6 +153,9 @@
       return SIN_TABLE[((x * SIN_K % SIN_N) + SIN_N) % SIN_N | 0];
     }
 
+    function fillCircle(x, y, r) { ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fill(); }
+    function fillEllipse(x, y, rx, ry, rot) { ctx.beginPath(); ctx.ellipse(x, y, rx, ry, rot || 0, 0, TAU); ctx.fill(); }
+
 // ─── Logo blade image (real SVG path from navbar) ─────────────────────────
     const imgBlades = new Image();
     imgBlades.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
@@ -114,60 +163,80 @@
       '<path d="M65.663 31.972c-0.431 1.082-2.916 6.376-6.887 11.376-1.854 2.335-4.236 4.094-6.037 5.222-0.153-0.331-0.353-0.628-0.596-0.891 1.85-2.367 4.409-6.216 5.24-10.302 1.82-6.495-0.103-12.741-0.895-14.089-1.195-3.259-4.372-4.667-6.383-3.377-2.025 1.29-2.585 4.068-1.761 6.367 0.461 1.07 2.446 6.569 3.174 12.911 0.325 2.829-0.061 5.623-0.511 7.672-0.359-0.157-0.752-0.245-1.162-0.269-0.392-2.977-1.319-7.293-3.531-10.638-3.309-5.88-9.083-8.934-10.596-9.329-3.152-1.456-6.393-0.209-6.901 2.126-0.52 2.344 1.048 4.703 3.256 5.746 1.084 0.43 6.376 2.917 11.377 6.886 2.093 1.662 3.72 3.746 4.847 5.457-0.41 0.174-0.78 0.427-1.09 0.737-2.387-1.794-5.96-4.032-9.728-4.799-6.498-1.82-12.74 0.1-14.089 0.894-3.26 1.196-4.667 4.371-3.377 6.383 1.289 2.026 4.066 2.585 6.365 1.762 1.071-0.461 6.57-2.447 12.914-3.177 2.56-0.292 5.09-0.003 7.069 0.389-0.092 0.309-0.157 0.628-0.157 0.967 0 0.131 0.025 0.253 0.039 0.378-2.95 0.425-7.011 1.373-10.186 3.471-5.881 3.309-8.937 9.08-9.329 10.598-1.459 3.149-0.208 6.393 2.126 6.901 2.343 0.52 4.703-1.048 5.745-3.258 0.431-1.081 2.916-6.376 6.887-11.376 1.62-2.04 3.644-3.641 5.331-4.764 0.25 0.36 0.567 0.67 0.935 0.912-1.808 2.387-4.095 6.001-4.874 9.822-1.82 6.495 0.103 12.74 0.898 14.083 1.195 3.263 4.37 4.672 6.381 3.382 2.026-1.292 2.585-4.069 1.759-6.367-0.46-1.07-2.446-6.57-3.174-12.913-0.314-2.74 0.039-5.453 0.47-7.485 0.139 0.019 0.275 0.042 0.42 0.042 0.264 0 0.52-0.033 0.767-0.092 0.382 2.979 1.303 7.376 3.551 10.77 3.307 5.881 9.08 8.936 10.593 9.327 3.152 1.462 6.392 0.211 6.904-2.126 0.517-2.343-1.051-4.7-3.26-5.745-1.081-0.428-6.374-2.916-11.375-6.886-2.289-1.818-4.02-4.14-5.151-5.927 0.289-0.213 0.543-0.467 0.752-0.759 2.36 1.854 6.247 4.453 10.368 5.292 6.498 1.82 12.741-0.1 14.089-0.895 3.259-1.195 4.668-4.372 3.378-6.384-1.291-2.023-4.068-2.583-6.367-1.759-1.069 0.461-6.569 2.447-12.913 3.174-2.992 0.345-5.946-0.108-8.021-0.591 0.067-0.265 0.113-0.539 0.113-0.827 0-0.064-0.017-0.122-0.019-0.188 2.975-0.349 7.621-1.258 11.163-3.598 5.882-3.31 8.937-9.083 9.329-10.598 1.461-3.149 0.21-6.392-2.126-6.901C69.065 28.195 66.707 29.762 65.663 31.972z" fill="#F5C500"/>' +
       '</svg>'
     );
-
-    const WORLD_W = 800;
-    const WORLD_H = 1080;   // game world height (viewport scrolls)
+    let bladesCanvas = null;
+    imgBlades.onload = function() {
+      const sz = Math.ceil(LOGO_FAN_W || 69);
+      bladesCanvas = document.createElement('canvas');
+      bladesCanvas.width = sz;
+      bladesCanvas.height = sz;
+      bladesCanvas.getContext('2d').drawImage(imgBlades, 0, 0, sz, sz);
+    };
 
     const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-    if (isMobile) canvas.height = WORLD_H;
 
-    const CW = canvas.width;   // 800
-    const CH = canvas.height;  // 700 desktop, 1080 mobile
+    const CW = 800;   // logical game width (canvas is half-res, scaled)
+    const CH = 1080;  // logical game height
+    const TAU = Math.PI * 2;
 
-    const VERSION = 'v5.39';
+    const COL_CAULK  = '#FF6B00';
+    const COL_GOLD   = '#F5C500';
+    const COL_GREEN  = '#00e87a';
+    const COL_STREAM = '#d8f2ff';
+
+    const elLives    = document.getElementById('sb-lives');
+    const elTimer    = document.getElementById('sb-timer');
+    const elCfmValue = document.getElementById('sb-cfm-value');
+    const elCfmFill  = document.getElementById('sb-cfm-fill');
+    const elScoreBar = document.getElementById('score-bar');
 
     // ─── Constants ───────────────────────────────────────────────────────────
     const SPEED             = 5;
-    const JUMP_FORCE        = -51;   // first jump (-10%)
-    const DOUBLE_JUMP_FORCE = -26;   // second jump (half height)
+    const JUMP_FORCE        = -58;   // boosted for floor-to-floor jumping
+    const DOUBLE_JUMP_FORCE = -64;   // boosted for floor-to-floor jumping
     const WALL_JUMP_VX      =   8;   // horizontal kick off wall
     const WALL_BOOST_FRAMES =  12;   // frames the kick overrides input
     const GRAVITY_UP = 7.84;         // gravity on ascent (2× heavier)
-    const GRAVITY_DN = 0.26;         // gravity on descent (+30% fall speed)
+    const GRAVITY_DN = 0.13;         // gravity on descent (50% slower fall)
+    const BULLET_SPEED  = 14;        // caulk projectile px/frame
+    const FIRE_COOLDOWN = 18;        // frames between shots (~0.3s)
 
     let tick = 0; // global frame counter for animations
 
     // (gradients are now created inline in drawMechanicals — runs once during buildBG)
 
     // ─── Logo bounds (shared by drawLogo + platform collision) ───────────────
-    const LOGO_H  = 120;
-    const LOGO_SC = LOGO_H / 140;
-    const LOGO_BX = CW / 2 - 40 * LOGO_SC;
-    const LOGO_BY = 980;  // visual bottom at y=1075
-    const LOGO_FAN_Y = LOGO_BY + 20 * LOGO_SC;  // top of fan square
-    const LOGO_W  = 270 * LOGO_SC;               // full logo width
+    // SVG brand logo: viewBox="0 0 270 140" — fan x=0 y=20 w=80 h=80
+    const LOGO_H   = 120;
+    const LOGO_SC  = LOGO_H / 140;               // scale from SVG height (270×140)
+    const LOGO_BX  = CW / 2 - 40 * LOGO_SC;     // center fan horiz (fan cx = 40 SVG units)
+    const LOGO_BY  = 975;
+    const LOGO_FAN_Y = LOGO_BY + 20 * LOGO_SC;  // top of fan square (y=20 in SVG)
+    const LOGO_FAN_W = 80 * LOGO_SC;            // fan square size (80 SVG units)
+    const LOGO_W   = 270 * LOGO_SC;             // full logo width (270 SVG units)
 
     // ─── Row home level layout ────────────────────────────────────────────────
-    const WALL_L  = 40;   // left brick wall inner edge
-    const WALL_R  = 760;  // right brick wall inner edge
+    const WALL_L  = 68;   // left brick wall inner edge (30% thicker: was 52)
+    const WALL_R  = 732;  // right brick wall inner edge (30% thicker: was 748)
     const F1      = 795;  // basement ceiling / 1st floor surface
     const F2      = 532;  // 1st ceiling / 2nd floor surface
     const F3      = 269;  // 2nd ceiling / 3rd floor
     const FH      = 34;   // floor band thickness (framed floor depth)
+    const GAP_W   = 53;   // one joist bay gap (64 spacing - 11 joist width)
+    const F1_GAP  = 609;  // F1 gap x: right side (between joist at x=598 and x=662)
+    const F2_GAP  = 161;  // F2 gap x: left side (between joist at x=150 and x=214)
+    const F3_GAP  = 353;  // F3 gap x: center (between joist at x=342 and x=406)
 
-    // ─── Camera ──────────────────────────────────────────────────────────────
-    const cam = { y: WORLD_H - 700 }; // start at bottom (basement)
-
-    // ─── Offscreen canvas for static background (drawn once at startup) ───────
+    // ─── Offscreen canvas for static background (drawn once at render res) ────
     const bgCanvas = document.createElement('canvas');
-    bgCanvas.width  = WORLD_W;
-    bgCanvas.height = WORLD_H;
+    bgCanvas.width  = CW * RENDER_SCALE;
+    bgCanvas.height = CH * RENDER_SCALE;
     const bgCtx = bgCanvas.getContext('2d');
+    bgCtx.scale(RENDER_SCALE, RENDER_SCALE);
     let bgBuilt = false;
 
     // ─── Player ──────────────────────────────────────────────────────────────
     const player = {
-      x: 76,    // start just left of hot water heater (left edge at x=108)
+      x: 376,   // start just right of hot water heater (left edge at x=258)
       y: 1000,  // start in basement
       w: 28, h: 38,
       vx: 0, vy: 0,
@@ -181,41 +250,31 @@
     };
 
     // ─── Platforms ─────────────────────────────────────────────────────────────
-    // Floor bands (F1/F2/F3) are background-only — not in collision list.
-    // Gritty jumps between visible yellow platforms instead.
     const platforms = [
       // Basement concrete slab — invisible ground (player spawns here)
       { x: 0, y: 1058, w: 800, h: 22, invisible: true },
 
       // Top of the LES NRG logo — invisible landing surface
-      { x: LOGO_BX, y: LOGO_BY + 20 * LOGO_SC, w: LOGO_W, h: 12, invisible: true },
+      { x: LOGO_BX, y: LOGO_FAN_Y, w: LOGO_W, h: 12, invisible: true },
 
-      // ── Basement platforms ──────────────────────────────────────────────────
-      { x: 400, y:  900, w: 160, h: 12 },   // basement center
+      // ── House floor surfaces (one-way: land from above, jump through from below) ─
+      { x: WALL_L,          y: F1, w: F1_GAP - WALL_L,            h: 8, invisible: true },
+      { x: F1_GAP + GAP_W,  y: F1, w: WALL_R - (F1_GAP + GAP_W), h: 8, invisible: true },
+      { x: WALL_L,          y: F2, w: F2_GAP - WALL_L,            h: 8, invisible: true },
+      { x: F2_GAP + GAP_W,  y: F2, w: WALL_R - (F2_GAP + GAP_W), h: 8, invisible: true },
+      { x: WALL_L,          y: F3, w: F3_GAP - WALL_L,            h: 8, invisible: true },
+      { x: F3_GAP + GAP_W,  y: F3, w: WALL_R - (F3_GAP + GAP_W), h: 8, invisible: true },
 
-      // ── 1st floor platforms ─────────────────────────────────────────────────
-      { x:  55, y:  790, w: 150, h: 12 },   // left lower
-      { x: 520, y:  760, w:  64, h: 12 },   // right lower
-      { x: 240, y:  660, w: 140, h: 12 },   // center upper
-
-      // ── 2nd floor platforms ─────────────────────────────────────────────────
-      { x: 150, y:  460, w:  75, h: 12, slippery: true },   // left lower — icy
-      { x: 559, y:  490, w:  82, h: 12, solid: true },   // right lower — crib width
-      { x: 325, y:  400, w: 150, h: 12, solid: true },   // center upper
-
-      // ── 3rd floor platforms ─────────────────────────────────────────────────
-      { x:  55, y:  270, w: 150, h: 12, solid: true },   // left lower
-      { x: 300, y:  145, w: 140, h: 12, solid: true },   // center upper
 
       // ── Win platform ────────────────────────────────────────────────────────
-      { x: 610, y: 58, w: 67, h: 14, solid: true },
+      { x: 610, y: 58, w: 67, h: 16, solid: true },
 
     ];
 
     // ─── Solid obstacles (full 4-direction collision) ─────────────────────────
     const solidObstacles = [
-      { x: 108, y: 973, w: 40, h: 85 },   // hot water heater
-      { x: 656, y: 978, w: 90, h: 80 },   // furnace
+      { x: 258, y: 947, w: 52, h: 111 },   // hot water heater
+      { x: 575, y: 954, w: 117, h: 104 },   // furnace
     ];
 
     // ─── Precomputed player tuft angles (constant coords — no atan2 per frame) ─
@@ -224,12 +283,33 @@
     const HEAD_TUFTS = [[-13,-9],[13,-9],[-10,-15],[10,-15]];
     const HEAD_TUFT_ANGLES = HEAD_TUFTS.map(([tx,ty]) => Math.atan2(ty,tx));
 
-    // ─── Lives & Air Leaks ───────────────────────────────────────────────────
-    let gameOver = false;
-    let gameWon  = false;
-    const leaks = [];
+    // ─── Game state ───────────────────────────────────────────────────────────
+    const GAME_DURATION    = 60 * 60;  // 60 seconds at 60 fps
+    const MAX_LIVES        = 3;
+    const INVINCIBLE_FRAMES = 90;      // 1.5s invincibility after hit
+    const START_SHIELD_FRAMES = 600;   // 10s invincibility at game start
+
+    let gameOver  = false;
+    let gameWon   = false;
+    let gameState = 'attract'; // 'attract' | 'playing' | 'gameover' | 'scoreEntry' | 'leaderboard'
+    let gameoverTimer = 0;
+    const GAMEOVER_DURATION = 180; // 3 seconds at 60fps
+    let lives     = MAX_LIVES;
+    let cfm       = 5000; // CFM50 infiltration — starts high, player reduces it
+    let framesLeft = GAME_DURATION;
+    let invincible = 0;               // countdown frames of invincibility
+    let startShield = 0;              // countdown frames of start invincibility
+    let loseReason = '';              // 'time' | 'lives' | 'fan'
+    let bonusFlash = 0;               // countdown frames for full-seal bonus flash
+    let floatTexts = [];              // [{wx, wy, text, life}] floating score popups
+
+    // ─── Bullets & Air Leaks ─────────────────────────────────────────────────
+    const bullets = [];
+    let   fireCooldown = 0;
+    const seals  = [];   // caulk marks left on wall after shooting a wall leak
+    const leaks  = [];
     let leakTimer = 0;
-    const LEAK_INTERVAL = 37; // frames between spawns (~0.6s)
+    const LEAK_INTERVAL = 18; // frames between spawns (~0.3s)
 
     // Wall crack positions [y, fromLeft] — shared by drawing + air emitters + spawn zones
     const WALL_CRACKS = [
@@ -239,15 +319,46 @@
       { y: 626, fromLeft: false },   // right wall, 2nd floor lower section
     ];
 
-    // Random top-or-bottom edge per window, chosen once at load [topY, botY, useTop]
+    // Fixed top-or-bottom edge per window [topY, botY, useTop]
     const WIN_EDGES = [
-      [115,       195,        Math.random() < 0.5],  // left  3rd floor window  [0]
-      [380,       460,        Math.random() < 0.5],  // left  2nd floor window  [1]
-      [380,       460,        Math.random() < 0.5],  // right 2nd floor window  [2]
-      [F1+FH+8,  F1+FH+56,  Math.random() < 0.5],  // left  basement glass block [3]
-      [F1+FH+8,  F1+FH+56,  Math.random() < 0.5],  // right basement glass block [4]
+      [115,       195,        false],  // left  3rd floor window  [0] — bottom
+      [380,       460,        true ],  // left  2nd floor window  [1] — top
+      [380,       460,        true ],  // right 2nd floor window  [2] — top
+      [F1+FH+8,  F1+FH+56,  false],  // left  basement glass block [3] — bottom
+      [F1+FH+8,  F1+FH+56,  false],  // right basement glass block [4] — bottom
     ];
     const we = i => WIN_EDGES[i][2] ? WIN_EDGES[i][0] : WIN_EDGES[i][1];
+
+    // ─── Sealable air leak emitters ───────────────────────────────────────────
+    // Each: world-space origin (ox, oy) used for bullet hit detection + caulk bead
+    const EMITTERS = [
+      { ox: WALL_L,  oy: F1 - 114       },  //  0 front door
+      { ox: WALL_R,  oy: F1 - 114       },  //  1 back door
+      { ox: WALL_L,  oy: we(0)          },  //  2 left 3rd floor window
+      { ox: WALL_L,  oy: we(1)          },  //  3 left 2nd floor window
+      { ox: WALL_R,  oy: we(2)          },  //  4 right 2nd floor window
+      { ox: WALL_L,  oy: we(3)          },  //  5 basement left window
+      { ox: WALL_R,  oy: we(4)          },  //  6 basement right window
+      { ox: WALL_L,  oy: 343            },  //  7 wall crack left upper
+      { ox: WALL_L,  oy: 626            },  //  8 wall crack left lower
+      { ox: WALL_R,  oy: 343            },  //  9 wall crack right upper
+      { ox: WALL_R,  oy: 626            },  // 10 wall crack right lower
+      { ox: 240,     oy: 838            },  // 11 duct trunk 1
+      { ox: 460,     oy: 838            },  // 12 duct trunk 2
+      { ox: 320,     oy: F3 + FH + 14  },  // 13 duct 2nd floor branch
+      { ox: 340,     oy: F2 + FH + 14  },  // 14 duct 1st floor branch
+      { ox: 520,     oy: F2 + 80        },  // 15 supply riser
+      { ox: WALL_L,  oy: F2 + FH * 0.5 },  // 16 rim joist left
+      { ox: WALL_R,  oy: F2 + FH * 0.5 },  // 17 rim joist right
+      { ox: 294,     oy: F3 - 12        },  // 18 receptacle
+      { ox: 110,     oy: 90             },  // 19 can light 1
+      { ox: 220,     oy: 90             },  // 20 can light 2
+      { ox: 330,     oy: 90             },  // 21 can light 3
+      { ox: WALL_L,  oy: F1 + FH + 132 },  // 22 pipe penetration
+      { ox: 570,     oy: F3 + FH       },  // 23 kid room can light
+      { ox: 377,     oy: F1 - 12       },  // 24 living room receptacle
+    ];
+    const sealedEmitters = new Set();
 
     // Spawn zones — big leaks enter from both sides at every floor [minY, maxY, fromLeft]
     const spawnZones = [
@@ -282,19 +393,193 @@
     // Recessed light x positions (WALL_L+70, then every 110px up to x<400)
     const LIGHT_XS = [110, 220, 330];
 
+    // ─── Audio engine (8-bit Web Audio API) ───────────────────────────────────
+    let audioCtx = null;
+    function initAudio() {
+      if (audioCtx) return;
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playTone(freq, duration, type, volume, dest) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || 'square';
+      osc.frequency.value = freq;
+      gain.gain.value = volume || 0.2;
+      osc.connect(gain);
+      gain.connect(dest || audioCtx.destination);
+      const t = audioCtx.currentTime;
+      osc.start(t);
+      osc.stop(t + duration);
+      gain.gain.setValueAtTime(volume || 0.2, t);
+      gain.gain.linearRampToValueAtTime(0, t + duration);
+    }
+
+    function playSlide(startFreq, endFreq, duration, type, volume) {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = type || 'square';
+      gain.gain.value = volume || 0.2;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      const t = audioCtx.currentTime;
+      osc.frequency.setValueAtTime(startFreq, t);
+      osc.frequency.linearRampToValueAtTime(endFreq, t + duration);
+      gain.gain.setValueAtTime(volume || 0.2, t);
+      gain.gain.linearRampToValueAtTime(0, t + duration);
+      osc.start(t);
+      osc.stop(t + duration);
+    }
+
+    function sfxJump() {
+      if (gameState === 'attract') return;
+      initAudio();
+      playSlide(200, 400, 0.08, 'square', 0.15);
+    }
+
+    function sfxShoot() {
+      if (gameState === 'attract') return;
+      initAudio();
+      playSlide(600, 200, 0.1, 'square', 0.12);
+    }
+
+    function sfxSeal() {
+      if (gameState === 'attract') return;
+      initAudio();
+      const t = audioCtx.currentTime;
+      [330, 440, 550].forEach((f, i) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = f;
+        gain.gain.value = 0.15;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t + i * 0.05);
+        osc.stop(t + i * 0.05 + 0.06);
+        gain.gain.setValueAtTime(0.15, t + i * 0.05);
+        gain.gain.linearRampToValueAtTime(0, t + i * 0.05 + 0.06);
+      });
+    }
+
+    function sfxHit() {
+      if (gameState === 'attract') return;
+      initAudio();
+      playSlide(300, 100, 0.2, 'square', 0.2);
+    }
+
+    function sfxGameOver() {
+      if (gameState === 'attract') return;
+      initAudio();
+      const t = audioCtx.currentTime;
+      // Dramatic descending sequence ~2 seconds
+      const notes = [
+        [440, 0.0], [400, 0.2], [350, 0.4], [300, 0.6],
+        [250, 0.85], [200, 1.1], [150, 1.4],
+      ];
+      notes.forEach(([f, offset]) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = f;
+        gain.gain.value = 0.2;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t + offset);
+        osc.stop(t + offset + 0.25);
+        gain.gain.setValueAtTime(0.2, t + offset);
+        gain.gain.linearRampToValueAtTime(0, t + offset + 0.25);
+      });
+      // Final low buzz
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 80;
+      gain.gain.value = 0.15;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t + 1.7);
+      osc.stop(t + 2.3);
+      gain.gain.setValueAtTime(0.15, t + 1.7);
+      gain.gain.linearRampToValueAtTime(0, t + 2.3);
+    }
+
+    function sfxWin() {
+      if (gameState === 'attract') return;
+      initAudio();
+      const t = audioCtx.currentTime;
+      // Triumphant ascending fanfare ~2 seconds
+      const notes = [
+        [262, 0.0], [330, 0.15], [392, 0.3], [523, 0.5],
+        [659, 0.7], [784, 0.9],
+        [0, 1.1],
+        [784, 1.3], [880, 1.45], [1047, 1.6],
+      ];
+      notes.forEach(([f, offset]) => {
+        if (f === 0) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'square';
+        osc.frequency.value = f;
+        gain.gain.value = 0.18;
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(t + offset);
+        osc.stop(t + offset + 0.18);
+        gain.gain.setValueAtTime(0.18, t + offset);
+        gain.gain.linearRampToValueAtTime(0, t + offset + 0.18);
+      });
+      // Final held high note
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'square';
+      osc.frequency.value = 1047;
+      gain.gain.value = 0.2;
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(t + 1.8);
+      osc.stop(t + 2.4);
+      gain.gain.setValueAtTime(0.2, t + 1.8);
+      gain.gain.linearRampToValueAtTime(0, t + 2.4);
+    }
+
+    // Resume AudioContext on first user interaction (autoplay policy)
+    ['click', 'keydown', 'touchstart'].forEach(evt => {
+      window.addEventListener(evt, function resumeAudio() {
+        initAudio();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        window.removeEventListener(evt, resumeAudio);
+      }, { once: true });
+    });
+
     function spawnLeak() {
+      // 10% chance: emerge from AC unit top or bottom gap
+      if (Math.random() < 0.10) {
+        const fromTop = Math.random() < 0.5;
+        leaks.push({
+          x: WALL_L, y: fromTop ? 143 : 185,
+          w: 106, h: 53,
+          vx: 5.0, vy: fromTop ? -0.4 : 0.4,
+          angle: 0, fromWall: true,
+        });
+        return;
+      }
+
       // 15% chance: emerge directly from a wall crack surface
       if (Math.random() < 0.15) {
         const crack    = WALL_CRACKS[Math.floor(Math.random() * WALL_CRACKS.length)];
         const fromLeft = crack.fromLeft;
         leaks.push({
-          x:     fromLeft ? WALL_L : WALL_R - 88,
-          y:     crack.y - 22 + (Math.random() - 0.5) * 40,
-          w:     88,
-          h:     44,
+          x:     fromLeft ? WALL_L : WALL_R - 106,
+          y:     crack.y - 27 + (Math.random() - 0.5) * 40,
+          w:     106,
+          h:     53,
           vx:    fromLeft ? 5.0 : -5.0,
           vy:    (Math.random() - 0.5) * 0.8,
           angle: fromLeft ? 0 : Math.PI,
+          fromWall: true,
         });
         return;
       }
@@ -303,10 +588,10 @@
       if (Math.random() < 0.20) {
         const lx = LIGHT_XS[Math.floor(Math.random() * LIGHT_XS.length)];
         leaks.push({
-          x:     lx - 44,
-          y:     42,
-          w:     88,
-          h:     44,
+          x:     lx - 53,
+          y:     87,
+          w:     106,
+          h:     53,
           vx:    (Math.random() - 0.5) * 0.8,
           vy:    0.5,
           angle: Math.PI / 2,
@@ -317,20 +602,219 @@
       const fromLeft = zone[2];
       const spawnY   = zone[0] + Math.random() * (zone[1] - zone[0]);
       leaks.push({
-        x:     fromLeft ? -90 : WORLD_W + 10,
+        x:     fromLeft ? -110 : CW + 10,
         y:     spawnY,
-        w:     88,
-        h:     44,
+        w:     106,
+        h:     53,
         vx:    fromLeft ? 5.0 : -5.0,
         vy:    0,
         angle: fromLeft ? 0 : Math.PI,
       });
     }
 
+    // ─── AI controller for attract mode ──────────────────────────────────────
+    const ai = { jumpCooldown: 0, fireCooldown: 0, targetLeak: null, moveDir: 0, jumpWant: false, fireWant: false };
+
+    function updateAI() {
+      ai.jumpWant = false;
+      ai.fireWant = false;
+
+      // Find nearest leak
+      let nearest = null, nearDist = Infinity;
+      for (const l of leaks) {
+        const dx = (l.x + l.w / 2) - (player.x + player.w / 2);
+        const dy = (l.y + l.h / 2) - (player.y + player.h / 2);
+        const d = Math.abs(dx) + Math.abs(dy);
+        if (d < nearDist) { nearDist = d; nearest = l; }
+      }
+
+      if (nearest) {
+        const dx = (nearest.x + nearest.w / 2) - (player.x + player.w / 2);
+        const dy = (nearest.y + nearest.h / 2) - (player.y + player.h / 2);
+        // Move toward leak horizontally
+        if (Math.abs(dx) > 30) ai.moveDir = dx > 0 ? 1 : -1;
+        else ai.moveDir = 0;
+        // Jump if leak is above — double jump when airborne and still need height
+        if (dy < -60 && ai.jumpCooldown <= 0) {
+          if (player.onGround) {
+            ai.jumpWant = true;
+            ai.jumpCooldown = 12;
+          } else if (player.jumpsLeft > 0 && player.vy > -20) {
+            ai.jumpWant = true;
+            ai.jumpCooldown = 30;
+          }
+        }
+        // Fire at leak if roughly aligned vertically
+        if (Math.abs(dy) < 80 && ai.fireCooldown <= 0) {
+          ai.fireWant = true;
+          ai.fireCooldown = 20;
+          player.facing = dx > 0 ? 1 : -1;
+        }
+      } else {
+        // Wander
+        if (tick % 120 < 60) ai.moveDir = 1; else ai.moveDir = -1;
+        if (tick % 90 === 0 && player.onGround) ai.jumpWant = true;
+      }
+
+      if (ai.jumpCooldown > 0) ai.jumpCooldown--;
+      if (ai.fireCooldown > 0) ai.fireCooldown--;
+
+      // Periodically jump to explore floors
+      if (player.onGround && tick % 180 === 0) ai.jumpWant = true;
+    }
+
+    // ─── Score entry state ──────────────────────────────────────────────────────
+    const scoreEntry = {
+      initials: [0, 0, 0],   // indexes into A-Z (0=A)
+      company: [],            // array of char indexes (0=A, 26=space, 27=0-9 mapped)
+      email: '',              // typed email address
+      cursor: 0,              // 0-2 = initials, 3+ = company chars
+      phase: 'initials',      // 'initials' | 'company' | 'email' | 'done'
+      submitted: false,
+      blinkTimer: 0,
+      keyRepeat: 0,
+      lastDpadUp: false,
+      lastDpadDown: false,
+      lastDpadRight: false,
+      lastDpadLeft: false,
+      lastConfirm: false,
+      kbBuffer: '',           // keyboard fallback for company name
+    };
+
+    const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ';
+    const MAX_COMPANY = 12;
+
+    let scoreScreenTimer = 0;
+    const SCORE_SCREEN_TIMEOUT = 7200; // 2 min at 60fps
+
+    function resetScoreEntry() {
+      scoreEntry.initials = [0, 0, 0];
+      scoreEntry.company = [26]; // start with blank (space) selected
+      scoreEntry.email = '';
+      scoreEntry.cursor = 0;
+      scoreEntry.phase = 'initials';
+      scoreEntry.submitted = false;
+      scoreEntry.blinkTimer = 0;
+      scoreEntry.kbBuffer = '';
+      scoreEntry.lastDpadUp = false;
+      scoreEntry.lastDpadDown = false;
+      scoreScreenTimer = 0;
+      scoreEntry.lastDpadRight = false;
+      scoreEntry.lastDpadLeft = false;
+      scoreEntry.lastConfirm = false;
+      scoreEntry.lastSelect = false;
+    }
+
+    // ─── Score backend (kiosk = local score server, web = site API) ──────────
+    const IS_KIOSK = location.protocol === 'file:' || location.port === '8080';
+    const SCORES_GET = IS_KIOSK ? 'http://localhost:3001/get-scores' : '/api/scores?limit=20';
+
+    function normalizeScores(rows) {
+      return (rows || []).map(r => ({
+        initials: r.initials || r.name || '---',
+        company: r.company || '',
+        score: r.score,
+        email: r.email || ''
+      })).filter(r => typeof r.score === 'number');
+    }
+
+    function syncScores() {
+      return fetch(SCORES_GET, { cache: 'no-store' })
+        .then(r => r.json())
+        .then(rows => {
+          const scores = normalizeScores(rows);
+          if (!scores.length) return;
+          allScoresHistory = scores.slice();
+          scores.sort((a, b) => a.score - b.score);
+          localStorage.setItem('leaky_scores', JSON.stringify(scores.slice(0, 20)));
+        })
+        .catch(() => {});
+    }
+
+    // ─── Score helpers (file-backed via local server) ─────────────────────────
+    function loadScores() {
+      try {
+        const raw = localStorage.getItem('leaky_scores');
+        if (raw) return JSON.parse(raw);
+      } catch(e) {}
+      return [];
+    }
+
+    let allScoresHistory = [];
+
+    function saveScore(initials, company, score, email) {
+      const entry = { initials, company, score, email, timestamp: new Date().toISOString() };
+      const scores = loadScores();
+      scores.push(entry);
+      scores.sort((a, b) => a.score - b.score);
+      allScoresHistory.push(entry);
+      const top20 = scores.slice(0, 20);
+      localStorage.setItem('leaky_scores', JSON.stringify(top20));
+      return top20;
+    }
+
+    // Sync leaderboard on startup (kiosk: local file, web: Supabase via /api/scores)
+    syncScores();
+
+    // ─── Formspree submission with offline queue ────────────────────────────────
+    function formspreePayload(initials, company, score, email) {
+      return {
+        _subject: 'Leaky Arcade Score',
+        initials, company, email, score,
+        message: `${initials} from ${company} (${email}) scored ${score} CFM@50pa`
+      };
+    }
+
+    function getQueue() {
+      try { return JSON.parse(localStorage.getItem('leaky_email_queue') || '[]'); } catch { return []; }
+    }
+    function saveQueue(q) { localStorage.setItem('leaky_email_queue', JSON.stringify(q)); }
+
+    function sendToFormspree(payload) {
+      return fetch('https://formspree.io/f/mgollbvl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(payload)
+      }).then(r => { if (!r.ok) throw new Error(); });
+    }
+
+    function flushQueue() {
+      const q = getQueue();
+      if (!q.length) return;
+      const item = q[0];
+      sendToFormspree(item).then(() => { q.shift(); saveQueue(q); flushQueue(); }).catch(() => {});
+    }
+
+    function submitToFormspree(initials, company, score, email) {
+      const payload = formspreePayload(initials, company, score, email);
+      sendToFormspree(payload).catch(() => {
+        const q = getQueue(); q.push(payload); saveQueue(q);
+      });
+
+      if (IS_KIOSK) {
+        fetch('http://localhost:3001/save-scores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(allScoresHistory)
+        }).catch(() => {});
+      } else {
+        fetch('/api/scores', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: initials, score })
+        }).then(() => syncScores()).catch(() => {});
+      }
+    }
+
+    flushQueue();
+
+    // ─── Leaderboard state ──────────────────────────────────────────────────────
+    let leaderboardTimer = 0;
+    let lastSubmittedEntry = null; // { initials, company, score } for highlighting
+
     function resetPlayer() {
       player.x  = 76;
       player.y  = 1000;
-      cam.y = WORLD_H - 700;
       player.vx = 0;
       player.vy = 0;
       player.jumpsLeft = 2;
@@ -342,10 +826,53 @@
       leakTimer = 0;
     }
 
+    function resetGameState() {
+      elScoreBar.style.display = 'flex';
+      lives        = MAX_LIVES;
+      cfm          = 5000;
+      framesLeft   = GAME_DURATION;
+      invincible   = 0;
+      fireCooldown = 0;
+      loseReason   = '';
+      bonusFlash   = 0;
+      floatTexts.length = 0;
+      gameOver     = false;
+      gameWon      = false;
+      bullets.length = 0;
+      seals.length   = 0;
+      sealedEmitters.clear();
+      resetPlayer();
+    }
+
+    function startDemo() {
+      gameState = 'attract';
+      attractTimer = 0;
+      attractShowLeaderboard = false;
+      resetGameState();
+      startShield  = 0;
+      ai.jumpCooldown = 0;
+      ai.fireCooldown = 0;
+      requestAnimationFrame(loop);
+    }
+
+    function startGame() {
+      gameState    = 'playing';
+      resetGameState();
+      startShield  = START_SHIELD_FRAMES;
+      initAudio();
+      requestAnimationFrame(loop);
+    }
+
     // ─── Input ───────────────────────────────────────────────────────────────
     const keys = {};
     window.addEventListener('keydown', e => { keys[e.code] = true;  e.preventDefault(); });
     window.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+    // Prevent pinch-zoom and iOS gesture zoom inside the iframe
+    document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+    document.addEventListener('gesturestart',  e => e.preventDefault(), { passive: false });
+    document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
+    document.addEventListener('gestureend',    e => e.preventDefault(), { passive: false });
 
     // ─── Mobile touch controls ────────────────────────────────────────────────
     function bindBtn(id, key) {
@@ -357,20 +884,89 @@
     bindBtn('btn-left',  'ArrowLeft');
     bindBtn('btn-right', 'ArrowRight');
     bindBtn('btn-jump',  'Space');
-    // Tap canvas to restart on game over / win
-    canvas.addEventListener('touchstart', e => {
-      if (gameOver || gameWon) { e.preventDefault(); gameOver = false; gameWon = false; resetPlayer(); requestAnimationFrame(loop); }
-    }, { passive: false });
+    // Touch handling moved to bottom (after loop function)
 
-const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
-    const wantsRight = () => keys['ArrowRight'] || keys['KeyD'];
-    const wantsJump  = () => keys['ArrowUp'] || keys['KeyW'] || keys['Space'];
+const wantsLeft  = () => (gameState === 'attract' ? ai.moveDir < 0 : (keys['ArrowLeft']  || keys['KeyA'] || keys['_gpLeft']));
+    const wantsRight = () => (gameState === 'attract' ? ai.moveDir > 0 : (keys['ArrowRight'] || keys['KeyD'] || keys['_gpRight']));
+    const wantsJump  = () => (gameState === 'attract' ? ai.jumpWant : (keys['ArrowUp'] || keys['KeyW'] || keys['Space'] || keys['_gpJump']));
+    const wantsFire  = () => (gameState === 'attract' ? ai.fireWant : (keys['KeyZ'] || keys['KeyX'] || keys['KeyF'] || keys['_gpFire']));
+
+    // ─── Gamepad (NES USB controller) ────────────────────────────────────────
+    let lastGamepadIndex = -1;
+    let gamepadMissFrames = 0;
+    const GAMEPAD_GRACE = 30; // hold last state for 30 frames (~0.5s) on dropout
+    window.addEventListener('gamepadconnected', (e) => { lastGamepadIndex = e.gamepad.index; gamepadMissFrames = 0; });
+    window.addEventListener('gamepaddisconnected', () => { lastGamepadIndex = -1; });
+    function btn(gp, i) { return gp.buttons[i] ? gp.buttons[i].pressed : false; }
+    function pollGamepad() {
+      const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+      let gp = null;
+      // prefer last known index, then scan
+      if (lastGamepadIndex >= 0 && gamepads[lastGamepadIndex]) {
+        gp = gamepads[lastGamepadIndex];
+      } else {
+        for (let i = 0; i < gamepads.length; i++) { if (gamepads[i]) { gp = gamepads[i]; lastGamepadIndex = i; break; } }
+      }
+      if (!gp) {
+        gamepadMissFrames++;
+        if (gamepadMissFrames > GAMEPAD_GRACE) {
+          // clear gamepad keys only after grace period
+          keys['_gpLeft'] = keys['_gpRight'] = keys['_gpUp'] = keys['_gpDown'] = false;
+          keys['_gpJump'] = keys['_gpFire'] = keys['_gpStart'] = keys['_gpSelect'] = false;
+        }
+        return;
+      }
+      gamepadMissFrames = 0;
+      // D-pad: axes + button fallbacks
+      const ax0 = gp.axes.length > 0 ? gp.axes[0] : 0;
+      const ax1 = gp.axes.length > 1 ? gp.axes[1] : 0;
+      const dLeft  = (ax0 < -0.5) || btn(gp, 14);
+      const dRight = (ax0 >  0.5) || btn(gp, 15);
+      const dUp    = (ax1 < -0.5) || btn(gp, 12);
+      const dDown  = (ax1 >  0.5) || btn(gp, 13);
+      // A (button 0) = jump; B (button 1) = fire/confirm
+      const btnA = btn(gp, 0);
+      const btnB = btn(gp, 1);
+      // Start/Select: check common mappings
+      const btnStart  = btn(gp, 9) || btn(gp, 16);
+      const btnSelect = btn(gp, 2) || btn(gp, 8) || btn(gp, 10);
+      keys['_gpLeft']   = dLeft;
+      keys['_gpRight']  = dRight;
+      keys['_gpUp']     = dUp;
+      keys['_gpDown']   = dDown;
+      keys['_gpJump']   = dUp || btnA;
+      keys['_gpFire']   = btnB;
+      keys['_gpStart']  = btnStart;
+      keys['_gpSelect'] = btnSelect;
+    }
+
+    // Secret exit: hold L + E + S for 3 seconds
+    let exitHoldStart = 0;
+    function checkExitCombo() {
+      if (!IS_KIOSK) return;
+      if (keys['KeyL'] && keys['KeyE'] && keys['KeyS']) {
+        if (!exitHoldStart) exitHoldStart = Date.now();
+        else if (Date.now() - exitHoldStart >= 3000) {
+          window.close();
+          document.body.innerHTML = '<div style="position:fixed;inset:0;background:#000;color:#0f0;display:flex;align-items:center;justify-content:center;font:28px monospace">EXIT — safe to power off</div>';
+        }
+      } else {
+        exitHoldStart = 0;
+      }
+    }
 
     let jumpPrev = false;  // was jump pressed last frame
 
     // ─── AABB overlap ─────────────────────────────────────────────────────────
     function overlaps(ax, ay, aw, ah, bx, by, bw, bh) {
       return ax < bx + bw && ax + aw > bx && ay < by + bh && ay + ah > by;
+    }
+
+    function spawnBullet() {
+      const bx = player.facing > 0 ? player.x + player.w + 2 : player.x - 18;
+      const by = player.y + player.h * 0.38;
+      bullets.push({ x: bx, y: by, vx: BULLET_SPEED * player.facing, w: 16, h: 8 });
+      fireCooldown = FIRE_COOLDOWN;
     }
 
     // ─── Update ───────────────────────────────────────────────────────────────
@@ -380,16 +976,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const onWallRight = !player.onGround && player.x >= WALL_R - player.w;
 
       // Horizontal — instant, original style
-      const onIce = player.onGround && player.groundPlatform && player.groundPlatform.slippery;
-      if (onIce) {
-        if (wantsLeft())       { player.vx = Math.max(player.vx - 1.2, -SPEED); player.facing = -1; }
-        else if (wantsRight()) { player.vx = Math.min(player.vx + 1.2,  SPEED); player.facing =  1; }
-        else { player.vx *= 0.97; }
-      } else {
-        player.vx = 0;
-        if (wantsLeft())  { player.vx = -SPEED; player.facing = -1; }
-        if (wantsRight()) { player.vx =  SPEED; player.facing =  1; }
-      }
+      player.vx = 0;
+      if (wantsLeft())  { player.vx = -SPEED; player.facing = -1; }
+      if (wantsRight()) { player.vx =  SPEED; player.facing =  1; }
 
       // Jump (normal + double jump + wall jump) — fires on each new keypress
       const jumpCur   = wantsJump();
@@ -400,12 +989,14 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           player.vy = player.jumpsLeft === 1 ? DOUBLE_JUMP_FORCE : JUMP_FORCE;
           player.onGround = false;
           player.jumpsLeft--;
+          sfxJump();
         } else if (onWallLeft || onWallRight) {
           player.vy          = JUMP_FORCE;
           player.wallKickVx  = onWallLeft ? WALL_JUMP_VX : -WALL_JUMP_VX;
           player.wallKickTimer = WALL_BOOST_FRAMES;
           player.facing      = onWallLeft ? 1 : -1;
           player.jumpsLeft   = 0;
+          sfxJump();
         }
       }
 
@@ -472,51 +1063,148 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
 
 
-      // Fall off bottom — lose a life
-      if (player.y > WORLD_H + 80) {
+      // Fall off bottom — respawn
+      if (player.y > CH + 80) {
         resetPlayer();
       }
 
-      // Win condition — reach the top platform
-      if (player.y < 75 && player.onGround) {
+      // ─── Timer countdown ─────────────────────────────────────────────────────
+      framesLeft = Math.max(0, framesLeft - 1);
+      if (framesLeft === 0) {
         gameWon = true;
-        window.parent.postMessage({ type: 'GAME_WIN' }, '*');
+        sfxWin();
+        window.parent.postMessage({ type: 'GAME_WIN', score: cfm }, '*');
         return;
       }
 
-      // Fan suck — pull LES toward fan, game over if he gets too close
+      // ─── Fan suck ────────────────────────────────────────────────────────────
       const fanCX2 = LOGO_BX + 40 * LOGO_SC;
-      const fanCY2 = LOGO_FAN_Y + 40 * LOGO_SC;
+      const fanCY2 = LOGO_FAN_Y + LOGO_FAN_W / 2;
       const pdx = fanCX2 - (player.x + player.w / 2);
       const pdy = fanCY2 - (player.y + player.h / 2);
-      const pDist = Math.sqrt(pdx * pdx + pdy * pdy);
-      if (pDist < 120) {
+      const pDist2 = pdx * pdx + pdy * pdy;
+      if (pDist2 < 14400) { // 120*120
+        const pDist = Math.sqrt(pDist2);
         const pull = 0.18 * (1 - pDist / 120);
         player.vx += (pdx / pDist) * pull;
         player.vy += (pdy / pDist) * pull;
       }
-      if (pDist < 22) {
-        gameOver = true;
-        window.parent.postMessage({ type: 'GAME_LOSE' }, '*');
-        return;
+      if (pDist2 < 484 && startShield === 0) { // 22*22
+        lives--;
+        invincible = INVINCIBLE_FRAMES;
+        resetPlayer();
+        if (lives <= 0) {
+          lives = 0;
+          loseReason = 'fan';
+          gameOver = true;
+          sfxWin();
+          window.parent.postMessage({ type: 'GAME_LOSE', score: cfm }, '*');
+          return;
+        }
+        sfxHit();
       }
 
-      // ─── Big leaks — 7–12 on screen, more frequent near the top ─────────
-      const heightFrac = 1 - Math.max(0, Math.min(1, player.y / WORLD_H)); // 0=bottom, 1=top
-      const dynInterval = Math.round(45 - heightFrac * 30); // 45 frames at bottom → 15 at top
+      // ─── Leak hit detection ───────────────────────────────────────────────────
+      if (invincible === 0 && startShield === 0) {
+        const px = player.x + 6, py = player.y + 6, pw = player.w - 12, ph = player.h - 12;
+        for (const l of leaks) {
+          if (overlaps(px, py, pw, ph, l.x + l.w * 0.2, l.y + l.h * 0.2, l.w * 0.6, l.h * 0.6)) {
+            lives--;
+            invincible = INVINCIBLE_FRAMES;
+            if (lives <= 0) {
+              lives = 0;
+              loseReason = 'lives';
+              gameOver = true;
+              sfxWin();
+              window.parent.postMessage({ type: 'GAME_LOSE', score: cfm }, '*');
+              return;
+            }
+            sfxHit();
+            break;
+          }
+        }
+      }
+      if (invincible > 0) invincible--;
+      if (startShield > 0) startShield--;
+
+      // ─── Caulk gun ───────────────────────────────────────────────────────────
+      if (fireCooldown > 0) fireCooldown--;
+      if (wantsFire() && fireCooldown === 0) { spawnBullet(); sfxShoot(); }
+
+      for (let i = bullets.length - 1; i >= 0; i--) {
+        const b = bullets[i];
+        const bxPrev = b.x;          // position before moving — needed for sweep check
+        b.x += b.vx;
+        if (b.x > CW + 60 || b.x < -60) { bullets.splice(i, 1); continue; }
+        let hit = false;
+        for (let j = leaks.length - 1; j >= 0; j--) {
+          const l = leaks[j];
+          let isHit = false;
+          if (l.fromWall) {
+            // Wall/AC leaks: wide sweep in both directions so the bullet hits
+            // regardless of which way the player faces or which way the leak moves.
+            const sweepX = Math.min(bxPrev, b.x) - 150;
+            const sweepW = Math.abs(b.vx) + b.w + 300;
+            const sweepY = b.y - 100;
+            const sweepH = b.h + 200;
+            isHit = overlaps(sweepX, sweepY, sweepW, sweepH, l.x, l.y, l.w, l.h);
+          } else {
+            // Traversing leaks: directional sweep
+            const sweepX = Math.min(bxPrev, b.x);
+            const sweepW = Math.abs(b.vx) + b.w;
+            const sweepY = b.y - 20;
+            const sweepH = b.h + 40;
+            isHit = overlaps(sweepX, sweepY, sweepW, sweepH, l.x, l.y, l.w, l.h);
+          }
+          if (isHit) {
+            leaks.splice(j, 1);
+            cfm = Math.max(0, cfm - 50); // big leak: -50 CFM
+            floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−50', life: 65 });
+            hit = true;
+            break;
+          }
+        }
+        // Check emitter sources (particle streams at walls/cracks/ducts)
+        if (!hit) {
+          const bCX = b.x + b.w / 2;
+          const bCY = b.y + b.h / 2;
+          for (let e = 0; e < EMITTERS.length; e++) {
+            if (sealedEmitters.has(e)) continue;
+            const em = EMITTERS[e];
+            if (Math.abs(bCX - em.ox) < 40 && Math.abs(bCY - em.oy) < 40) {
+              sealedEmitters.add(e);
+              cfm = Math.max(0, cfm - 100); // LL seal: -100 CFM
+              floatTexts.push({ wx: player.x + 16, wy: player.y - 10, text: '−100', life: 65 });
+              sfxSeal();
+              // Bonus: seal ALL emitters → -2000 CFM
+              if (sealedEmitters.size === EMITTERS.length) {
+                cfm = Math.max(0, cfm - 1000);
+                bonusFlash = 240; // show for 4 seconds
+              }
+              hit = true;
+              break;
+            }
+          }
+        }
+        if (hit) { bullets.splice(i, 1); }
+      }
+
+      // ─── Big leaks — max 4 on screen ─────────────────────────────────────
+      const heightFrac = 1 - Math.max(0, Math.min(1, player.y / CH)); // 0=bottom, 1=top
+      const dynInterval = Math.round(70 - heightFrac * 30); // 70 frames at bottom → 40 at top
       leakTimer++;
-      if (leakTimer >= dynInterval && leaks.length < 12) {
+      if (leakTimer >= dynInterval && leaks.length < 4) {
         spawnLeak();
         leakTimer = 0;
       }
-      // Keep minimum 7 on screen
-      if (leaks.length < 7) {
+      // Keep minimum 2 on screen
+      if (leaks.length < 2) {
         spawnLeak();
       }
 
       // Fan center — leaks get pulled toward it
       const fanCX = LOGO_BX + 40 * LOGO_SC;
-      const fanCY = LOGO_FAN_Y + 40 * LOGO_SC;
+      const fanCY = LOGO_FAN_Y + LOGO_FAN_W / 2;
 
       for (let i = leaks.length - 1; i >= 0; i--) {
         const lcx = leaks[i].x + leaks[i].w / 2;
@@ -547,12 +1235,12 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         // Smooth angle from actual velocity
         const targetAngle = Math.atan2(moveY, moveX);
         let da = targetAngle - leaks[i].angle;
-        while (da >  Math.PI) da -= Math.PI * 2;
-        while (da < -Math.PI) da += Math.PI * 2;
+        while (da >  Math.PI) da -= TAU;
+        while (da < -Math.PI) da += TAU;
         leaks[i].angle += da * 0.15;
 
         // Remove when off screen
-        if (leaks[i].x > WORLD_W + 100 || leaks[i].x < -100) {
+        if (leaks[i].x > CW + 100 || leaks[i].x < -100) {
           leaks.splice(i, 1);
           continue;
         }
@@ -569,12 +1257,6 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       if (player.vx !== 0) player.frame++;
       tick++;
 
-      // Camera follows player — pulls to top when LES is in the top 35% of the level
-      const topThreshold = WORLD_H * 0.35;
-      const targetCamY = player.y < topThreshold ? 0 : player.y - CH * 0.4;
-      const lerpRate = player.y < topThreshold ? 0.4 : 0.2;
-      cam.y += (targetCamY - cam.y) * lerpRate;
-      cam.y = Math.max(0, Math.min(WORLD_H - CH, cam.y));
     }
 
     // ─── Draw ─────────────────────────────────────────────────────────────────
@@ -613,7 +1295,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
           ? `rgba(107,76,40,${0.35 + sz * 0.3})`
           : `rgba(220,210,200,${0.3 + sz * 0.4})`;
         ctx.beginPath();
-        ctx.arc(sx3, sy3, 1 + sz * 2, 0, Math.PI * 2);
+        ctx.arc(sx3, sy3, 1 + sz * 2, 0, TAU);
         ctx.fill();
       }
       // Irregular stone blocks
@@ -642,19 +1324,28 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
     }
 
-    function drawFloorBand(y) {
+    function drawFloorBand(y, gapX) {
       const pw = WALL_R - WALL_L;
+
+      // Clip to exclude gap zone so floor elements don't draw there
+      ctx.save();
+      if (gapX !== undefined) {
+        ctx.beginPath();
+        ctx.rect(WALL_L, y - 1, gapX - WALL_L, FH + 2);
+        ctx.rect(gapX + GAP_W, y - 1, WALL_R - (gapX + GAP_W), FH + 2);
+        ctx.clip();
+      }
 
       // Dark cavity fill (air between joists)
       ctx.fillStyle = '#141210';
       ctx.fillRect(WALL_L, y, pw, FH);
 
       // ── Finished floor surface (hardwood oak) ────────────────────────────
-      ctx.fillStyle = '#c8a060';
+      ctx.fillStyle = '#f0cc80';
       ctx.fillRect(WALL_L, y, pw, 4);
-      ctx.fillStyle = '#b88848';
+      ctx.fillStyle = '#d8a850';
       ctx.fillRect(WALL_L, y + 1, pw, 1);          // shadow line under top
-      ctx.strokeStyle = '#a07830'; ctx.lineWidth = 0.5;
+      ctx.strokeStyle = '#c09040'; ctx.lineWidth = 0.5;
       for (let sx = WALL_L + 42; sx < WALL_R; sx += 42) {
         ctx.beginPath(); ctx.moveTo(sx, y); ctx.lineTo(sx, y + 4); ctx.stroke();
       }
@@ -677,6 +1368,27 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.strokeStyle = '#a8a49c'; ctx.lineWidth = 1;
       for (let sx = WALL_L + 120; sx < WALL_R; sx += 120) {
         ctx.beginPath(); ctx.moveTo(sx, y + FH - 3); ctx.lineTo(sx, y + FH); ctx.stroke();
+      }
+
+      ctx.restore();
+
+      // ── Gap: open hole with yellow side markers and down arrow ────────────
+      if (gapX !== undefined) {
+        ctx.fillStyle = '#0d0d0d';
+        ctx.fillRect(gapX, y, GAP_W, FH);
+        // Yellow side posts
+        ctx.fillStyle = '#F5C500';
+        ctx.fillRect(gapX, y, 3, FH);
+        ctx.fillRect(gapX + GAP_W - 3, y, 3, FH);
+        // Down arrow
+        const ax = gapX + GAP_W / 2;
+        const ay = y + FH / 2 + 2;
+        ctx.beginPath();
+        ctx.moveTo(ax - 9, ay - 7);
+        ctx.lineTo(ax + 9, ay - 7);
+        ctx.lineTo(ax, ay + 7);
+        ctx.closePath();
+        ctx.fill();
       }
     }
 
@@ -729,70 +1441,70 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     }
 
     function drawFrontDoor(floorY) {
-      const dw = 36, dh = 114;
+      const dw = WALL_L - 4, dh = 148;
       const dy = floorY - dh;
       // Frame
       ctx.fillStyle = '#2a1408';
-      ctx.fillRect(0, dy - 4, 40, dh + 4);
+      ctx.fillRect(0, dy - 4, WALL_L, dh + 4);
       // Door panel (darker wood — classic Philly front door)
       ctx.fillStyle = '#3a1e08';
       ctx.fillRect(2, dy, dw, dh);
       // Upper glass pane
       ctx.fillStyle = '#a8d4ee';
-      ctx.fillRect(5, dy + 5, dw - 7, 30);
+      ctx.fillRect(5, dy + 7, dw - 7, 39);
       ctx.fillStyle = '#cce8f8';
-      ctx.fillRect(6, dy + 6, (dw - 9) / 2, 13);
+      ctx.fillRect(6, dy + 8, (dw - 9) / 2, 17);
       ctx.fillStyle = '#88b8d8';
-      ctx.fillRect(5, dy + 20, dw - 7, 15);
+      ctx.fillRect(5, dy + 26, dw - 7, 20);
       // Muntin cross
       ctx.fillStyle = '#2a1408';
-      ctx.fillRect(5 + (dw - 9) / 2, dy + 5, 2, 30);
-      ctx.fillRect(5, dy + 19, dw - 7, 2);
+      ctx.fillRect(5 + (dw - 9) / 2, dy + 7, 2, 39);
+      ctx.fillRect(5, dy + 25, dw - 7, 2);
       // Lower raised panels
       ctx.fillStyle = '#2e1606';
-      ctx.fillRect(5, dy + 40, dw - 7, 32);
-      ctx.fillRect(5, dy + 77, dw - 7, 32);
+      ctx.fillRect(5, dy + 52, dw - 7, 42);
+      ctx.fillRect(5, dy + 100, dw - 7, 42);
       ctx.fillStyle = '#201008';
-      ctx.fillRect(7, dy + 42, dw - 11, 28);
-      ctx.fillRect(7, dy + 79, dw - 11, 28);
+      ctx.fillRect(7, dy + 55, dw - 11, 36);
+      ctx.fillRect(7, dy + 103, dw - 11, 36);
       // Knob (on right/interior side)
       ctx.fillStyle = '#c8a020';
       ctx.beginPath();
-      ctx.arc(31, dy + 63, 3, 0, Math.PI * 2);
+      ctx.arc(WALL_L - 8, dy + 82, 3, 0, TAU);
       ctx.fill();
     }
 
     function drawBackDoor(floorY) {
-      const dx = 760, dw = 36, dh = 114;
+      const dx = WALL_R, dw = CW - WALL_R - 4, dh = 148;
       const dy = floorY - dh;
       // Frame
       ctx.fillStyle = '#2a1408';
-      ctx.fillRect(dx, dy - 4, 40, dh + 4);
+      ctx.fillRect(dx, dy - 4, CW - WALL_R, dh + 4);
       // Door panel (white)
       ctx.fillStyle = '#efefef';
       ctx.fillRect(dx + 2, dy, dw, dh);
       // Upper glass pane
       ctx.fillStyle = '#a8d4ee';
-      ctx.fillRect(dx + 5, dy + 5, dw - 7, 30);
+      ctx.fillRect(dx + 5, dy + 7, dw - 7, 39);
       ctx.fillStyle = '#cce8f8';
-      ctx.fillRect(dx + 6, dy + 6, (dw - 9) / 2, 13);
+      ctx.fillRect(dx + 6, dy + 8, (dw - 9) / 2, 17);
       ctx.fillStyle = '#88b8d8';
-      ctx.fillRect(dx + 5, dy + 20, dw - 7, 15);
+      ctx.fillRect(dx + 5, dy + 26, dw - 7, 20);
       // Muntin cross
       ctx.fillStyle = '#cccccc';
-      ctx.fillRect(dx + 5 + (dw - 9) / 2, dy + 5, 2, 30);
-      ctx.fillRect(dx + 5, dy + 19, dw - 7, 2);
+      ctx.fillRect(dx + 5 + (dw - 9) / 2, dy + 7, 2, 39);
+      ctx.fillRect(dx + 5, dy + 25, dw - 7, 2);
       // Lower raised panels
       ctx.fillStyle = '#e0e0e0';
-      ctx.fillRect(dx + 5, dy + 40, dw - 7, 32);
-      ctx.fillRect(dx + 5, dy + 77, dw - 7, 32);
+      ctx.fillRect(dx + 5, dy + 52, dw - 7, 42);
+      ctx.fillRect(dx + 5, dy + 100, dw - 7, 42);
       ctx.fillStyle = '#d0d0d0';
-      ctx.fillRect(dx + 7, dy + 42, dw - 11, 28);
-      ctx.fillRect(dx + 7, dy + 79, dw - 11, 28);
+      ctx.fillRect(dx + 7, dy + 55, dw - 11, 36);
+      ctx.fillRect(dx + 7, dy + 103, dw - 11, 36);
       // Knob
       ctx.fillStyle = '#c8a020';
       ctx.beginPath();
-      ctx.arc(dx + 7, dy + 63, 3, 0, Math.PI * 2);
+      ctx.arc(dx + 7, dy + 82, 3, 0, TAU);
       ctx.fill();
     }
 
@@ -833,23 +1545,23 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       // ── Main supply trunk (basement ceiling, hangs below F1 floor band) ────
-      const tX1 = 98, tX2 = 656, tY = 838, tH = 20;
+      const tX1 = 98, tX2 = 575, tY = 838, tH = 26;
       hDuct(tX1, tY, tX2 - tX1, tH);
       hSeams(tX1, tY, tX2 - tX1, tH, 72);
       ctx.fillStyle = D; ctx.fillRect(tX1, tY, 3, tH);          // left end cap
       // Transition plenum where trunk meets furnace (sits on top of furnace)
-      ctx.fillStyle = M; ctx.fillRect(tX2, tY - 7, 26, tH + 7);
-      ctx.fillStyle = L; ctx.fillRect(tX2, tY - 7, 26, 3);
+      ctx.fillStyle = M; ctx.fillRect(tX2, tY - 7, 34, tH + 7);
+      ctx.fillStyle = L; ctx.fillRect(tX2, tY - 7, 34, 3);
       ctx.strokeStyle = S; ctx.lineWidth = 1;
-      ctx.strokeRect(tX2, tY - 7, 26, tH + 7);
+      ctx.strokeRect(tX2, tY - 7, 34, tH + 7);
       // Vertical supply drop — connects plenum directly to furnace top
-      vDuct(tX2 + 1, tY + tH, 24, 978 - (tY + tH));
-      vSeams(tX2 + 1, tY + tH, 24, 978 - (tY + tH), 40);
+      vDuct(tX2 + 1, tY + tH, 31, 954 - (tY + tH));
+      vSeams(tX2 + 1, tY + tH, 31, 954 - (tY + tH), 40);
       ctx.strokeStyle = S; ctx.lineWidth = 1;
-      ctx.strokeRect(tX2 + 1, tY + tH, 24, 978 - (tY + tH));
+      ctx.strokeRect(tX2 + 1, tY + tH, 31, 954 - (tY + tH));
 
       // ── Supply riser (vertical, from trunk up to 2nd floor ceiling) ─────────
-      const rX = 520, rW = 14;
+      const rX = 520, rW = 18;
       vDuct(rX, F3 + FH, rW, tY - (F3 + FH));     // F3+FH=222 down to trunk
       vSeams(rX, F3 + FH, rW, tY - (F3 + FH), 80);
       // Cap at top of riser
@@ -864,7 +1576,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       // ── Branch ducts (2nd floor and 1st floor only) ──────────────────────
-      const bH = 9;
+      const bH = 12;
 
       // 2nd floor branch (F3 + FH + 14 = 236)
       const b2Y = F3 + FH + 14;
@@ -895,9 +1607,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
     function drawInteriorWalls() {
       // Interior drywall assembly on inside face of each exterior wall
       // From outside in: [brick/stone] → [air gap] → [furring strips] → [drywall face]
-      const gapW  = 5;    // air gap width (px)
-      const dwW   = 4;    // drywall face thickness (px)
-      const top   = 40;   // start below roof drywall
+      const gapW  = 7;    // air gap width (px)
+      const dwW   = 5;    // drywall face thickness (px)
+      const top   = 90;   // start below roof drywall
       const bot   = F1 + FH; // stop at basement — no drywall below grade
       const span  = bot - top;
 
@@ -946,7 +1658,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       const bFloor = 1058;
 
       // ── Hot Water Heater ────────────────────────────────────────────────────
-      const hx = 108, hy = 973, hw = 40, hh = 85;
+      const hx = 258, hy = 947, hw = 52, hh = 111;
 
       // Plumbing lines going up through ceiling
       ctx.strokeStyle = '#3d7fa8'; ctx.lineWidth = 4;   // cold water (blue)
@@ -960,7 +1672,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillText('H', hx + 28, F1 + FH + 12);
 
       // Tank body (insulation jacket — off-white cylinder)
-      const hGrad = ctx.createLinearGradient(108, 0, 148, 0);
+      const hGrad = ctx.createLinearGradient(258, 0, 298, 0);
       hGrad.addColorStop(0,    '#b0aca6');
       hGrad.addColorStop(0.25, '#d8d4ce');
       hGrad.addColorStop(0.75, '#d4d0ca');
@@ -973,11 +1685,11 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // Top dome cap
       ctx.fillStyle = '#a0a09a';
       ctx.beginPath();
-      ctx.ellipse(hx + hw / 2, hy + 10, hw / 2 - 1, 6, 0, 0, Math.PI * 2);
+      ctx.ellipse(hx + hw / 2, hy + 10, hw / 2 - 1, 6, 0, 0, TAU);
       ctx.fill();
       ctx.fillStyle = '#c0bcb6';
       ctx.beginPath();
-      ctx.ellipse(hx + hw / 2 - 3, hy + 8, 5, 3, -0.3, 0, Math.PI * 2);
+      ctx.ellipse(hx + hw / 2 - 3, hy + 8, 5, 3, -0.3, 0, TAU);
       ctx.fill();
 
       // Label + energy stripe
@@ -992,7 +1704,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillStyle = '#888884';
       ctx.fillRect(hx + hw, hy + 42, 7, 4);
       ctx.fillStyle = '#cc3300';
-      ctx.beginPath(); ctx.arc(hx + hw + 10, hy + 44, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(hx + hw + 10, hy + 44, 3, 0, TAU); ctx.fill();
 
       // Drain valve near bottom
       ctx.fillStyle = '#777770';
@@ -1004,7 +1716,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(hx + hw - 12, bFloor - 5, 10, 5);
 
       // ── Furnace ─────────────────────────────────────────────────────────────
-      const fx = 656, fy = 978, fw = 90, fh = 80;
+      const fx = 575, fy = 954, fw = 117, fh = 104;
 
       // Flue pipe (right side, going up through ceiling)
       ctx.strokeStyle = '#404040'; ctx.lineWidth = 10;
@@ -1016,7 +1728,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(fx + fw - 22, F1 + FH - 2, 8, 8);
 
       // Main cabinet
-      const fGrad = ctx.createLinearGradient(656, 0, 746, 0);
+      const fGrad = ctx.createLinearGradient(575, 0, 692, 0);
       fGrad.addColorStop(0,   '#303030');
       fGrad.addColorStop(0.5, '#484844');
       fGrad.addColorStop(1,   '#343430');
@@ -1032,9 +1744,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(fx + 6, fy + 6, fw - 12, fh * 0.42);
       // Green status LED
       ctx.fillStyle = '#00dd55';
-      ctx.beginPath(); ctx.arc(fx + 15, fy + 14, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(fx + 15, fy + 14, 3, 0, TAU); ctx.fill();
       ctx.fillStyle = 'rgba(0,220,80,0.22)';
-      ctx.beginPath(); ctx.arc(fx + 15, fy + 14, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(fx + 15, fy + 14, 6, 0, TAU); ctx.fill();
       // Nameplate
       ctx.fillStyle = '#ffffffbb'; ctx.font = 'bold 6px monospace';
       ctx.fillText('FURNACE', fx + 24, fy + 16);
@@ -1064,18 +1776,15 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // ── Exterior ──────────────────────────────────────────────────────────
       ctx.fillStyle = '#080808';
-      ctx.fillRect(0, 0, CW, WORLD_H);
+      ctx.fillRect(0, 0, CW, CH);
 
       // ── Room interiors ────────────────────────────────────────────────────
-      // 3rd floor — left: baby's room, right: roof deck (outside)
+      // Sky — flat sky blue behind everything above 3rd floor
+      ctx.fillStyle = '#a0c8e8';
+      ctx.fillRect(0, 0, CW, F3);
+      // 3rd floor — left: baby's room only; right is roof deck (sky shows through)
       ctx.fillStyle = '#878583';
-      ctx.fillRect(WALL_L, 40, pw, F3 - 40);
-      const skyGrad3 = ctx.createLinearGradient(400, 0, 400, F3);
-      skyGrad3.addColorStop(0,    '#2a5a98');
-      skyGrad3.addColorStop(0.12, '#5898c8');
-      skyGrad3.addColorStop(1,    '#a0c8e8');
-      ctx.fillStyle = skyGrad3;
-      ctx.fillRect(400, 0, CW - 400, F3);  // sky covers full right side including exterior wall area
+      ctx.fillRect(WALL_L, 90, 400 - WALL_L, F3 - 90);
 
       // 2nd floor
       ctx.fillStyle = '#86898c';
@@ -1083,9 +1792,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // 1st floor: beige living room (left) + teal kitchen (right)
       const divX = 403;
-      ctx.fillStyle = '#97928b';   // beige (50% lighter)
+      ctx.fillStyle = '#97928b';
       ctx.fillRect(WALL_L, F2 + FH, divX - WALL_L, F1 - F2 - FH);
-      ctx.fillStyle = '#879490';   // teal (50% lighter)
+      ctx.fillStyle = '#879490';
       ctx.fillRect(divX, F2 + FH, WALL_R - divX, F1 - F2 - FH);
 
       // Basement
@@ -1105,24 +1814,68 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ── Brick walls (above basement) + stone foundation ───────────────────
       drawBrickWall(0,      0, WALL_L, F1 + FH);
       drawBrickWall(WALL_R, F3, CW - WALL_R, F1 + FH - F3);  // right wall starts at 3rd floor (above is open outside)
-      drawStoneWall(0,      F1 + FH, WALL_L, WORLD_H - (F1 + FH));
-      drawStoneWall(WALL_R, F1 + FH, CW - WALL_R, WORLD_H - (F1 + FH));
+      drawStoneWall(0,      F1 + FH, WALL_L, CH - (F1 + FH));
+      drawStoneWall(WALL_R, F1 + FH, CW - WALL_R, CH - (F1 + FH));
 
       // ── Interior wall assembly (air gap + furring + drywall) ──────────────
       drawInteriorWalls();
 
       // ── Floor bands (full-width) ───────────────────────────────────────────
-      drawFloorBand(F1);
-      drawFloorBand(F2);
-      drawFloorBand(F3);
+      drawFloorBand(F1, F1_GAP);
+      drawFloorBand(F2, F2_GAP);
+      drawFloorBand(F3, F3_GAP);
+
+
+      // ── Kid room ceiling can lights (embedded in F3 floor band) ───────────
+      for (const lx of [570]) {
+        const canW = 32, canTop = F3 + 4, canH = FH - 10;
+        const ceilY = F3 + FH;
+        // Metal can housing
+        const canGrad = ctx.createLinearGradient(lx - canW / 2, 0, lx + canW / 2, 0);
+        canGrad.addColorStop(0,   '#111111');
+        canGrad.addColorStop(0.2, '#383834');
+        canGrad.addColorStop(0.8, '#383834');
+        canGrad.addColorStop(1,   '#111111');
+        ctx.fillStyle = canGrad;
+        ctx.fillRect(lx - canW / 2, canTop, canW, canH);
+        ctx.fillStyle = '#282824';
+        ctx.fillRect(lx - canW / 2, canTop, canW, 3);
+        // Trim ring at drywall face
+        ctx.fillStyle = '#505050';
+        ctx.fillRect(lx - canW / 2 - 4, ceilY - 5, canW + 8, 5);
+        ctx.fillStyle = '#686864';
+        ctx.fillRect(lx - canW / 2 - 2, ceilY - 4, canW + 4, 2);
+        // Light cone below ceiling
+        const coneGrad = ctx.createLinearGradient(lx, ceilY, lx, ceilY + 70);
+        coneGrad.addColorStop(0, 'rgba(255,240,160,0.35)');
+        coneGrad.addColorStop(1, 'rgba(255,240,160,0)');
+        ctx.fillStyle = coneGrad;
+        ctx.beginPath();
+        ctx.moveTo(lx - 14, ceilY); ctx.lineTo(lx + 14, ceilY);
+        ctx.lineTo(lx + 40, ceilY + 70); ctx.lineTo(lx - 40, ceilY + 70);
+        ctx.closePath(); ctx.fill();
+        // Bulb glow
+        ctx.shadowColor = 'rgba(255,245,160,0.9)'; ctx.shadowBlur = 18;
+        ctx.fillStyle = 'rgba(255,250,200,1)';
+        ctx.beginPath(); ctx.ellipse(lx, ceilY, 14, 6, 0, 0, TAU); ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.ellipse(lx, ceilY - 1, 6, 3, 0, 0, TAU); ctx.fill();
+        // Amber edge gap glow
+        ctx.shadowColor = 'rgba(255,160,20,0.9)'; ctx.shadowBlur = 12;
+        ctx.fillStyle = 'rgba(255,160,20,0.9)';
+        ctx.fillRect(lx - canW / 2 - 5, ceilY - 7, 5, 7);
+        ctx.fillRect(lx + canW / 2,     ceilY - 7, 5, 7);
+        ctx.shadowBlur = 0;
+      }
 
       // ── 2nd floor rim joist gap — degraded sealant at wall/floor junction ──
       ctx.fillStyle = 'rgba(180,90,20,0.65)';
-      ctx.fillRect(WALL_L,     F2 + 5, 7, FH - 10);   // left rim
-      ctx.fillRect(WALL_R - 7, F2 + 5, 7, FH - 10);   // right rim
+      ctx.fillRect(WALL_L,      F2 + 5, 9, FH - 10);   // left rim
+      ctx.fillRect(WALL_R - 9,  F2 + 5, 9, FH - 10);   // right rim
       ctx.strokeStyle = 'rgba(220,130,50,0.5)'; ctx.lineWidth = 1;
-      ctx.strokeRect(WALL_L - 1,     F2 + 4, 9, FH - 8);
-      ctx.strokeRect(WALL_R - 8, F2 + 4, 9, FH - 8);
+      ctx.strokeRect(WALL_L - 1,  F2 + 4, 12, FH - 8);
+      ctx.strokeRect(WALL_R - 10, F2 + 4, 12, FH - 8);
 
       // Gap arrow hints
       ctx.fillStyle = '#ffffff10';
@@ -1137,85 +1890,118 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ── Flat roof structure — left half (baby room) only ──────────────────
       // Roof band covers left side only; right side is open sky (outside)
       ctx.fillStyle = '#181410';
-      ctx.fillRect(0, 0, 400, 40);
+      ctx.fillRect(0, 0, 400, 80);
       // Membrane / gravel surface
       ctx.fillStyle = '#242020';
-      ctx.fillRect(WALL_L, 0, 400 - WALL_L, 6);
+      ctx.fillRect(WALL_L, 0, 400 - WALL_L, 12);
       // Pink fiberglass insulation
       ctx.fillStyle = '#e484b0';
-      ctx.fillRect(WALL_L, 31, 400 - WALL_L, 9);
+      ctx.fillRect(WALL_L, 62, 400 - WALL_L, 18);
 
       // Fluffy puffs along the top of the batt
       ctx.fillStyle = '#ee9cc4';
       for (let bx = WALL_L + 8; bx < 408; bx += 13) {
         ctx.beginPath();
-        ctx.ellipse(bx, 31, 8, 7, 0, 0, Math.PI * 2);
+        ctx.ellipse(bx, 62, 16, 14, 0, 0, TAU);
         ctx.fill();
       }
       // Lighter highlight on each puff
       ctx.fillStyle = '#f8b8d8';
       for (let bx = WALL_L + 8; bx < 408; bx += 13) {
         ctx.beginPath();
-        ctx.ellipse(bx - 2, 29, 4, 3, -0.3, 0, Math.PI * 2);
+        ctx.ellipse(bx - 2, 58, 8, 6, -0.3, 0, TAU);
         ctx.fill();
       }
       // Fiber texture in the base
       ctx.strokeStyle = '#f0a8cc'; ctx.lineWidth = 0.5;
-      for (let fy = 33; fy < 39; fy += 2) {
+      for (let fy = 65; fy < 77; fy += 2) {
         ctx.beginPath(); ctx.moveTo(WALL_L, fy); ctx.lineTo(400, fy); ctx.stroke();
       }
 
       // Roof rafters (left half only)
       for (let rx = WALL_L + 18; rx < 390; rx += 64) {
         ctx.fillStyle = '#4a3018';
-        ctx.fillRect(rx, 6, 11, 34);
+        ctx.fillRect(rx, 12, 11, 68);
         ctx.fillStyle = '#3a2010';
-        ctx.fillRect(rx + 2, 8, 7, 28);
+        ctx.fillRect(rx + 2, 14, 7, 56);
         ctx.strokeStyle = '#5a4028'; ctx.lineWidth = 0.5;
-        ctx.strokeRect(rx, 6, 11, 34);
+        ctx.strokeRect(rx, 12, 11, 68);
       }
 
       // ── Drywall ceiling (left half only) ──────────────────────────────────
       ctx.fillStyle = '#c4c0b8';
-      ctx.fillRect(WALL_L, 40, 400 - WALL_L, 5);
+      ctx.fillRect(WALL_L, 80, 400 - WALL_L, 10);
       ctx.fillStyle = 'rgba(0,0,0,0.18)';
-      ctx.fillRect(WALL_L, 40, 400 - WALL_L, 2);
+      ctx.fillRect(WALL_L, 80, 400 - WALL_L, 4);
       ctx.strokeStyle = '#a8a49c'; ctx.lineWidth = 1;
       for (let sx = WALL_L + 120; sx < 400; sx += 120) {
-        ctx.beginPath(); ctx.moveTo(sx, 40); ctx.lineTo(sx, 45); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(sx, 80); ctx.lineTo(sx, 90); ctx.stroke();
       }
 
       // ── Recessed can lights (left half only) ──────────────────────────────
       for (let lx = WALL_L + 70; lx < 400; lx += 110) {
-        // Light cone (drawn first, behind housing)
-        const coneGrad = ctx.createLinearGradient(lx, 45, lx, 45 + 70);
+        const canW = 32, canH = 30, canTop = 80 - canH;  // can = 50–80px
+
+        // Metal can housing in the roof cavity
+        const canGrad = ctx.createLinearGradient(lx - canW / 2, 0, lx + canW / 2, 0);
+        canGrad.addColorStop(0,   '#111111');
+        canGrad.addColorStop(0.2, '#383834');
+        canGrad.addColorStop(0.8, '#383834');
+        canGrad.addColorStop(1,   '#111111');
+        ctx.fillStyle = canGrad;
+        ctx.fillRect(lx - canW / 2, canTop, canW, canH);
+
+        // Top cap of can
+        ctx.fillStyle = '#282824';
+        ctx.fillRect(lx - canW / 2, canTop, canW, 3);
+
+        // Trim ring at drywall face
+        ctx.fillStyle = '#505050';
+        ctx.fillRect(lx - canW / 2 - 4, 80, canW + 8, 5);
+        ctx.fillStyle = '#686864';
+        ctx.fillRect(lx - canW / 2 - 2, 81, canW + 4, 2);
+
+        // Light cone below ceiling
+        const coneGrad = ctx.createLinearGradient(lx, 90, lx, 90 + 70);
         coneGrad.addColorStop(0, 'rgba(255,240,160,0.35)');
         coneGrad.addColorStop(1, 'rgba(255,240,160,0)');
         ctx.fillStyle = coneGrad;
         ctx.beginPath();
-        ctx.moveTo(lx - 7, 45);
-        ctx.lineTo(lx + 7, 45);
-        ctx.lineTo(lx + 40, 45 + 70);
-        ctx.lineTo(lx - 40, 45 + 70);
+        ctx.moveTo(lx - 14, 90);
+        ctx.lineTo(lx + 14, 90);
+        ctx.lineTo(lx + 40, 90 + 70);
+        ctx.lineTo(lx - 40, 90 + 70);
         ctx.closePath();
         ctx.fill();
-        // Housing recess (dark oval)
-        ctx.fillStyle = '#1a1a1a';
+
+        // Bulb glow — large bright ellipse with halo
+        ctx.shadowColor = 'rgba(255,245,160,0.9)';
+        ctx.shadowBlur  = 18;
+        ctx.fillStyle   = 'rgba(255,250,200,1)';
         ctx.beginPath();
-        ctx.ellipse(lx, 45, 8, 3, 0, 0, Math.PI * 2);
+        ctx.ellipse(lx, 90, 14, 6, 0, 0, TAU);
         ctx.fill();
-        // Bulb glow
-        ctx.fillStyle = 'rgba(255,245,180,0.9)';
+        ctx.shadowBlur  = 0;
+        // Bright hot-spot centre
+        ctx.fillStyle = '#ffffff';
         ctx.beginPath();
-        ctx.ellipse(lx, 45, 5, 2, 0, 0, Math.PI * 2);
+        ctx.ellipse(lx, 89, 6, 3, 0, 0, TAU);
         ctx.fill();
+
+        // Air gap at can edges — vivid amber leak glow at drywall face
+        ctx.shadowColor = 'rgba(255,160,20,0.9)';
+        ctx.shadowBlur  = 12;
+        ctx.fillStyle   = 'rgba(255,160,20,0.9)';
+        ctx.fillRect(lx - canW / 2 - 5, 83, 5, 7);
+        ctx.fillRect(lx + canW / 2,     83, 5, 7);
+        ctx.shadowBlur  = 0;
       }
 
       // ── Attic insulation batts (left half only — no batts over outside) ───
       ctx.fillStyle = '#f5c50018';
       for (let ix = WALL_L + 10; ix < 390; ix += 44) {
         ctx.beginPath();
-        ctx.ellipse(ix + 18, F3 - 9, 20, 9, 0, 0, Math.PI * 2);
+        ctx.ellipse(ix + 18, F3 - 9, 20, 9, 0, 0, TAU);
         ctx.fill();
       }
 
@@ -1244,12 +2030,12 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.beginPath(); ctx.moveTo(0, ppY); ctx.lineTo(WALL_L + 35, ppY); ctx.stroke();
       // Wall sleeve/collar at penetration
       ctx.fillStyle = '#505050';
-      ctx.fillRect(WALL_L - 5, ppY - 6, 10, 12);
+      ctx.fillRect(WALL_L - 7, ppY - 8, 13, 16);
       ctx.fillStyle = '#686868';
-      ctx.fillRect(WALL_L - 4, ppY - 5, 8, 10);
+      ctx.fillRect(WALL_L - 5, ppY - 7, 10, 13);
       // Degraded sealant (should be air-sealed, but isn't)
       ctx.fillStyle = 'rgba(160,100,40,0.7)';
-      ctx.fillRect(WALL_L - 2, ppY - 6, 4, 12);
+      ctx.fillRect(WALL_L - 3, ppY - 8, 5, 16);
 
       // ── Basement pipes ────────────────────────────────────────────────────
       ctx.strokeStyle = '#3c3c3c'; ctx.lineWidth = 7;
@@ -1259,15 +2045,15 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.beginPath(); ctx.moveTo(WALL_L, F1 + 55); ctx.lineTo(340, F1 + 55); ctx.stroke();
       // pipe collar
       ctx.fillStyle = '#484848';
-      ctx.beginPath(); ctx.arc(420, F1 + 38, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(420, F1 + 38, 6, 0, TAU); ctx.fill();
 
       // ── Mechanical equipment (hot water heater + furnace) ─────────────────
       drawMechanicals();
 
 
       // ── 1st floor: living room (left) + kitchen (right) ─────────────────
-      const fY = F1;       // floor surface y = 490
-      const rC = F2 + FH;  // ceiling y = 358
+      const fY = F1;       // floor surface y
+      const rC = F2 + FH;  // ceiling y
 
       // Warm ambient light wash (living room)
       const lGrad = ctx.createRadialGradient(200, fY - 65, 5, 200, fY - 65, 160);
@@ -1276,113 +2062,159 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillStyle = lGrad;
       ctx.fillRect(WALL_L, rC, 360, fY - rC);
 
-
-      // TV (flat screen on left wall)
+      // ── TV (wall-mounted on left wall, side profile) ──────────────────
       ctx.fillStyle = '#1c1c1c';
-      ctx.fillRect(40, rC + 30, 8, 50);
+      ctx.fillRect(WALL_L, rC + 32, 12, 82);
       ctx.fillStyle = '#060610';
-      ctx.fillRect(41, rC + 32, 6, 46);
+      ctx.fillRect(WALL_L + 1, rC + 34, 9, 78);
       ctx.fillStyle = 'rgba(40,60,140,0.18)';
-      ctx.fillRect(41, rC + 32, 6, 46);
+      ctx.fillRect(WALL_L + 1, rC + 34, 9, 78);
       ctx.fillStyle = '#2a2a2a';
-      ctx.fillRect(40, rC + 55, 3, 4);   // bracket
+      ctx.fillRect(WALL_L + 12, rC + 68, 8, 6);       // wall bracket
+
+      // TV console table
+      ctx.fillStyle = '#2a1e10';
+      ctx.fillRect(WALL_L, fY - 38, 62, 6);
+      ctx.fillRect(WALL_L, fY - 38, 7, 38);
+      ctx.fillRect(WALL_L + 55, fY - 38, 7, 38);
+      ctx.fillStyle = '#1a1208';
+      ctx.fillRect(WALL_L + 8, fY - 30, 46, 28);
+      ctx.strokeStyle = '#0a0a06'; ctx.lineWidth = 1;
+      ctx.strokeRect(WALL_L + 10, fY - 28, 21, 24);
+      ctx.strokeRect(WALL_L + 33, fY - 28, 21, 24);
 
       // Rug
       ctx.fillStyle = '#6e1e08';
-      ctx.fillRect(60, fY - 11, 232, 10);
+      ctx.fillRect(WALL_L, fY - 13, 320, 12);
       ctx.fillStyle = '#882410';
-      ctx.fillRect(62, fY - 9, 228, 7);
+      ctx.fillRect(WALL_L + 2, fY - 11, 316, 9);
       ctx.fillStyle = 'rgba(245,197,0,0.2)';
-      for (let rx = 72; rx < 288; rx += 22) ctx.fillRect(rx, fY - 9, 2, 7);
+      for (let rx = WALL_L + 12; rx < WALL_L + 308; rx += 22) ctx.fillRect(rx, fY - 11, 2, 9);
+
+      // Coffee table (between console and sofa)
+      ctx.fillStyle = '#52321a';
+      ctx.fillRect(142, fY - 30, 74, 7);
+      ctx.fillStyle = '#8B5520';
+      ctx.fillRect(142, fY - 30, 74, 2);
+      ctx.fillStyle = '#3a2010';
+      ctx.fillRect(147, fY - 23, 6, 15);
+      ctx.fillRect(204, fY - 23, 6, 15);
+      ctx.fillRect(147, fY - 20, 63, 3);              // stretcher
 
       // Sofa
+      const sfX = 228, sfW = 155, sfH = 62;
       ctx.fillStyle = '#3e2c1a';
-      ctx.fillRect(68, fY - 46, 122, 46);
+      ctx.fillRect(sfX, fY - sfH, sfW, sfH);
       ctx.fillStyle = '#52381e';
-      ctx.fillRect(70, fY - 44, 53, 24);    // left back cushion
-      ctx.fillRect(126, fY - 44, 52, 24);   // right back cushion
-      ctx.fillRect(70, fY - 20, 53, 14);    // left seat cushion
-      ctx.fillRect(126, fY - 20, 52, 14);   // right seat cushion
+      ctx.fillRect(sfX + 13, fY - sfH + 3, 63, 34);
+      ctx.fillRect(sfX + 79, fY - sfH + 3, 63, 34);
+      ctx.fillStyle = '#4a3218';
+      ctx.fillRect(sfX + 13, fY - sfH + 37, 63, 19);
+      ctx.fillRect(sfX + 79, fY - sfH + 37, 63, 19);
       ctx.fillStyle = '#342012';
-      ctx.fillRect(68, fY - 46, 10, 46);    // left arm
-      ctx.fillRect(180, fY - 46, 10, 46);   // right arm
+      ctx.fillRect(sfX, fY - sfH, 13, sfH);
+      ctx.fillRect(sfX + sfW - 13, fY - sfH, 13, sfH);
       ctx.fillStyle = '#28180c';
-      ctx.fillRect(72, fY - 7, 5, 7);       // legs
-      ctx.fillRect(182, fY - 7, 5, 7);
+      ctx.fillRect(sfX + 9, fY - 10, 7, 10);
+      ctx.fillRect(sfX + sfW - 16, fY - 10, 7, 10);
 
-      // Coffee table
-      ctx.fillStyle = '#52321a';
-      ctx.fillRect(206, fY - 22, 66, 5);
-      ctx.fillStyle = '#3a2010';
-      ctx.fillRect(211, fY - 17, 4, 10);
-      ctx.fillRect(259, fY - 17, 4, 10);
+      // ── Living room receptacle (near dividing wall) ──────────────────────
+      const lrRcpX = 365, lrRcpY = fY - 22;
+      ctx.fillStyle = 'rgba(140,90,30,0.55)';
+      ctx.fillRect(lrRcpX - 2, lrRcpY - 2, 28, 24);
+      ctx.fillStyle = '#c4bdb0'; ctx.fillRect(lrRcpX, lrRcpY, 24, 20);
+      ctx.fillStyle = '#b8b0a4'; ctx.fillRect(lrRcpX + 1, lrRcpY + 1, 22, 18);
+      ctx.strokeStyle = '#888'; ctx.lineWidth = 1;
+      ctx.strokeRect(lrRcpX + 2, lrRcpY + 2, 20, 16);
+      ctx.fillStyle = '#444';
+      ctx.fillRect(lrRcpX + 5,  lrRcpY + 4, 2, 4);
+      ctx.fillRect(lrRcpX + 9,  lrRcpY + 4, 2, 4);
+      ctx.beginPath(); ctx.arc(lrRcpX + 8, lrRcpY + 11, 1.5, 0, TAU); ctx.fill();
+      ctx.fillRect(lrRcpX + 14, lrRcpY + 4, 2, 4);
+      ctx.fillRect(lrRcpX + 18, lrRcpY + 4, 2, 4);
+      ctx.beginPath(); ctx.arc(lrRcpX + 17, lrRcpY + 11, 1.5, 0, TAU); ctx.fill();
+      ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.arc(lrRcpX + 12, lrRcpY + 10, 2, 0, TAU); ctx.stroke();
 
-      // Half-wall divider between living room and kitchen
+      // Half-wall divider
       ctx.fillStyle = '#261c0e';
-      ctx.fillRect(393, fY - 52, 10, 52);
+      ctx.fillRect(393, fY - 60, 10, 60);
 
       // ── Kitchen ──────────────────────────────────────────────────────────
-      // Refrigerator (far left of kitchen)
+      const cabH = 46;
+      const ctrY = fY - cabH - 7;
+
+      // Refrigerator
+      const fridgeW = 38, fridgeH = 92;
       ctx.fillStyle = '#bfbab4';
-      ctx.fillRect(403, fY - 78, 18, 78);
+      ctx.fillRect(403, fY - fridgeH, fridgeW, fridgeH);
       ctx.fillStyle = '#b0aba5';
-      ctx.fillRect(403, fY - 78, 18, 36);   // freezer
+      ctx.fillRect(403, fY - fridgeH, fridgeW, 44);
       ctx.strokeStyle = '#a8a39e'; ctx.lineWidth = 1;
-      ctx.strokeRect(403, fY - 78, 18, 36);
-      ctx.strokeRect(403, fY - 40, 18, 40);
+      ctx.strokeRect(403, fY - fridgeH, fridgeW, 44);
+      ctx.strokeRect(403, fY - fridgeH + 44, fridgeW, fridgeH - 44);
       ctx.fillStyle = '#888';
-      ctx.fillRect(418, fY - 68, 2, 18);    // fridge handle
-      ctx.fillRect(418, fY - 28, 2, 18);    // freezer handle
+      ctx.fillRect(403 + fridgeW - 4, fY - fridgeH + 8,  4, 22);
+      ctx.fillRect(403 + fridgeW - 4, fY - fridgeH + 54, 4, 26);
 
-      // Base cabinets (starts right of fridge)
+      // Base cabinets
+      const bcX = 403 + fridgeW + 2;
+      const bcW = WALL_R - 16 - bcX;
       ctx.fillStyle = '#342214';
-      ctx.fillRect(423, fY - 32, 305, 32);
+      ctx.fillRect(bcX, fY - cabH, bcW, cabH);
 
-      // Stove (built-in, left of cabinets)
-      ctx.fillStyle = '#1e1e1e';
-      ctx.fillRect(423, fY - 32, 56, 32);
+      // Stove
+      const stoveW = 58;
+      ctx.fillStyle = '#222222';
+      ctx.fillRect(bcX, fY - cabH, stoveW, cabH);
+      ctx.fillStyle = '#181818';
+      ctx.fillRect(bcX + 3, fY - cabH + 3, stoveW - 6, cabH - 6);
 
       // Counter top
       ctx.fillStyle = '#747068';
-      ctx.fillRect(421, fY - 35, 309, 5);
+      ctx.fillRect(403 + fridgeW, ctrY, bcW + 2, 7);
       ctx.fillStyle = '#888078';
-      ctx.fillRect(421, fY - 35, 309, 2);   // highlight
+      ctx.fillRect(403 + fridgeW, ctrY, bcW + 2, 2);
 
-      // Stove surface (slightly darker than counter)
+      // Stove surface + burners
       ctx.fillStyle = '#282828';
-      ctx.fillRect(423, fY - 35, 56, 5);
-
-      // Burners
-      ctx.strokeStyle = '#505050'; ctx.lineWidth = 1.5;
-      for (const bx of [438, 465]) {
-        ctx.beginPath(); ctx.arc(bx, fY - 37, 5, 0, Math.PI * 2); ctx.stroke();
-        ctx.beginPath(); ctx.arc(bx, fY - 37, 2, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillRect(bcX, ctrY, stoveW, 7);
+      ctx.strokeStyle = '#555555'; ctx.lineWidth = 1.5;
+      for (const bx of [bcX + 16, bcX + 42]) {
+        ctx.beginPath(); ctx.arc(bx, ctrY + 3, 7, 0, TAU); ctx.stroke();
+        ctx.beginPath(); ctx.arc(bx, ctrY + 3, 3, 0, TAU); ctx.stroke();
       }
 
-      // Cabinet door outlines
+      // Cabinet doors
       ctx.strokeStyle = '#241408'; ctx.lineWidth = 1;
-      for (let cx = 481; cx < 688; cx += 48) {
-        ctx.strokeRect(cx + 2, fY - 29, 43, 24);
+      for (let cdx = bcX + stoveW + 4; cdx < WALL_R - 70; cdx += 52) {
+        ctx.strokeRect(cdx + 3, fY - cabH + 4, 45, cabH - 8);
+        ctx.fillStyle = '#7a6a54';
+        ctx.fillRect(cdx + 38, fY - cabH / 2 - 4, 3, 16);
       }
 
       // Sink
+      const sinkX = WALL_R - 82;
       ctx.fillStyle = '#26303a';
-      ctx.fillRect(672, fY - 29, 54, 22);
+      ctx.fillRect(sinkX, fY - cabH + 5, 64, cabH - 9);
       ctx.fillStyle = '#1a242e';
-      ctx.fillRect(675, fY - 27, 48, 18);
-      // Faucet
+      ctx.fillRect(sinkX + 3, fY - cabH + 8, 58, cabH - 16);
       ctx.fillStyle = '#848484';
-      ctx.fillRect(696, fY - 45, 3, 12);
-      ctx.fillRect(696, fY - 45, 9, 3);
+      ctx.fillRect(sinkX + 30, ctrY - 18, 3, 14);
+      ctx.fillRect(sinkX + 30, ctrY - 18, 14, 3);
       ctx.fillStyle = '#666';
-      ctx.beginPath(); ctx.arc(705, fY - 43, 2.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(sinkX + 44, ctrY - 15, 3.5, 0, TAU); ctx.fill();
 
-      // Upper cabinets (on back/right wall)
+      // Upper cabinets (above counter, inside the room)
+      const ucY = rC + 28, ucH = 60;
+      const ucX = 630, ucW = WALL_R - 14 - ucX;
       ctx.fillStyle = '#342214';
-      ctx.fillRect(752, rC + 28, 8, 72);
+      ctx.fillRect(ucX, ucY, ucW, ucH);
       ctx.strokeStyle = '#241408'; ctx.lineWidth = 1;
-      ctx.strokeRect(752, rC + 30, 8, 32);
-      ctx.strokeRect(752, rC + 64, 8, 34);
+      for (let ux = ucX; ux < ucX + ucW - 4; ux += 52) {
+        const dw = Math.min(48, ucX + ucW - ux - 4);
+        ctx.strokeRect(ux + 2, ucY + 3, dw, ucH - 6);
+      }
 
       // ── 2nd floor: bedrooms ───────────────────────────────────────────────
       // Floor y = F2 = 340, ceiling y = F3+FH = 208
@@ -1431,28 +2263,28 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // Bed (double, headboard against left wall)
       // Headboard
       ctx.fillStyle = '#3a2010';
-      ctx.fillRect(42, b2Y - 66, 10, 60);
+      ctx.fillRect(77, b2Y - 66, 10, 60);
       // Mattress
       ctx.fillStyle = '#d8d0c0';
-      ctx.fillRect(52, b2Y - 62, 140, 56);
+      ctx.fillRect(87, b2Y - 62, 140, 56);
       // Sheets / bedding
       ctx.fillStyle = '#c8c0b0';
-      ctx.fillRect(52, b2Y - 30, 140, 24);
+      ctx.fillRect(87, b2Y - 30, 140, 24);
       // Pillows
       ctx.fillStyle = '#e8e4de';
-      ctx.fillRect(55, b2Y - 60, 58, 22);
-      ctx.fillRect(120, b2Y - 60, 58, 22);
+      ctx.fillRect(90, b2Y - 60, 58, 22);
+      ctx.fillRect(155, b2Y - 60, 58, 22);
       // Pillow highlight
       ctx.fillStyle = '#f0ece8';
-      ctx.fillRect(57, b2Y - 58, 24, 8);
-      ctx.fillRect(122, b2Y - 58, 24, 8);
+      ctx.fillRect(92, b2Y - 58, 24, 8);
+      ctx.fillRect(157, b2Y - 58, 24, 8);
       // Footboard
       ctx.fillStyle = '#3a2010';
-      ctx.fillRect(192, b2Y - 62, 8, 56);
+      ctx.fillRect(227, b2Y - 62, 8, 56);
       // Bed legs
       ctx.fillStyle = '#28180a';
-      ctx.fillRect(52, b2Y - 6, 5, 6);
-      ctx.fillRect(187, b2Y - 6, 5, 6);
+      ctx.fillRect(87, b2Y - 6, 5, 6);
+      ctx.fillRect(222, b2Y - 6, 5, 6);
 
       // Nightstand (left side)
       ctx.fillStyle = '#4a2e12';
@@ -1487,11 +2319,11 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // Polka dots
       ctx.fillStyle = 'rgba(255,210,120,0.40)';
       for (const [dx, dy] of [[430,222],[500,210],[575,228],[650,215],[720,225]]) {
-        ctx.beginPath(); ctx.arc(dx, dy, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(dx, dy, 5, 0, TAU); ctx.fill();
       }
       ctx.fillStyle = 'rgba(130,190,255,0.35)';
       for (const [dx, dy] of [[460,240],[538,232],[614,244],[690,236]]) {
-        ctx.beginPath(); ctx.arc(dx, dy, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(dx, dy, 4, 0, TAU); ctx.fill();
       }
 
       // ── Crib ─────────────────────────────────────────────────────────────
@@ -1524,8 +2356,8 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.strokeRect(ctX2 + 63, b2Y - 34, 36, 13);
       ctx.strokeRect(ctX2 + 63, b2Y - 18, 36, 13);
       ctx.fillStyle = '#c89020';
-      ctx.beginPath(); ctx.arc(ctX2 + 81, b2Y - 27, 2, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(ctX2 + 81, b2Y - 11, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(ctX2 + 81, b2Y - 27, 2, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.arc(ctX2 + 81, b2Y - 11, 2, 0, TAU); ctx.fill();
 
       // ── 3rd floor split: baby room + roof deck ────────────────────────────
       drawThirdFloor();
@@ -1533,14 +2365,14 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ── Windows ───────────────────────────────────────────────────────────
       // Left wall (front facade)
       // Windows — each centered vertically in its floor's room
-      drawGlassBlockWindow(4,   F1 + FH + 8, 34, 48);  // basement left
+      drawGlassBlockWindow(3,   F1 + FH + 8, WALL_L - 6, 62);  // basement left
       drawFrontDoor(F1);                  // 1st floor left — front door
-      drawWallWindow(3,   380, 34, 80);  // 2nd floor left
-      drawWallWindow(3,   115, 34, 80);  // 3rd floor left
+      drawWallWindow(3,   380, WALL_L - 6, 104);  // 2nd floor left
+      drawWallWindow(3,   115, WALL_L - 6, 104);  // 3rd floor left
       // Right wall
-      drawGlassBlockWindow(763, F1 + FH + 8, 34, 48);  // basement right
+      drawGlassBlockWindow(WALL_R + 3, F1 + FH + 8, CW - WALL_R - 6, 62);  // basement right
       drawBackDoor(F1);                   // 1st floor right — back door
-      drawWallWindow(763, 380, 34, 80);  // 2nd floor right
+      drawWallWindow(WALL_R + 3, 380, CW - WALL_R - 6, 104);  // 2nd floor right
 
       // ── Floor labels ──────────────────────────────────────────────────────
       ctx.fillStyle = 'rgba(255,255,255,0.13)';
@@ -1553,16 +2385,53 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // ── Wall cracks ───────────────────────────────────────────────────────
       drawWallCracks();
 
+      // ── Cornice — stepped stone cap at top of each brick wall ─────────────
+      // Left wall cornice (roofline, y=0) — matches roof height (80px), 3 equal steps
+      ctx.fillStyle = '#e8e4d8';                                        // top cap
+      ctx.fillRect(0,  0, WALL_L + 6,  27);
+      ctx.fillStyle = '#d0cbc0';                                        // mid step
+      ctx.fillRect(0, 27, WALL_L + 12, 27);
+      ctx.fillStyle = '#b8b2a8';                                        // bottom overhang
+      ctx.fillRect(0, 54, WALL_L + 20, 26);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';                          // step highlights
+      ctx.fillRect(0,  0, WALL_L + 6,  2);
+      ctx.fillRect(0, 27, WALL_L + 12, 2);
+      ctx.fillRect(0, 54, WALL_L + 20, 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';                              // shadow below
+      ctx.fillRect(0, 80, WALL_L + 20, 5);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';                               // right-edge shadows
+      ctx.fillRect(WALL_L + 18, 54, 4, 26);
+      ctx.fillRect(WALL_L + 10, 27, 4, 27);
+      ctx.fillRect(WALL_L + 4,   0, 4, 27);
+
+      // Right wall cornice (top of right brick wall at F3)
+      ctx.fillStyle = '#e8e4d8';
+      ctx.fillRect(WALL_R - 6,  F3, CW, 8);
+      ctx.fillStyle = '#d0cbc0';
+      ctx.fillRect(WALL_R - 12, F3 + 8, CW, 8);
+      ctx.fillStyle = '#b8b2a8';
+      ctx.fillRect(WALL_R - 20, F3 + 16, CW, 8);
+      ctx.fillStyle = 'rgba(255,255,255,0.3)';
+      ctx.fillRect(WALL_R - 6,  F3, CW, 2);
+      ctx.fillRect(WALL_R - 12, F3 + 8, CW, 2);
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.fillRect(WALL_R - 20, F3 + 24, CW, 5);
+      ctx.fillStyle = 'rgba(0,0,0,0.3)';
+      ctx.fillRect(WALL_R - 20, F3 + 16, 4, 8);
+      ctx.fillRect(WALL_R - 14, F3 + 8,  4, 8);
+      ctx.fillRect(WALL_R - 8,  F3,      4, 8);
+
+
       // (air leak sources drawn per-frame by drawAirLeakSources)
     }
 
     function drawThirdFloor() {
-      const top  = 45;        // ceiling drywall bottom
+      const top  = 90;        // ceiling drywall bottom
       const bot  = F3;        // floor surface = 269
       const midX = 400;       // dividing wall x
 
       // ── Office background (left half) ────────────────────────────────────
-      ctx.fillStyle = '#879490';  // teal (matches kitchen)
+      ctx.fillStyle = '#879490';
       ctx.fillRect(WALL_L, top, midX - WALL_L, bot - top);
 
       // ── Bookshelf (left wall) ─────────────────────────────────────────────
@@ -1631,22 +2500,22 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillStyle = '#444';
       ctx.fillRect(rcpX + 5,  rcpY + 4, 2, 4);   // L slot
       ctx.fillRect(rcpX + 9,  rcpY + 4, 2, 4);   // R slot
-      ctx.beginPath(); ctx.arc(rcpX + 8, rcpY + 11, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(rcpX + 8, rcpY + 11, 1.5, 0, TAU); ctx.fill();
       // Bottom outlet
       ctx.fillRect(rcpX + 14, rcpY + 4, 2, 4);
       ctx.fillRect(rcpX + 18, rcpY + 4, 2, 4);
-      ctx.beginPath(); ctx.arc(rcpX + 17, rcpY + 11, 1.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(rcpX + 17, rcpY + 11, 1.5, 0, TAU); ctx.fill();
       // Center screw
       ctx.strokeStyle = '#666'; ctx.lineWidth = 1;
-      ctx.beginPath(); ctx.arc(rcpX + 12, rcpY + 10, 2, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(rcpX + 12, rcpY + 10, 2, 0, TAU); ctx.stroke();
 
       // ── Small desk plant ──────────────────────────────────────────────────
       ctx.fillStyle = '#6a3818'; ctx.fillRect(dkX + 8, bot - 42, 12, 6);    // pot
       ctx.fillStyle = '#4a1a08'; ctx.fillRect(dkX + 10, bot - 40, 8, 4);    // soil
       ctx.fillStyle = '#387020';
-      ctx.beginPath(); ctx.ellipse(dkX + 14, bot - 44, 9, 4, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(dkX + 8,  bot - 47, 6, 3, -0.5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(dkX + 20, bot - 47, 6, 3, 0.5, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(dkX + 14, bot - 44, 9, 4, 0, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(dkX + 8,  bot - 47, 6, 3, -0.5, 0, TAU); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(dkX + 20, bot - 47, 6, 3, 0.5, 0, TAU); ctx.fill();
 
       // ── Dividing brick wall with door ────────────────────────────────────
       const wX = 392, wW = 16;
@@ -1668,7 +2537,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(wX + 2, dY + 5,  wW - 4, 34);
       ctx.fillRect(wX + 2, dY + 44, wW - 4, 34);
       ctx.fillStyle = '#cc9820';
-      ctx.beginPath(); ctx.arc(wX - 1, dY + dH * 0.55, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(wX - 1, dY + dH * 0.55, 2, 0, TAU); ctx.fill();
 
       // ── Roof deck (right half) ────────────────────────────────────────────
       // Deck boards
@@ -1703,11 +2572,11 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         ctx.beginPath(); ctx.moveTo(px, bot - 20); ctx.lineTo(px, bot - 20 - ph); ctx.stroke();
         // Leaves
         ctx.fillStyle = '#4a9828';
-        ctx.beginPath(); ctx.ellipse(px,     bot - 20 - ph - 7, 13, 5,  0,    0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(px - 9, bot - 20 - ph,      9, 4, -0.5,  0, Math.PI * 2); ctx.fill();
-        ctx.beginPath(); ctx.ellipse(px + 9, bot - 20 - ph,      9, 4,  0.5,  0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(px,     bot - 20 - ph - 7, 13, 5,  0,    0, TAU); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(px - 9, bot - 20 - ph,      9, 4, -0.5,  0, TAU); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(px + 9, bot - 20 - ph,      9, 4,  0.5,  0, TAU); ctx.fill();
         ctx.fillStyle = 'rgba(100,200,60,0.45)';
-        ctx.beginPath(); ctx.ellipse(px - 2, bot - 20 - ph - 9, 5, 2.5, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(px - 2, bot - 20 - ph - 9, 5, 2.5, 0, 0, TAU); ctx.fill();
       }
 
       // ── Railing along right wall (top of right exterior wall) ────────────
@@ -1735,51 +2604,79 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(btX - 32, bot - 48, 3, 12);
       ctx.fillRect(btX + 20, bot - 36, 12, 3);
       ctx.fillRect(btX + 29, bot - 48, 3, 12);
+
+      // ── Window AC unit — full 3rd floor left window, protrudes into room ──
+      const acX = 3, acY = 115, acW = 44, acH = 104; // full window
+      const acP = 18; // pixels protruding past wall into room
+      // Aged foam/seal in window gap (wall portion only)
+      ctx.fillStyle = '#b89f60';
+      ctx.fillRect(acX, acY, acW, acH);
+      // Outdoor grille face (window portion)
+      ctx.fillStyle = '#d4d0c8'; ctx.fillRect(acX + 2, acY + 2, acW - 4, acH - 4);
+      // Grille slats (outdoor face)
+      ctx.fillStyle = '#a8a4a0';
+      for (let gy = acY + 4; gy < acY + acH - 6; gy += 5) {
+        ctx.fillRect(acX + 4, gy, acW - 8, 3);
+      }
+      // Indoor protrusion box (sticks into room)
+      ctx.fillStyle = '#c8c4bc';
+      ctx.fillRect(acX + acW, acY + 2, acP, acH - 4);
+      // Indoor front face — slightly lighter panel
+      ctx.fillStyle = '#deded8';
+      ctx.fillRect(acX + acW + 1, acY + 3, acP - 3, acH - 8);
+      // Control strip across top of indoor face
+      ctx.fillStyle = '#b0b0a8';
+      ctx.fillRect(acX + acW + 1, acY + 3, acP - 3, 8);
+      // Power LED on indoor face
+      ctx.fillStyle = '#00dd44';
+      ctx.beginPath(); ctx.arc(acX + acW + acP - 5, acY + 7, 2, 0, TAU); ctx.fill();
+      // Gap shadow at top (air escaping)
+      ctx.fillStyle = 'rgba(80,50,10,0.45)';
+      ctx.fillRect(acX, acY, acW, 3);
+      // Drip edge at bottom
+      ctx.fillStyle = '#909088'; ctx.fillRect(acX + 2, acY + acH - 5, acW + acP - 4, 5);
     }
 
     function drawCalderMobile() {
       const b2C = F3 + FH;
       const mCX = 590, mCY = b2C;
-      const o1 = Math.sin(tick * 0.014) * 10;
-      const o2 = Math.sin(tick * 0.020 + 1.1) * 7;
-      const o3 = Math.sin(tick * 0.017 + 2.4) * 6;
+      const o1 = fsin(tick * 0.014) * 10;
+      const o2 = fsin(tick * 0.020 + 1.1) * 7;
+      const o3 = fsin(tick * 0.017 + 2.4) * 6;
       ctx.strokeStyle = '#555'; ctx.lineWidth = 0.8; ctx.shadowBlur = 0;
 
-      ctx.beginPath(); ctx.moveTo(mCX, mCY); ctx.lineTo(mCX, mCY + 22); ctx.stroke();
-
       const a1Y = mCY + 22, a1L = mCX - 50 + o1, a1R = mCX + 36 + o1;
-      ctx.beginPath(); ctx.moveTo(a1L, a1Y); ctx.lineTo(a1R, a1Y); ctx.stroke();
-
       const a2PX = a1L + o2, a2Y = a1Y + 32;
-      ctx.beginPath(); ctx.moveTo(a1L, a1Y); ctx.lineTo(a2PX, a2Y); ctx.stroke();
       const a2L = a2PX - 28, a2R = a2PX + 20;
-      ctx.beginPath(); ctx.moveTo(a2L, a2Y); ctx.lineTo(a2R, a2Y); ctx.stroke();
-
       const s1Y = a2Y + 22;
-      ctx.beginPath(); ctx.moveTo(a2L, a2Y); ctx.lineTo(a2L, s1Y); ctx.stroke();
-      ctx.fillStyle = '#D12820';
-      ctx.beginPath(); ctx.arc(a2L, s1Y + 11, 11, 0, Math.PI * 2); ctx.fill();
-
       const s2Y = a2Y + 28;
-      ctx.beginPath(); ctx.moveTo(a2R, a2Y); ctx.lineTo(a2R, s2Y); ctx.stroke();
-      ctx.fillStyle = '#1840C8';
-      ctx.beginPath(); ctx.ellipse(a2R, s2Y + 13, 7, 11, 0, 0, Math.PI * 2); ctx.fill();
-
       const a3PX = a1R + o3, a3Y = a1Y + 40;
-      ctx.beginPath(); ctx.moveTo(a1R, a1Y); ctx.lineTo(a3PX, a3Y); ctx.stroke();
       const a3L = a3PX - 22, a3R = a3PX + 30;
-      ctx.beginPath(); ctx.moveTo(a3L, a3Y); ctx.lineTo(a3R, a3Y); ctx.stroke();
-
       const s3Y = a3Y + 18;
-      ctx.beginPath(); ctx.moveTo(a3L, a3Y); ctx.lineTo(a3L, s3Y); ctx.stroke();
-      ctx.fillStyle = '#F5C500';
-      ctx.beginPath(); ctx.arc(a3L, s3Y + 12, 12, 0, Math.PI * 2); ctx.fill();
-
       const s4Y = a3Y + 25;
-      ctx.beginPath(); ctx.moveTo(a3R, a3Y); ctx.lineTo(a3R, s4Y); ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(mCX, mCY); ctx.lineTo(mCX, mCY + 22);
+      ctx.moveTo(a1L, a1Y); ctx.lineTo(a1R, a1Y);
+      ctx.moveTo(a1L, a1Y); ctx.lineTo(a2PX, a2Y);
+      ctx.moveTo(a2L, a2Y); ctx.lineTo(a2R, a2Y);
+      ctx.moveTo(a2L, a2Y); ctx.lineTo(a2L, s1Y);
+      ctx.moveTo(a2R, a2Y); ctx.lineTo(a2R, s2Y);
+      ctx.moveTo(a1R, a1Y); ctx.lineTo(a3PX, a3Y);
+      ctx.moveTo(a3L, a3Y); ctx.lineTo(a3R, a3Y);
+      ctx.moveTo(a3L, a3Y); ctx.lineTo(a3L, s3Y);
+      ctx.moveTo(a3R, a3Y); ctx.lineTo(a3R, s4Y);
+      ctx.stroke();
+
+      ctx.fillStyle = '#D12820';
+      fillCircle(a2L, s1Y + 11, 11);
+      ctx.fillStyle = '#1840C8';
+      fillEllipse(a2R, s2Y + 13, 7, 11);
+      ctx.fillStyle = COL_GOLD;
+      fillCircle(a3L, s3Y + 12, 12);
       ctx.fillStyle = '#111111';
       ctx.beginPath();
-      ctx.moveTo(a3R,      s4Y);
+      ctx.moveTo(a3R, s4Y);
       ctx.lineTo(a3R - 12, s4Y + 22);
       ctx.lineTo(a3R + 12, s4Y + 22);
       ctx.closePath(); ctx.fill();
@@ -1789,10 +2686,10 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       // Cracks span full 40px wall thickness, outer face (x=0/800) to inner face (x=40/760)
       // pts = [dx_from_outer_face, dy_from_crack_center], dx goes 0 → 40
       const crackShapes = [
-        { pts: [[0,-4],[8,-8],[16,0],[24,-5],[32,2],[40,-1]],  branch: [2, [16,-13],[22,-19]] },
-        { pts: [[0,2],[8,-4],[16,5],[24,-2],[32,6],[40,1]],    branch: [3, [24,9],[30,15]]    },
-        { pts: [[0,-2],[8,4],[16,-3],[24,5],[32,-2],[40,1]],   branch: [2, [16,-9],[22,-17]]  },
-        { pts: [[0,3],[8,-5],[16,4],[24,-6],[32,5],[40,-2]],   branch: [3, [24,-11],[30,-18]] },
+        { pts: [[0,-5],[10,-10],[21,0],[31,-7],[42,3],[52,-1]],  branch: [2, [21,-17],[29,-25]] },
+        { pts: [[0,3],[10,-5],[21,7],[31,-3],[42,8],[52,1]],     branch: [3, [31,12],[39,20]]   },
+        { pts: [[0,-3],[10,5],[21,-4],[31,7],[42,-3],[52,1]],    branch: [2, [21,-12],[29,-22]] },
+        { pts: [[0,4],[10,-7],[21,5],[31,-8],[42,7],[52,-3]],    branch: [3, [31,-14],[39,-23]] },
       ];
 
       ctx.lineCap   = 'round';
@@ -1844,7 +2741,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.lineCap    = 'round';
       ctx.shadowBlur  = 0;
 
-      ctx.strokeStyle = '#d8f2ff';  // set once — stream() never changes this
+      ctx.strokeStyle = COL_STREAM;
 
       // Single animated streak: starts tiny at source, grows as it travels inward
       // sc = size scale (1 = normal, 2 = double, etc.)
@@ -1853,9 +2750,18 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
         const dist  = t * 52 * sc;
         const len   = t * 24 * sc;
         const alpha = t < 0.18 ? t / 0.18 : (1 - t);
-        const w     = 0.6 * sc + t * 3.0 * sc;
+        const w     = 2.5 * sc + t * 7.0 * sc;
         const hx    = ox + dx * dist,  hy = oy + dy * dist;
         const tx    = hx  - dx * len,  ty = hy  - dy * len;
+        ctx.globalAlpha = Math.max(0, alpha) * 0.88;
+        // Soft bloom underlay
+        ctx.lineWidth   = w * 3;
+        ctx.globalAlpha *= 0.15;
+        ctx.beginPath();
+        ctx.moveTo(tx, ty);
+        ctx.lineTo(hx, hy);
+        ctx.stroke();
+        // Main streak
         ctx.globalAlpha = Math.max(0, alpha) * 0.88;
         ctx.lineWidth   = w;
         ctx.beginPath();
@@ -1865,7 +2771,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       // Helper: emit N parallel streams spread along the perpendicular axis
-      function emit(ox, oy, dx, dy, spread, n, phOffset, sc = 1, phases = 2) {
+      function emit(ox, oy, dx, dy, spread, n, phOffset, sc = 1, phases = 1) {
         const px = dy, py = -dx;  // perpendicular direction
         for (let i = 0; i < n; i++) {
           const s  = (i / (n - 1) - 0.5) * spread;
@@ -1877,92 +2783,116 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       }
 
       const SC = 1.5;  // all leaks same scale — 100%+ larger than before
+      const SE = sealedEmitters;
 
       // ── Front door — air at top of door frame ──────────────────────────────
-      emit(WALL_L, F1 - 114, 1, 0, 12, 10, 0.0, SC, 3);
+      if (!SE.has(0)) emit(WALL_L, F1 - 114, 1, 0, 12, 5, 0.0, SC);
 
       // ── Back door — air at top of door frame ───────────────────────────────
-      emit(WALL_R, F1 - 114, -1, 0, 12, 10, 0.1, SC, 3);
+      if (!SE.has(1)) emit(WALL_R, F1 - 114, -1, 0, 12, 5, 0.1, SC);
 
-      // ── Left wall windows — one edge per window (random top or bottom) ──────
-      emit(WALL_L, we(0), 1, 0, 8, 10, 0.07, SC, 3);  // 3rd floor
-      emit(WALL_L, we(1), 1, 0, 8, 10, 0.14, SC, 3);  // 2nd floor
+      // ── Left wall windows ──────────────────────────────────────────────────
+      if (!SE.has(2)) emit(WALL_L, we(0), 1, 0, 8, 5, 0.07, SC);  // 3rd floor
+      if (!SE.has(3)) emit(WALL_L, we(1), 1, 0, 8, 5, 0.14, SC);  // 2nd floor
 
       // ── Right wall windows ─────────────────────────────────────────────────
-      emit(WALL_R, we(2), -1, 0, 8, 10, 0.21, SC, 3);  // 2nd floor right
+      if (!SE.has(4)) emit(WALL_R, we(2), -1, 0, 8, 5, 0.21, SC);
 
       // ── Basement glass block windows ───────────────────────────────────────
-      emit(WALL_L, we(3),  1, 0, 8, 10, 0.35, SC, 3);
-      emit(WALL_R, we(4), -1, 0, 8, 10, 0.42, SC, 3);
+      if (!SE.has(5)) emit(WALL_L, we(3),  1, 0, 8, 5, 0.35, SC);
+      if (!SE.has(6)) emit(WALL_R, we(4), -1, 0, 8, 5, 0.42, SC);
 
-
-      // ── Wall cracks — narrow streams through each crack ────────────────────
+      // ── Wall cracks ────────────────────────────────────────────────────────
       WALL_CRACKS.forEach((crack, ci) => {
+        if (SE.has(7 + ci)) return;
         const wx = crack.fromLeft ? WALL_L : WALL_R;
         const dx = crack.fromLeft ? 1 : -1;
-        emit(wx, crack.y, dx, 0, 10, 6, ci * 0.15 + 0.6, SC * 0.7, 3);
+        emit(wx, crack.y, dx, 0, 10, 4, ci * 0.15 + 0.6, SC * 0.7);
       });
 
-      // ── Duct leaks at seam joints — downward toward basement ─────────────
+      // ── Duct leaks ─────────────────────────────────────────────────────────
       const DS = SC * 0.675;
-      emit(240, 838,            0,  1, 8, 4, 0.55, DS, 2);  // trunk seam
-      emit(460, 838,            0,  1, 8, 4, 0.62, DS, 2);  // trunk seam
-      emit(320, F3 + FH + 14,  0,  1, 6, 4, 0.70, DS, 2);  // 2nd floor branch
-      emit(340, F2 + FH + 14,  0,  1, 6, 4, 0.77, DS, 2);  // 1st floor branch
-      emit(520, F2 + 80,        0,  1, 6, 4, 0.84, DS, 2);  // supply riser
+      if (!SE.has(11)) emit(240, 838,           0,  1, 8, 3, 0.55, DS);
+      if (!SE.has(12)) emit(460, 838,           0,  1, 8, 3, 0.62, DS);
+      if (!SE.has(13)) emit(320, F3 + FH + 14, 0,  1, 6, 3, 0.70, DS);
+      if (!SE.has(14)) emit(340, F2 + FH + 14, 0,  1, 6, 3, 0.77, DS);
+      if (!SE.has(15)) emit(520, F2 + 80,      -1,  0, 14, 4, 0.84, DS * 1.4);
 
-      // ── 2nd floor rim joist leaks ─────────────────────────────────────────
-      emit(WALL_L, F2 + FH * 0.5, 1, 0, FH - 6, 5, 0.18, SC * 0.85, 3);
-      emit(WALL_R, F2 + FH * 0.5, -1, 0, FH - 6, 5, 0.26, SC * 0.85, 3);
+      // ── Rim joist leaks ────────────────────────────────────────────────────
+      if (!SE.has(16)) emit(WALL_L, F2 + FH * 0.5,  1, 0, FH - 6, 3, 0.18, SC * 0.85);
+      if (!SE.has(17)) emit(WALL_R, F2 + FH * 0.5, -1, 0, FH - 6, 3, 0.26, SC * 0.85);
 
-      // ── Office receptacle — air infiltration upward (x=294 = center of box) ─
-      emit(294, F3 - 12, 0, -1, 14, 8, 0.48, SC * 1.0, 4);
+      // ── Office receptacle ──────────────────────────────────────────────────
+      if (!SE.has(18)) emit(294, F3 - 12, 0, -1, 14, 4, 0.48, SC * 1.0);
 
-      // ── Recessed can lights — small leaks from left & right housing edges ──
-      for (const [lx, ph] of [[110, 0.33], [220, 0.41], [330, 0.50]]) {
-        emit(lx - 8, 45, 0, 1, 3, 3, ph,        SC * 0.3, 2);  // left edge
-        emit(lx + 8, 45, 0, 1, 3, 3, ph + 0.05, SC * 0.3, 2);  // right edge
+      // ── Living room receptacle ─────────────────────────────────────────────
+      if (!SE.has(24)) emit(377, F1 - 12, 0, -1, 14, 4, 0.52, SC * 1.0);
+
+      // ── Recessed can lights ────────────────────────────────────────────────
+      for (const [lx, ph, ei] of [[110, 0.33, 19], [220, 0.41, 20], [330, 0.50, 21]]) {
+        if (SE.has(ei)) continue;
+        emit(lx +  9, 90, -0.3, 0.95, 6, 3, ph,        SC * 0.55);
+        emit(lx + 41, 90,  0.3, 0.95, 6, 3, ph + 0.05, SC * 0.55);
       }
 
-      // ── Pipe penetration through left basement wall ───────────────────────
-      emit(WALL_L, F1 + FH + 132,  0.85,  0.52, 4, 2, 0.80, SC * 0.9, 2);  // seeps toward hot water heater
+      // ── Pipe penetration ───────────────────────────────────────────────────
+      if (!SE.has(22)) emit(WALL_L, F1 + FH + 132, 0.4, -0.92, 4, 2, 0.80, SC * 0.9);
+
+      // ── Kid room can lights (2nd floor ceiling) ────────────────────────────
+      for (const [lx, ph, ei] of [[570, 0.55, 23]]) {
+        if (SE.has(ei)) continue;
+        emit(lx - 16, F3 + FH, -0.3, 0.95, 6, 3, ph,        SC * 0.55);
+        emit(lx + 16, F3 + FH,  0.3, 0.95, 6, 3, ph + 0.05, SC * 0.55);
+      }
+
+      // ── Caulk beads at sealed sources ──────────────────────────────────────
+      ctx.globalAlpha = 1;
+      for (let i = 0; i < EMITTERS.length; i++) {
+        if (!SE.has(i)) continue;
+        const em = EMITTERS[i];
+        // Main bead
+        ctx.fillStyle = '#FF6B00';
+        ctx.beginPath();
+        ctx.arc(em.ox, em.oy, 7, 0, TAU);
+        ctx.fill();
+        // Dark outline
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        // Highlight dot
+        ctx.fillStyle = '#FFB347';
+        ctx.beginPath();
+        ctx.arc(em.ox - 2, em.oy - 2, 3, 0, TAU);
+        ctx.fill();
+      }
 
       ctx.restore();
     }
 
     function drawPlatform(p, i) {
       if (p.invisible) return;
-      const sy = p.y - cam.y;
+      const sy = p.y;
       if (sy + p.h < 0 || sy > CH) return; // off screen
 
-      if (p.slippery) {
-        ctx.fillStyle = '#a8d8ea';
-        ctx.fillRect(p.x, sy, p.w, p.h);
-        ctx.fillStyle = '#78b8d4';
-        ctx.fillRect(p.x, sy + p.h - 4, p.w, 4);
-        // Icy sheen
-        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
-        ctx.lineWidth = 1;
-        for (let ix = p.x + 3; ix < p.x + p.w - 2; ix += 7) {
-          ctx.beginPath(); ctx.moveTo(ix, sy + 2); ctx.lineTo(ix + 4, sy + 7); ctx.stroke();
-        }
-      } else {
-        ctx.fillStyle = '#F5C500';
-        ctx.fillRect(p.x, sy, p.w, p.h);
-        ctx.fillStyle = '#c49a00';
-        ctx.fillRect(p.x, sy + p.h - 4, p.w, 4);
-      }
-
+      ctx.fillStyle = '#F5C500';
+      ctx.fillRect(p.x, sy, p.w, p.h);
+      ctx.fillStyle = '#a07800';
+      ctx.fillRect(p.x, sy + p.h - 5, p.w, 5);
+      ctx.fillStyle = 'rgba(255,255,255,0.45)';
+      ctx.fillRect(p.x, sy, p.w, 3);
     }
 
     function drawPlayer() {
+      // Flicker during invincibility (every 6 frames)
+      if (invincible > 0 && Math.floor(invincible / 6) % 2 === 1) return;
+
       const sx = player.x;
-      const sy = player.y - cam.y;
+      const sy = player.y;
       const { w, h, facing, frame } = player;
 
       ctx.save();
       ctx.translate(sx + w / 2, sy + h / 2);
-      ctx.scale(facing, 1);
+      ctx.scale(facing * 1.25, 1.25);
 
       const s28 = fsin(frame * 0.28);
       const bob = s28 * 1.5;
@@ -1977,70 +2907,66 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
       // Big flat feet
       ctx.fillStyle = '#e84800';
-      ctx.beginPath(); ctx.ellipse(-6, 19 + leg, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse( 6, 19 - leg, 7, 3, 0, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(-6, 19 + leg, 7, 3);
+      fillEllipse( 6, 19 - leg, 7, 3);
 
       // Body — dark base fur shadow
       ctx.fillStyle = '#b83600';
-      ctx.beginPath(); ctx.ellipse(0, 2 + bob, 12, 12, 0, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(0, 2 + bob, 12, 12);
       // Main orange body fur
       ctx.fillStyle = '#f04e00';
-      ctx.beginPath(); ctx.ellipse(0, 1 + bob, 11, 11, 0, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(0, 1 + bob, 11, 11);
 
       // Body fur tufts
       ctx.fillStyle = '#ff6622';
       for (let i = 0; i < BODY_TUFTS.length; i++) {
         const [tx, ty] = BODY_TUFTS[i];
-        ctx.beginPath();
-        ctx.ellipse(tx, ty + bob, 4, 3, BODY_TUFT_ANGLES[i], 0, Math.PI * 2);
-        ctx.fill();
+        fillEllipse(tx, ty + bob, 4, 3, BODY_TUFT_ANGLES[i]);
       }
 
       // Head — dark base
       ctx.fillStyle = '#b83600';
-      ctx.beginPath(); ctx.ellipse(0, -8 + bob, 12, 11, 0, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(0, -8 + bob, 12, 11);
       // Head main fur
       ctx.fillStyle = '#f04e00';
-      ctx.beginPath(); ctx.ellipse(0, -9 + bob, 11, 10, 0, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(0, -9 + bob, 11, 10);
 
       // Head fur tufts
       ctx.fillStyle = '#ff5f1a';
       for (let i = 0; i < HEAD_TUFTS.length; i++) {
         const [tx, ty] = HEAD_TUFTS[i];
-        ctx.beginPath();
-        ctx.ellipse(tx, ty + bob, 3.5, 3, HEAD_TUFT_ANGLES[i], 0, Math.PI * 2);
-        ctx.fill();
+        fillEllipse(tx, ty + bob, 3.5, 3, HEAD_TUFT_ANGLES[i]);
       }
 
       // Wild spiky top fur
       ctx.fillStyle = '#ff5500';
-      ctx.beginPath(); ctx.ellipse(-6, -20 + bob, 4, 4.5, -0.5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse( 0, -22 + bob, 4, 4.5,  0,   0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse( 6, -20 + bob, 4, 4.5,  0.5, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(-6, -20 + bob, 4, 4.5, -0.5);
+      fillEllipse( 0, -22 + bob, 4, 4.5);
+      fillEllipse( 6, -20 + bob, 4, 4.5, 0.5);
       ctx.fillStyle = '#ff8822';
-      ctx.beginPath(); ctx.ellipse(-5.5, -24 + bob, 2.5, 2.5, -0.5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse(  0,  -26 + bob, 2.5, 2.5,  0,   0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse( 5.5, -24 + bob, 2.5, 2.5,  0.5, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(-5.5, -24 + bob, 2.5, 2.5, -0.5);
+      fillEllipse(  0,  -26 + bob, 2.5, 2.5);
+      fillEllipse( 5.5, -24 + bob, 2.5, 2.5, 0.5);
 
       // ── GOOGLY EYES ──────────────────────────────────────────────────────────
       ctx.fillStyle = '#cc3800';
-      ctx.beginPath(); ctx.ellipse(-4.5, -9 + bob, 6.5, 6, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse( 4.5, -9 + bob, 6.5, 6, 0, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(-4.5, -9 + bob, 6.5, 6);
+      fillEllipse( 4.5, -9 + bob, 6.5, 6);
       ctx.fillStyle = 'white';
-      ctx.beginPath(); ctx.ellipse(-4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.ellipse( 4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.fill();
+      fillEllipse(-4.5, -9 + bob, 5.5, 5);
+      fillEllipse( 4.5, -9 + bob, 5.5, 5);
       ctx.fillStyle = '#f5c500';
-      ctx.beginPath(); ctx.arc(-4.5, -9 + bob, 3.2, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc( 4.5, -9 + bob, 3.2, 0, Math.PI * 2); ctx.fill();
+      fillCircle(-4.5, -9 + bob, 3.2);
+      fillCircle( 4.5, -9 + bob, 3.2);
       ctx.fillStyle = '#0a0808';
-      ctx.beginPath(); ctx.arc(-4.5, -9 + bob, 1.5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc( 4.5, -9 + bob, 1.5, 0, Math.PI * 2); ctx.fill();
+      fillCircle(-4.5, -9 + bob, 1.5);
+      fillCircle( 4.5, -9 + bob, 1.5);
       ctx.fillStyle = 'white';
-      ctx.beginPath(); ctx.arc(-3.5, -10 + bob, 0.7, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc( 5.5, -10 + bob, 0.7, 0, Math.PI * 2); ctx.fill();
+      fillCircle(-3.5, -10 + bob, 0.7);
+      fillCircle( 5.5, -10 + bob, 0.7);
       ctx.strokeStyle = '#401000'; ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.ellipse(-4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.stroke();
-      ctx.beginPath(); ctx.ellipse( 4.5, -9 + bob, 5.5, 5, 0, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(-4.5, -9 + bob, 5.5, 5, 0, 0, TAU); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse( 4.5, -9 + bob, 5.5, 5, 0, 0, TAU); ctx.stroke();
 
       // Grin
       ctx.strokeStyle = '#1a0800'; ctx.lineWidth = 1.5;
@@ -2051,11 +2977,21 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.fillRect(-1, -3 + bob, 3, 3);
       ctx.fillRect( 3, -3 + bob, 3, 3);
 
+      // ── Caulk gun (arm faces +x; ctx.scale(facing,1) mirrors automatically) ──
+      ctx.fillStyle = '#3a4a2e';                           // dark olive body
+      ctx.beginPath(); ctx.roundRect(7, 0 + bob, 15, 6, 2); ctx.fill();
+      ctx.fillStyle = '#2a3520';                           // grip
+      ctx.beginPath(); ctx.roundRect(10, 5 + bob, 5, 7, 1); ctx.fill();
+      ctx.fillStyle = '#4a5e38';                           // barrel
+      ctx.beginPath(); ctx.roundRect(18, 1 + bob, 7, 4, 1); ctx.fill();
+      ctx.fillStyle = '#FF6B00';                           // orange nozzle
+      ctx.beginPath(); ctx.roundRect(24, 1.5 + bob, 4, 3, 1); ctx.fill();
+
       ctx.restore();
     }
 
     function drawLeak(leak) {
-      const sy = leak.y - cam.y;
+      const sy = leak.y;
       if (sy + leak.h < -10 || sy > CH + 10) return;
 
       const cx = leak.x + leak.w / 2;
@@ -2074,7 +3010,32 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.lineCap = 'round';
       ctx.shadowBlur = 0;
 
-      const lineCount = 5;
+      // Glow halo — single wide transparent stroke using center line path
+      {
+        const lineY   = 0;
+        const phase   = tick * 0.09 + 0.75;
+        const amp     = 5;
+        const lineLen = hw * 2 * 0.52;
+        const startX  = -lineLen / 2;
+        const segs = 2, segW = lineLen / segs;
+        ctx.globalAlpha = 0.12;
+        ctx.strokeStyle = '#aaddff';
+        ctx.lineWidth   = 12;
+        let curX = startX, curY = lineY + fsin(phase) * amp;
+        ctx.beginPath();
+        ctx.moveTo(curX, curY);
+        for (let s = 0; s < segs; s++) {
+          const ph1 = phase + (s + 1) * 1.4;
+          const nx  = curX + segW;
+          const ny  = lineY + fsin(ph1) * amp;
+          ctx.bezierCurveTo(curX + segW * 0.35, lineY + fsin(phase + s * 1.4 + 0.5) * amp * 1.7,
+                            nx - segW * 0.35, lineY + fsin(ph1 - 0.5) * amp * 1.7, nx, ny);
+          curX = nx; curY = ny;
+        }
+        ctx.stroke();
+      }
+
+      const lineCount = 3;
       for (let li = 0; li < lineCount; li++) {
         const lineY   = (li - (lineCount - 1) / 2) * (leak.h / lineCount);
         const phase   = tick * 0.09 + li * 0.75;
@@ -2085,9 +3046,9 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
         ctx.globalAlpha = alpha;
         ctx.strokeStyle = li % 3 === 1 ? '#ffffff' : li % 3 === 2 ? '#cceeff' : '#aaddff';
-        ctx.lineWidth   = 2.5 - li * 0.2;
+        ctx.lineWidth   = 4.0 - li * 0.3;
 
-        const segs = 3, segW = lineLen / segs;
+        const segs = 2, segW = lineLen / segs;
         let curX = startX;
         let curY = lineY + fsin(phase) * amp;
         ctx.beginPath();
@@ -2117,68 +3078,154 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.restore();
     }
 
+    function drawSeals() {
+      if (!seals.length) return;
+      for (const s of seals) {
+        const sx = s.x;
+        const sy = s.y;
+        // Outer glow — wide smear to cover the sealed leak area
+        ctx.fillStyle = 'rgba(255,107,0,0.25)';
+        fillEllipse(sx, sy, 52, 16);
+        // Main caulk smear
+        ctx.fillStyle = '#FF6B00';
+        fillEllipse(sx, sy, 40, 10);
+        // Highlight ridge
+        ctx.fillStyle = '#FFB347';
+        fillEllipse(sx - 6, sy - 2, 20, 4);
+      }
+    }
+
+    function drawBullets() {
+      if (!bullets.length) return;
+      for (const b of bullets) {
+        const cx = b.x + b.w / 2, cy = b.y + b.h / 2;
+        // Glow
+        ctx.fillStyle = 'rgba(255,120,0,0.25)';
+        fillEllipse(cx, cy, b.w, b.h);
+        // Main blob
+        ctx.fillStyle = '#FF6B00';
+        fillEllipse(cx, cy, b.w / 2, b.h / 2);
+        // Bright core
+        ctx.fillStyle = '#FFB347';
+        fillEllipse(cx, cy, b.w / 3.5, b.h / 3.5);
+      }
+    }
+
+    function updateScoreBar() {
+      if (tick % 6 !== 0) return; // throttle DOM updates
+      const livesEl = elLives;
+      const timerEl = elTimer;
+      const cfmVal  = elCfmValue;
+      const cfmFill = elCfmFill;
+
+      // Lives
+      let hearts = '';
+      for (let i = 0; i < MAX_LIVES; i++) hearts += i < lives ? '♥ ' : '♡ ';
+      livesEl.textContent = hearts.trim();
+      livesEl.style.color = '#ff3355';
+
+      // Timer
+      const totalSecs = Math.ceil(framesLeft / 60);
+      const mins = Math.floor(totalSecs / 60);
+      const secs = totalSecs % 60;
+      timerEl.textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+      timerEl.style.color = framesLeft < 600 ? '#ff3355' : 'rgba(255,255,255,0.9)';
+
+      // CFM manometer
+      const cfmRatio = cfm / 5000;
+      const cfmColor = cfmRatio > 0.75 ? '#ff3333'
+                     : cfmRatio > 0.5  ? '#ff8800'
+                     : cfmRatio > 0.25 ? '#F5C500'
+                     : '#00e87a';
+      cfmVal.textContent = cfm.toLocaleString();
+      cfmVal.style.color = cfmColor;
+      cfmFill.style.width = (cfmRatio * 100) + '%';
+      cfmFill.style.background = cfmColor;
+    }
+
     function drawHUD() {
-      // Height indicator (how high have they climbed)
-      const pct = Math.max(0, Math.min(1, 1 - (player.y / WORLD_H)));
-      const climbed = Math.round(pct * 100);
+      ctx.save();
+      ctx.textBaseline = 'top';
 
+      // ── Full-seal bonus flash ──────────────────────────────────────────────
+      if (bonusFlash > 0) {
+        bonusFlash--;
+        const alpha = Math.min(1, bonusFlash / 30); // fade out last 0.5s
+        ctx.save();
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        // glow backdrop
+        ctx.fillStyle = `rgba(0,0,0,${alpha * 0.55})`;
+        ctx.beginPath(); ctx.roundRect(CW / 2 - 180, CH / 2 - 36, 360, 68, 10); ctx.fill();
+        // main text
+        ctx.font = 'bold 28px monospace';
+        ctx.fillStyle = `rgba(0,232,122,${alpha})`;
+        ctx.fillText('ALL LEAKS SEALED!', CW / 2, CH / 2 - 10);
+        ctx.font = 'bold 20px monospace';
+        ctx.fillStyle = `rgba(245,197,0,${alpha})`;
+        ctx.fillText('−1,000 CFM@50pa BONUS', CW / 2, CH / 2 + 18);
+        ctx.restore();
+      }
 
-      // Version
+      // ── Version (bottom-right, faint) ─────────────────────────────────────
       ctx.textAlign = 'right';
-      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = 'rgba(255,255,255,0.15)';
       ctx.font = '10px monospace';
-      ctx.fillText(VERSION, CW - 8, CH - 8);
-      ctx.textAlign = 'left';
+      ctx.fillText('v0.2', CW - 8, CH - 8);
+
+      ctx.restore();
     }
 
     function drawLogo() {
-      // Matches the navbar SVG exactly: viewBox 0 0 270 140
-      // Fan sub-svg: x=0 y=20 w=80 h=80, viewBox 8.511 8.511 82.977 82.977
-      const H   = LOGO_H;
-      const sc  = LOGO_SC;
-      const bx  = LOGO_BX;
-      const by  = LOGO_BY;
-
-      const fanX  = bx;
-      const fanY  = by + 20 * sc;
-      const fanW  = 80 * sc;
-      const fanH  = 80 * sc;
+      const fanX  = LOGO_BX;
+      const fanY  = LOGO_FAN_Y;
+      const fanW  = LOGO_FAN_W;
       const fanCX = fanX + fanW / 2;
-      const fanCY = fanY + fanH / 2;
+      const fanCY = fanY + fanW / 2;
+      const sc    = LOGO_SC;
 
       ctx.save();
 
-      // Yellow rounded square
+      // ── Yellow rounded square (fan housing) ──
       ctx.fillStyle = '#F5C500';
       ctx.beginPath();
-      ctx.roundRect(fanX, fanY, fanW, fanH, 9 / 82.977 * fanW);
+      ctx.roundRect(fanX, fanY, fanW, fanW, 9 / 82.977 * fanW);
       ctx.fill();
 
-      // White circle (r=31.72 in internal viewBox)
+      // ── White hub circle ──
       ctx.fillStyle = 'white';
       ctx.beginPath();
-      ctx.arc(fanCX, fanCY, 31.72 / 82.977 * fanW, 0, Math.PI * 2);
+      ctx.arc(fanCX, fanCY, 31.72 / 82.977 * fanW, 0, TAU);
       ctx.fill();
 
-      // Real blade path — rotated around fan center
-      if (imgBlades.complete && imgBlades.naturalWidth > 0) {
+      // ── Spinning blade image (pre-rasterized) ──
+      const bladeImg = bladesCanvas || imgBlades;
+      if (bladeImg.width > 0) {
         ctx.save();
         ctx.translate(fanCX, fanCY);
         ctx.rotate(tick * 0.18);
         ctx.translate(-fanCX, -fanCY);
-        ctx.drawImage(imgBlades, fanX, fanY, fanW, fanH);
+        ctx.drawImage(bladeImg, fanX, fanY, fanW, fanW);
         ctx.restore();
       }
 
-      // White divider (x=90 y=16 w=2 h=94 in outer viewBox)
-      ctx.fillStyle = 'rgba(255,255,255,0.4)';
-      ctx.fillRect(bx + 90 * sc, by + 16 * sc, Math.max(1, 2 * sc), 94 * sc);
-
-      // LES / NRG text (fontSize=75, LES y=56, NRG y=98 in outer viewBox)
+      // ── White divider line ──
+      const divX = LOGO_BX + 90 * sc;
+      const divY = LOGO_BY + 16 * sc;
+      const divH = 94 * sc;
       ctx.fillStyle = 'white';
-      ctx.font = `${Math.round(75 * sc)}px Peddana, Georgia, serif`;
-      ctx.fillText('LES', bx + 100 * sc, by + 56 * sc);
-      ctx.fillText('NRG', bx + 100 * sc, by + 98 * sc);
+      ctx.fillRect(divX, divY, 2, divH);
+
+      // ── "LES" / "NRG" text in Peddana (falls back to serif) ──
+      const fontSize = Math.round(56 * sc);
+      ctx.font = `bold ${fontSize}px Peddana, Georgia, serif`;
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      const textX = LOGO_BX + 100 * sc;
+      ctx.fillText('LES', textX, LOGO_BY + 56 * sc);
+      ctx.fillText('NRG', textX, LOGO_BY + 100 * sc);
 
       ctx.restore();
     }
@@ -2194,19 +3241,38 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
 
     function draw() {
       if (!bgBuilt) buildBG();
-      // Blit static background scrolled by camera
-      ctx.drawImage(bgCanvas, 0, -cam.y);
-      // Animated world elements — apply camera transform
       ctx.save();
-      ctx.translate(0, -cam.y);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.drawImage(bgCanvas, 0, 0);
+      ctx.restore();
       drawCalderMobile();
       drawAirLeakSources();
       drawLogo();
-      ctx.restore();
-      platforms.forEach((p, i) => drawPlatform(p, i));
+      for (let i = 0; i < platforms.length; i++) drawPlatform(platforms[i], i);
       for (const l of leaks) drawLeak(l);
       drawPlayer();
+      drawSeals();
+      drawBullets();
+      drawFloatTexts();
       drawHUD();
+    }
+
+    function drawFloatTexts() {
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 18px monospace';
+      for (let i = floatTexts.length - 1; i >= 0; i--) {
+        const ft = floatTexts[i];
+        ft.wy -= 1.2;
+        ft.life--;
+        if (ft.life <= 0) { floatTexts.splice(i, 1); continue; }
+        const alpha = Math.min(1, ft.life / 20);
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = '#00e87a';
+        ctx.fillText(ft.text, ft.wx, ft.wy);
+      }
+      ctx.restore();
     }
 
     // ─── Overlay screens ──────────────────────────────────────────────────────
@@ -2219,7 +3285,7 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.font = 'bold 42px monospace';
       ctx.fillText(title, CW / 2, CH / 2 - 40);
 
-      ctx.fillStyle = '#ffffffbb';
+      ctx.fillStyle = '#ffffffdd';
       ctx.font = '16px monospace';
       ctx.fillText(sub, CW / 2, CH / 2 + 4);
 
@@ -2236,28 +3302,578 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       ctx.textAlign = 'left';
     }
 
-    // ─── Loop ─────────────────────────────────────────────────────────────────
-    function loop() {
-      update();
-      draw();
-      if (gameOver) {
-        drawOverlay('GAME OVER', 'You got sucked into the fan.', '[ PRESS R TO RESTART ]');
-        return; // stop RAF — redraw only when restarted
+    // ─── Attract mode overlay ───────────────────────────────────────────────────
+    let attractBlink = 0;
+    function drawAttractOverlay() {
+      const boxH = 440;
+      const boxY = CH / 2 - boxH / 2;
+      ctx.fillStyle = 'rgba(0,0,0,0.85)';
+      ctx.beginPath();
+      ctx.roundRect(CW / 2 - 240, boxY, 480, boxH, 12);
+      ctx.fill();
+      ctx.strokeStyle = '#F5C500';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect(CW / 2 - 240, boxY, 480, boxH, 12);
+      ctx.stroke();
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = 'bold 48px monospace';
+      ctx.fillStyle = '#F5C500';
+      ctx.fillText('SEAL THE LEAKY', CW / 2, boxY + 45);
+      ctx.fillText('PHILLY ROWHOME', CW / 2, boxY + 95);
+
+      // How to play
+      ctx.font = '15px monospace';
+      ctx.fillStyle = '#ffffffdd';
+      const lines = [
+        'Shoot caulk to seal air leaks in',
+        'windows, doors, pipes, plugs,',
+        'cracks, lights and ductwork.',
+        '',
+        'Dodge the big gusts — 3 lives!',
+        'Lowest CFM in 60 seconds wins.',
+      ];
+      for (let i = 0; i < lines.length; i++) {
+        ctx.fillText(lines[i], CW / 2, boxY + 160 + i * 26);
       }
-      if (gameWon) {
-        drawOverlay('Congratulations!', 'You escaped the leaky house!', '[ PRESS R TO PLAY AGAIN ]');
-        return; // stop RAF — redraw only when restarted
+
+      // Controls
+      ctx.font = '13px monospace';
+      ctx.fillStyle = '#ffffff99';
+      ctx.fillText('D-PAD move  |  A jump  |  B shoot', CW / 2, boxY + 340);
+
+      attractBlink++;
+      if (attractBlink % 60 < 40) {
+        ctx.font = 'bold 22px monospace';
+        ctx.fillStyle = '#F5C500';
+        ctx.fillText('PRESS START', CW / 2, boxY + 400);
       }
+      ctx.restore();
+    }
+
+    // ─── Score entry screen ─────────────────────────────────────────────────────
+    function updateScoreEntry() {
+      scoreEntry.blinkTimer++;
+      const gp = navigator.getGamepads ? navigator.getGamepads() : [];
+      let pad = null;
+      for (let i = 0; i < gp.length; i++) { if (gp[i]) { pad = gp[i]; break; } }
+
+      const dUp    = keys['ArrowUp']   || (pad && ((pad.axes[1] < -0.5) || (pad.buttons[12] && pad.buttons[12].pressed)));
+      const dDown  = keys['ArrowDown'] || (pad && ((pad.axes[1] >  0.5) || (pad.buttons[13] && pad.buttons[13].pressed)));
+      const dRight = keys['ArrowRight']|| (pad && ((pad.axes[0] >  0.5) || (pad.buttons[15] && pad.buttons[15].pressed)));
+      const dLeft  = keys['ArrowLeft'] || (pad && ((pad.axes[0] < -0.5) || (pad.buttons[14] && pad.buttons[14].pressed)));
+      const confirm = keys['_gpFire'] || (pad && pad.buttons[0] && pad.buttons[0].pressed);
+      const selectBtn = keys['_gpSelect'] || false;
+
+      const upEdge    = dUp    && !scoreEntry.lastDpadUp;
+      const downEdge  = dDown  && !scoreEntry.lastDpadDown;
+      const rightEdge = dRight && !scoreEntry.lastDpadRight;
+      const leftEdge  = dLeft  && !scoreEntry.lastDpadLeft;
+      const confirmEdge = confirm && !scoreEntry.lastConfirm;
+      const selectEdge = selectBtn && !scoreEntry.lastSelect;
+      scoreEntry.lastDpadUp    = dUp;
+      scoreEntry.lastDpadDown  = dDown;
+      scoreEntry.lastDpadRight = dRight;
+      scoreEntry.lastDpadLeft  = dLeft;
+      scoreEntry.lastConfirm   = confirm;
+      scoreEntry.lastSelect    = selectBtn;
+
+      // Start + Select = skip score entry
+      if (keys['_gpStart'] && keys['_gpSelect']) { startDemo(); return; }
+
+      if (scoreEntry.phase === 'initials') {
+        if (upEdge) scoreEntry.initials[scoreEntry.cursor] = (scoreEntry.initials[scoreEntry.cursor] + 1) % 26;
+        if (downEdge) scoreEntry.initials[scoreEntry.cursor] = (scoreEntry.initials[scoreEntry.cursor] + 25) % 26;
+        if (rightEdge && scoreEntry.cursor < 2) scoreEntry.cursor++;
+        if (leftEdge && scoreEntry.cursor > 0) scoreEntry.cursor--;
+        if (confirmEdge) {
+          if (scoreEntry.cursor < 2) scoreEntry.cursor++;
+          else { scoreEntry.phase = 'company'; scoreEntry.cursor = 0; scoreEntry.company = [26]; }
+        }
+      } else if (scoreEntry.phase === 'company') {
+        if (selectEdge) { scoreEntry.phase = 'initials'; scoreEntry.cursor = 2; }
+        else if (upEdge) scoreEntry.company[scoreEntry.cursor] = (scoreEntry.company[scoreEntry.cursor] + 1) % ALPHABET.length;
+        else if (downEdge) scoreEntry.company[scoreEntry.cursor] = (scoreEntry.company[scoreEntry.cursor] + ALPHABET.length - 1) % ALPHABET.length;
+        if (rightEdge && scoreEntry.cursor < MAX_COMPANY - 1) {
+          scoreEntry.cursor++;
+          if (scoreEntry.cursor >= scoreEntry.company.length) scoreEntry.company.push(26);
+        }
+        if (leftEdge && scoreEntry.cursor > 0) scoreEntry.cursor--;
+        if (confirmEdge) scoreEntry.phase = 'email';
+      } else if (scoreEntry.phase === 'email') {
+        if (selectEdge) { scoreEntry.phase = 'company'; scoreEntry.cursor = 0; }
+        else if (confirmEdge) scoreEntry.phase = 'done';
+      } else if (scoreEntry.phase === 'done') {
+        if (selectEdge) scoreEntry.phase = 'email';
+        else if (confirmEdge) submitScore();
+      }
+    }
+
+    function handleScoreEntryKeyboard(e) {
+      if (gameState !== 'scoreEntry') return;
+      if (scoreEntry.phase === 'initials') {
+        const ch = e.key.toUpperCase();
+        if (ch.length === 1 && ch >= 'A' && ch <= 'Z') {
+          scoreEntry.initials[scoreEntry.cursor] = ch.charCodeAt(0) - 65;
+          if (scoreEntry.cursor < 2) scoreEntry.cursor++;
+          else { scoreEntry.phase = 'company'; scoreEntry.cursor = 0; scoreEntry.company = [26]; scoreEntry.kbBuffer = ''; }
+        }
+        if (e.code === 'Backspace' && scoreEntry.cursor > 0) scoreEntry.cursor--;
+      } else if (scoreEntry.phase === 'company') {
+        if (e.code === 'Escape') { scoreEntry.phase = 'initials'; scoreEntry.cursor = 2; return; }
+        const ch = e.key.toUpperCase();
+        if (ch.length === 1 && ((ch >= 'A' && ch <= 'Z') || ch === ' ')) {
+          const idx = ALPHABET.indexOf(ch);
+          if (idx >= 0) {
+            scoreEntry.company[scoreEntry.cursor] = idx;
+            if (scoreEntry.cursor < MAX_COMPANY - 1) {
+              scoreEntry.cursor++;
+              if (scoreEntry.cursor >= scoreEntry.company.length) scoreEntry.company.push(26);
+            }
+          }
+        }
+        if (e.code === 'Backspace' && scoreEntry.cursor > 0) {
+          scoreEntry.company.splice(scoreEntry.cursor, 1);
+          scoreEntry.cursor--;
+        }
+        if (e.code === 'Enter') scoreEntry.phase = 'email';
+      } else if (scoreEntry.phase === 'email') {
+        if (e.code === 'Escape') { scoreEntry.phase = 'company'; scoreEntry.cursor = 0; return; }
+        if (e.key.length === 1) scoreEntry.email += e.key;
+        if (e.code === 'Backspace') scoreEntry.email = scoreEntry.email.slice(0, -1);
+        if (e.code === 'Enter') scoreEntry.phase = 'done';
+      } else if (scoreEntry.phase === 'done') {
+        if (e.code === 'Escape') { scoreEntry.phase = 'email'; return; }
+        if (e.code === 'Enter' || e.code === 'Space') submitScore();
+      }
+    }
+
+    function submitScore() {
+      if (scoreEntry.submitted) return;
+      scoreEntry.submitted = true;
+      const initials = scoreEntry.initials.map(i => String.fromCharCode(65 + i)).join('');
+      const company = scoreEntry.company.map(i => ALPHABET[i]).join('').trim() || 'N/A';
+      const email = scoreEntry.email.trim();
+      lastSubmittedEntry = { initials, company, score: cfm };
+      saveScore(initials, company, cfm, email);
+      submitToFormspree(initials, company, cfm, email);
+      gameState = 'leaderboard';
+      leaderboardTimer = 600;
       requestAnimationFrame(loop);
     }
 
-    window.addEventListener('keydown', e => {
-      if (e.code === 'KeyR' && (gameOver || gameWon)) {
-        gameOver = false;
-        gameWon  = false;
-        resetPlayer();
-        requestAnimationFrame(loop);
+    function drawScoreEntryScreen() {
+      ctx.fillStyle = '#060e0a';
+      ctx.fillRect(0, 0, CW, CH);
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      const title = 'GAME OVER';
+      ctx.font = 'bold 38px monospace';
+      ctx.fillStyle = gameWon ? '#00e87a' : '#ff3355';
+      ctx.fillText(title, CW / 2, 100);
+
+      ctx.font = 'bold 28px monospace';
+      ctx.fillStyle = '#F5C500';
+      ctx.fillText(`${cfm.toLocaleString()} CFM@50pa`, CW / 2, 160);
+
+      ctx.strokeStyle = '#1a3a28';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(CW / 2 - 200, 200);
+      ctx.lineTo(CW / 2 + 200, 200);
+      ctx.stroke();
+
+      // Initials
+      ctx.font = 'bold 20px monospace';
+      ctx.fillStyle = '#00e87a';
+      ctx.fillText('ENTER INITIALS', CW / 2, 260);
+
+      const letterSize = 60;
+      const letterGap = 20;
+      const initialsStartX = CW / 2 - (3 * letterSize + 2 * letterGap) / 2;
+
+      for (let i = 0; i < 3; i++) {
+        const x = initialsStartX + i * (letterSize + letterGap);
+        const y = 300;
+        const isActive = scoreEntry.phase === 'initials' && scoreEntry.cursor === i;
+        const isDone = scoreEntry.phase !== 'initials';
+
+        ctx.fillStyle = isActive ? '#1a3a28' : '#0d1f15';
+        ctx.strokeStyle = isActive ? '#00e87a' : '#1a3a28';
+        ctx.lineWidth = isActive ? 3 : 1;
+        ctx.beginPath();
+        ctx.roundRect(x, y, letterSize, letterSize + 10, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = 'bold 42px monospace';
+        ctx.fillStyle = isDone ? '#F5C500' : (isActive ? '#00e87a' : '#ffffff44');
+        const letter = String.fromCharCode(65 + scoreEntry.initials[i]);
+        ctx.fillText(letter, x + letterSize / 2, y + letterSize / 2 + 5);
+
+        if (isActive && scoreEntry.blinkTimer % 40 < 28) {
+          ctx.font = '16px monospace';
+          ctx.fillStyle = '#00e87a88';
+          ctx.fillText('\u25B2', x + letterSize / 2, y - 10);
+          ctx.fillText('\u25BC', x + letterSize / 2, y + letterSize + 20);
+        }
       }
+
+      // Company
+      if (scoreEntry.phase === 'company' || scoreEntry.phase === 'done') {
+        ctx.font = 'bold 20px monospace';
+        ctx.fillStyle = '#00e87a';
+        ctx.fillText('COMPANY', CW / 2, 440);
+
+        const compW = 44;
+        const compGap = 6;
+        const compLen = Math.max(scoreEntry.company.length, 1);
+        const compStartX = CW / 2 - (compLen * compW + (compLen - 1) * compGap) / 2;
+
+        for (let i = 0; i < compLen; i++) {
+          const x = compStartX + i * (compW + compGap);
+          const y = 470;
+          const isActive = scoreEntry.phase === 'company' && scoreEntry.cursor === i;
+
+          ctx.fillStyle = isActive ? '#1a3a28' : '#0d1f15';
+          ctx.strokeStyle = isActive ? '#00e87a' : '#1a3a28';
+          ctx.lineWidth = isActive ? 3 : 1;
+          ctx.beginPath();
+          ctx.roundRect(x, y, compW, compW + 6, 4);
+          ctx.fill();
+          ctx.stroke();
+
+          const ch = ALPHABET[scoreEntry.company[i] || 0];
+          ctx.font = 'bold 28px monospace';
+          ctx.fillStyle = scoreEntry.phase === 'done' ? '#F5C500' : (isActive ? '#00e87a' : '#ffffff44');
+          ctx.fillText(ch, x + compW / 2, y + compW / 2 + 3);
+
+          if (isActive && scoreEntry.blinkTimer % 40 < 28) {
+            ctx.font = '14px monospace';
+            ctx.fillStyle = '#00e87a88';
+            ctx.fillText('\u25B2', x + compW / 2, y - 8);
+            ctx.fillText('\u25BC', x + compW / 2, y + compW + 16);
+          }
+        }
+      }
+
+      // Email section
+      if (scoreEntry.phase === 'email' || scoreEntry.phase === 'done') {
+        ctx.font = 'bold 20px monospace';
+        ctx.fillStyle = '#00e87a';
+        ctx.fillText('EMAIL (optional)', CW / 2, 570);
+
+        // Email input box
+        const emailBoxW = 400, emailBoxH = 44;
+        const emailBoxX = CW / 2 - emailBoxW / 2, emailBoxY = 590;
+        ctx.fillStyle = scoreEntry.phase === 'email' ? '#1a3a28' : '#0d1f15';
+        ctx.strokeStyle = scoreEntry.phase === 'email' ? '#00e87a' : '#1a3a28';
+        ctx.lineWidth = scoreEntry.phase === 'email' ? 3 : 1;
+        ctx.beginPath();
+        ctx.roundRect(emailBoxX, emailBoxY, emailBoxW, emailBoxH, 6);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = '22px monospace';
+        ctx.fillStyle = scoreEntry.phase === 'done' ? '#F5C500' : '#00e87a';
+        const emailDisplay = scoreEntry.email + (scoreEntry.phase === 'email' && scoreEntry.blinkTimer % 40 < 28 ? '_' : '');
+        ctx.fillText(emailDisplay || (scoreEntry.phase === 'email' ? '_' : ''), CW / 2, emailBoxY + emailBoxH / 2);
+
+        ctx.font = '12px monospace';
+        ctx.fillStyle = '#ffffff66';
+        ctx.fillText('We may send you updates about LES NRG.', CW / 2, emailBoxY + emailBoxH + 20);
+        ctx.fillText('We will never share your email or send spam.', CW / 2, emailBoxY + emailBoxH + 36);
+      }
+
+      // Submit prompt
+      if (scoreEntry.phase === 'done' && !scoreEntry.submitted) {
+        if (scoreEntry.blinkTimer % 60 < 40) {
+          ctx.font = 'bold 22px monospace';
+          ctx.fillStyle = '#F5C500';
+          ctx.fillText('PRESS B / ENTER TO SUBMIT', CW / 2, 680);
+        }
+      }
+
+      ctx.font = '14px monospace';
+      ctx.fillStyle = '#ffffff66';
+      ctx.fillText('\u2191\u2193 change letter   \u2190\u2192 move   A confirm', CW / 2, CH - 60);
+      ctx.fillText('SELECT go back   START+SELECT skip', CW / 2, CH - 38);
+
+      ctx.restore();
+    }
+
+    // ─── Leaderboard screen ─────────────────────────────────────────────────────
+    let lbBlink = 0;
+    function drawLeaderboardLogo(cx, cy, scale) {
+      const sc = scale;
+      const fanW = 80 * sc;
+      const fanX = cx - (270 * sc) / 2;
+      const fanY = cy - (140 * sc) / 2 + 20 * sc;
+      const fanCX = fanX + fanW / 2;
+      const fanCY = fanY + fanW / 2;
+      const baseY = cy - (140 * sc) / 2;
+
+      ctx.save();
+      ctx.fillStyle = '#F5C500';
+      ctx.beginPath();
+      ctx.roundRect(fanX, fanY, fanW, fanW, 9 / 82.977 * fanW);
+      ctx.fill();
+
+      ctx.fillStyle = 'white';
+      ctx.beginPath();
+      ctx.arc(fanCX, fanCY, 31.72 / 82.977 * fanW, 0, TAU);
+      ctx.fill();
+
+      const bladeImg = bladesCanvas || imgBlades;
+      if (bladeImg.width > 0) {
+        ctx.save();
+        ctx.translate(fanCX, fanCY);
+        ctx.rotate(tick * 0.18);
+        ctx.translate(-fanCX, -fanCY);
+        ctx.drawImage(bladeImg, fanX, fanY, fanW, fanW);
+        ctx.restore();
+      }
+
+      const divX = fanX + 90 * sc;
+      const divY = baseY + 16 * sc;
+      ctx.fillStyle = 'white';
+      ctx.fillRect(divX, divY, 2, 94 * sc);
+
+      const fontSize = Math.round(56 * sc);
+      ctx.font = `bold ${fontSize}px Peddana, Georgia, serif`;
+      ctx.fillStyle = 'white';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      const textX = fanX + 100 * sc;
+      ctx.fillText('LES', textX, baseY + 56 * sc);
+      ctx.fillText('NRG', textX, baseY + 100 * sc);
+      ctx.restore();
+    }
+
+    function drawLeaderboardScreen() {
+      ctx.fillStyle = '#060e0a';
+      ctx.fillRect(0, 0, CW, CH);
+
+      ctx.save();
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      drawLeaderboardLogo(CW / 2, 55, 0.6);
+
+      ctx.font = 'bold 38px monospace';
+      ctx.fillStyle = '#F5C500';
+      ctx.fillText('TOP 20', CW / 2, 115);
+
+      ctx.font = 'bold 16px monospace';
+      ctx.fillStyle = '#00e87a88';
+      ctx.textAlign = 'left';
+      ctx.fillText('RANK', 140, 155);
+      ctx.fillText('WHO', 240, 155);
+      ctx.fillText('COMPANY', 380, 155);
+      ctx.textAlign = 'right';
+      ctx.fillText('CFM@50pa', 660, 155);
+
+      ctx.strokeStyle = '#1a3a28';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(120, 173);
+      ctx.lineTo(680, 173);
+      ctx.stroke();
+
+      const scores = loadScores();
+      const rowH = 38;
+      const startY = 193;
+
+      for (let i = 0; i < 20; i++) {
+        const y = startY + i * rowH;
+        const entry = scores[i];
+
+        const isCurrent = entry && lastSubmittedEntry &&
+          entry.initials === lastSubmittedEntry.initials &&
+          entry.score === lastSubmittedEntry.score;
+
+        if (isCurrent) {
+          ctx.fillStyle = 'rgba(0,232,122,0.08)';
+          ctx.beginPath();
+          ctx.roundRect(120, y - 16, 560, rowH - 4, 4);
+          ctx.fill();
+          ctx.strokeStyle = '#00e87a44';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.roundRect(120, y - 16, 560, rowH - 4, 4);
+          ctx.stroke();
+        }
+
+        ctx.textAlign = 'left';
+        ctx.font = 'bold 22px monospace';
+
+        if (!entry) {
+          ctx.fillStyle = '#ffffff15';
+          ctx.fillText(`${i + 1}.`, 140, y + 4);
+          ctx.fillText('---', 240, y + 4);
+          continue;
+        }
+
+        ctx.fillStyle = isCurrent ? '#00e87a' : (i < 3 ? '#F5C500' : '#ffffff88');
+        ctx.fillText(`${i + 1}.`, 140, y + 4);
+
+        ctx.fillStyle = isCurrent ? '#00e87a' : '#ffffffcc';
+        ctx.fillText(entry.initials, 240, y + 4);
+
+        ctx.font = '18px monospace';
+        ctx.fillStyle = isCurrent ? '#00e87a99' : '#ffffff66';
+        ctx.fillText(entry.company, 380, y + 4);
+
+        ctx.font = 'bold 22px monospace';
+        ctx.textAlign = 'right';
+        ctx.fillStyle = isCurrent ? '#00e87a' : '#F5C500';
+        ctx.fillText(entry.score.toLocaleString(), 660, y + 4);
+      }
+
+      lbBlink++;
+      if (lbBlink % 60 < 40) {
+        ctx.textAlign = 'center';
+        ctx.font = 'bold 18px monospace';
+        ctx.fillStyle = '#F5C500';
+        ctx.fillText('PRESS START TO CONTINUE', CW / 2, CH - 60);
+      }
+
+      ctx.restore();
+    }
+
+    // ─── Loop ─────────────────────────────────────────────────────────────────
+    // Full arcade flow (attract → play → score entry → leaderboard) runs even
+    // inside the site iframe; only the on-page control hints get hidden there.
+    const inFrame = window !== window.parent;
+    const isEmbedded = false;
+    if (inFrame) {
+      const mc = document.getElementById('mobile-controls');
+      if (mc) mc.style.display = 'none';
+      const ctrl = document.getElementById('controls');
+      if (ctrl) ctrl.style.display = 'none';
+    }
+
+let startPrev = false;
+    let attractTimer = 0;
+    let attractShowLeaderboard = false;
+
+    let renderFrame = 0;
+    function loop() {
+      pollGamepad();
+      checkExitCombo();
+      const startCur = keys['_gpStart'] || false;
+      const startEdge = startCur && !startPrev;
+      startPrev = startCur;
+      const shouldDraw = (renderFrame++ & 1) === 0;
+
+      if (gameState === 'attract') {
+        attractTimer++;
+        // Every 15 seconds, toggle between demo and leaderboard
+        if (attractTimer >= 900) {
+          attractTimer = 0;
+          attractShowLeaderboard = !attractShowLeaderboard;
+        }
+        if (attractShowLeaderboard) {
+          elScoreBar.style.display = 'none';
+          if (shouldDraw) drawLeaderboardScreen();
+        } else {
+          elScoreBar.style.display = 'flex';
+          updateAI();
+          update();
+          updateScoreBar();
+          if (shouldDraw) { draw(); drawAttractOverlay(); }
+          if (gameOver || gameWon) { startDemo(); return; }
+        }
+        if (startEdge || keys['Space'] || keys['Enter']) {
+          keys['Space'] = false; keys['Enter'] = false; keys['_gpStart'] = false;
+          startGame(); return;
+        }
+        requestAnimationFrame(loop);
+        return;
+      }
+
+      if (gameState === 'playing') {
+        update();
+        updateScoreBar();
+        if (shouldDraw) draw();
+        if (gameOver || gameWon) {
+          if (isEmbedded) {
+            if (gameOver) {
+              const sub = loseReason === 'fan' ? 'Sucked into the fan!' : 'The leaks got you.';
+              drawOverlay('GAME OVER', `${cfm} CFM50  —  ${sub}`, '[ PRESS R TO RESTART ]');
+            } else {
+              drawOverlay('GAME OVER', `${cfm} CFM50`, '[ PRESS R TO PLAY AGAIN ]');
+            }
+          } else {
+            gameState = 'gameover';
+            gameoverTimer = GAMEOVER_DURATION;
+          }
+          requestAnimationFrame(loop);
+          return;
+        }
+        requestAnimationFrame(loop);
+        return;
+      }
+
+      if (gameState === 'gameover') {
+        gameoverTimer--;
+        if (shouldDraw) {
+          draw();
+          ctx.fillStyle = 'rgba(0,0,0,0.75)';
+          ctx.fillRect(0, 0, CW, CH);
+          ctx.save();
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          const flash = Math.floor(gameoverTimer / 8) % 2 === 0;
+          if (flash) {
+            ctx.font = 'bold 52px monospace';
+            ctx.fillStyle = '#F5C500';
+            ctx.fillText('GAME OVER', CW / 2, CH / 2 - 40);
+            ctx.font = 'bold 36px monospace';
+            ctx.fillStyle = '#00e87a';
+            ctx.fillText('YOU DID IT!', CW / 2, CH / 2 + 15);
+            ctx.font = '22px monospace';
+            ctx.fillStyle = '#ffffffbb';
+            ctx.fillText(`${cfm} CFM@50pa`, CW / 2, CH / 2 + 55);
+          }
+          ctx.restore();
+        }
+        if (gameoverTimer <= 0) {
+          gameState = 'scoreEntry';
+          resetScoreEntry();
+          elScoreBar.style.display = 'none';
+        }
+        requestAnimationFrame(loop);
+        return;
+      }
+
+      if (gameState === 'scoreEntry') {
+        scoreScreenTimer++;
+        if (scoreScreenTimer >= SCORE_SCREEN_TIMEOUT) { startDemo(); return; }
+        updateScoreEntry();
+        if (shouldDraw) drawScoreEntryScreen();
+        requestAnimationFrame(loop);
+        return;
+      }
+
+      if (gameState === 'leaderboard') {
+        leaderboardTimer--;
+        if (shouldDraw) drawLeaderboardScreen();
+        if (leaderboardTimer <= 0 || startEdge) { startDemo(); return; }
+        requestAnimationFrame(loop);
+        return;
+      }
+    }
+
+    window.addEventListener('keydown', e => {
+      if (gameState === 'scoreEntry') { handleScoreEntryKeyboard(e); return; }
+      if (isEmbedded && e.code === 'KeyR' && (gameOver || gameWon)) startGame();
     });
 
     // ─── Parent-frame key injection (for embedded mobile controls) ───────────
@@ -2265,91 +3881,30 @@ const wantsLeft  = () => keys['ArrowLeft']  || keys['KeyA'];
       if (e.data?.type === 'KEY_DOWN' && e.data.key) keys[e.data.key] = true;
       if (e.data?.type === 'KEY_UP'   && e.data.key) keys[e.data.key] = false;
       if (e.data?.type === 'JUMP') {
-        // Execute immediately — bypasses frame timing so quick taps are never lost
         if (player.jumpsLeft > 0) {
           player.vy = player.jumpsLeft === 1 ? DOUBLE_JUMP_FORCE : JUMP_FORCE;
           player.onGround = false;
           player.jumpsLeft--;
         }
       }
-      if (e.data?.type === 'RESTART' && (gameOver || gameWon)) {
-        gameOver = false; gameWon = false; resetPlayer(); requestAnimationFrame(loop);
+      if (e.data?.type === 'SHOOT') {
+        if (fireCooldown === 0 && gameState === 'playing') { spawnBullet(); sfxShoot(); }
+      }
+      if (e.data?.type === 'RESTART' && isEmbedded && (gameOver || gameWon)) {
+        startGame();
       }
     });
 
-    loop();
+    // Touch handling for all screens
+    canvas.addEventListener('touchstart', e => {
+      if (gameState === 'attract') { e.preventDefault(); startGame(); }
+      else if (gameState === 'scoreEntry' && scoreEntry.phase === 'done') { e.preventDefault(); submitScore(); }
+      else if (gameState === 'leaderboard') { e.preventDefault(); startDemo(); }
+      else if (isEmbedded && (gameOver || gameWon)) { e.preventDefault(); startGame(); }
+    }, { passive: false });
+
+    startDemo();
   </script>
 
-  <script>
-    // ─── Horizontal rulers (top & bottom) ────────────────────────────────────
-    function drawRulerH(id) {
-      const rc = document.getElementById(id);
-      const rx = rc.getContext('2d');
-      const W = 800, H = 24;
-      const ticksDown = (id === 'rulerBot'); // rulerTop ticks point down, rulerBot ticks point up
-
-      rx.fillStyle = '#111';
-      rx.fillRect(0, 0, W, H);
-      rx.font = '9px monospace';
-      rx.textAlign = 'center';
-
-      for (let x = 0; x <= W; x += 10) {
-        const isMaj = x % 100 === 0;
-        const isMid = x % 50 === 0;
-        const tickH = isMaj ? 14 : isMid ? 9 : 5;
-        const tickY = ticksDown ? 0 : (H - tickH);
-
-        rx.fillStyle = isMaj ? '#aaa' : isMid ? '#666' : '#444';
-        rx.fillRect(x, tickY, 1, tickH);
-
-        if (isMaj && x > 0 && x < W) {
-          rx.fillStyle = '#F5C500';
-          const labelY = ticksDown ? tickH + 9 : H - tickH - 3;
-          rx.fillText(x, x, labelY);
-        }
-      }
-      rx.fillStyle = '#F5C500';
-      rx.textAlign = 'left';  rx.fillText('0',   3,     ticksDown ? 21 : H - 16);
-      rx.textAlign = 'right'; rx.fillText('800', W - 2, ticksDown ? 21 : H - 16);
-    }
-
-    // ─── Vertical rulers (left & right) ──────────────────────────────────────
-    function drawRulerV(id) {
-      const rc = document.getElementById(id);
-      const rx = rc.getContext('2d');
-      const W = 36, H = 1080;
-      const ticksRight = (id === 'rulerLeft'); // left ruler ticks point right toward canvas
-
-      rx.fillStyle = '#111';
-      rx.fillRect(0, 0, W, H);
-      rx.font = '9px monospace';
-
-      for (let y = 0; y <= H; y += 10) {
-        const isMaj = y % 100 === 0;
-        const isMid = y % 50 === 0;
-        const tickW = isMaj ? 14 : isMid ? 9 : 5;
-        const tickX = ticksRight ? (W - tickW) : 0;
-
-        rx.fillStyle = isMaj ? '#aaa' : isMid ? '#666' : '#444';
-        rx.fillRect(tickX, y, tickW, 1);
-
-        if (isMaj) {
-          rx.fillStyle = '#F5C500';
-          if (ticksRight) {
-            rx.textAlign = 'right';
-            rx.fillText(y, tickX - 2, y + 3);
-          } else {
-            rx.textAlign = 'left';
-            rx.fillText(y, tickW + 2, y + 3);
-          }
-        }
-      }
-    }
-
-    drawRulerH('rulerTop');
-    drawRulerH('rulerBot');
-    drawRulerV('rulerLeft');
-    drawRulerV('rulerRight');
-  </script>
 </body>
 </html>

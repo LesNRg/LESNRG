@@ -8,6 +8,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${base}/services`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/contact`, lastModified, changeFrequency: "yearly", priority: 0.8 },
     { url: `${base}/large-building-blower-door-testing`, lastModified, changeFrequency: "monthly", priority: 0.9 },
+    { url: `${base}/special-inspections`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/energy-star-multifamily`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/phius-passive-house-verification`, lastModified, changeFrequency: "monthly", priority: 0.9 },
     { url: `${base}/why-it-matters`, lastModified, changeFrequency: "monthly", priority: 0.8 },
