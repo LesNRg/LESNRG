@@ -13,6 +13,7 @@ const navLinks = [
   { href: "/special-inspections", label: "Special Inspections" },
   { href: "/energy-star-multifamily", label: "Energy Star Certification" },
   { href: "/phius-passive-house-verification", label: "Passive House Verification" },
+  { href: "/thegame", label: "The Game" },
 ];
 
 export default function Navbar() {

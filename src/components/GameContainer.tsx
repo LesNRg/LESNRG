@@ -31,9 +31,9 @@ export default function GameContainer() {
   }
 
   return (
-    <div style={{ maxWidth: "800px" }} className="w-full">
+    <div style={{ maxWidth: "975px" }} className="w-full">
       <div
-        className="relative w-full overflow-hidden rounded-xl border-2 border-[#F5C500]/20 h-[80vh] max-h-[900px]"
+        className="relative w-full overflow-hidden rounded-xl border-2 border-[#F5C500]/20 h-[95vh] max-h-[1075px]"
         onMouseEnter={focusGame}
         onClick={focusGame}
       >
