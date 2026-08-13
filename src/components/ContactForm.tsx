@@ -130,7 +130,17 @@ export default function ContactForm() {
 
       {error && (
         <p className="text-red-500 text-sm text-center">
-          Something went wrong. Please try again or email us directly.
+          Something went wrong sending your message. Please try again, or reach
+          us on Instagram{" "}
+          <a
+            href="https://instagram.com/les.nrg"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline font-semibold"
+          >
+            @les.nrg
+          </a>
+          .
         </p>
       )}
       <button type="submit" disabled={sending} className="btn-primary w-full justify-center py-3 disabled:opacity-60 disabled:cursor-not-allowed">

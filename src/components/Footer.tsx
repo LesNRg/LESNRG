@@ -4,6 +4,31 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Instagram, ArrowUp } from "lucide-react";
 
+const footerColumns = [
+  {
+    heading: "Services",
+    links: [
+      { href: "/services", label: "All Services" },
+      { href: "/large-building-blower-door-testing", label: "Large Building Testing" },
+      { href: "/special-inspections", label: "Special Inspections" },
+      { href: "/energy-star-multifamily", label: "Energy Star Certification" },
+      { href: "/phius-passive-house-verification", label: "Passive House Verification" },
+    ],
+  },
+  {
+    heading: "Company",
+    links: [
+      { href: "/about", label: "About" },
+      { href: "/why-it-matters", label: "Why It Matters" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+  {
+    heading: "More",
+    links: [{ href: "/thegame", label: "LESNRG The Game" }],
+  },
+];
+
 export default function Footer() {
   return (
     <footer className="bg-[#111111] border-t border-white/8 mt-0">
@@ -34,8 +59,34 @@ export default function Footer() {
               <Instagram size={14} />
               @les.nrg
             </a>
+            <p className="text-white/30 text-xs leading-relaxed mt-5 max-w-xs">
+              Serving Pennsylvania, New Jersey, New York, Delaware and beyond.
+              No project is too far.
+            </p>
           </div>
 
+          {/* Link columns */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-10 md:gap-14">
+            {footerColumns.map((col) => (
+              <div key={col.heading}>
+                <h3 className="text-white/30 text-[10px] font-bold tracking-[0.14em] uppercase mb-4">
+                  {col.heading}
+                </h3>
+                <ul className="space-y-2.5">
+                  {col.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-white/45 hover:text-[#F5C500] transition-colors text-sm"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="border-t border-white/8 mt-10 pt-8 flex flex-col items-center gap-4">
