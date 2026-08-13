@@ -11,6 +11,7 @@ const routes = [
   { path: "/energy-star-multifamily", lastModified: "2026-04-26", changeFrequency: "monthly", priority: 0.9 },
   { path: "/phius-passive-house-verification", lastModified: "2026-05-09", changeFrequency: "monthly", priority: 0.9 },
   { path: "/why-it-matters", lastModified: "2026-04-27", changeFrequency: "monthly", priority: 0.8 },
+  { path: "/about", lastModified: "2026-08-13", changeFrequency: "yearly", priority: 0.7 },
   { path: "/contact", lastModified: "2026-04-26", changeFrequency: "yearly", priority: 0.8 },
 ] as const;
 
