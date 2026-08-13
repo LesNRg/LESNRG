@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // OG image routes read these font files at runtime via process.cwd(),
+  // which Next's file tracing cannot infer on its own.
+  outputFileTracingIncludes: {
+    "/**/opengraph-image": [
+      "./public/fonts/peddana-regular.ttf",
+      "./node_modules/@fontsource/inter/files/inter-latin-800-normal.woff",
+    ],
+  },
   async redirects() {
     return [
       {

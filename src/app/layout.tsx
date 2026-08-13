@@ -20,6 +20,7 @@ export const metadata: Metadata = {
   description: "Expert air leakage testing agency, envelope commissioning provider, and air leakage special inspection firm offering blower door testing, HERS ratings, energy audits, and code compliance verification for new construction and existing buildings. Philadelphia, PA.",
   keywords: "blower door testing, HERS rating, energy audit, building performance, Philadelphia, passive house, energy star, code compliance, envelope integrity testing, whole building blower door testing, air leakage testing agency, envelope commissioning provider, air leakage special inspection",
   metadataBase: new URL("https://www.lesnrg.com"),
+  twitter: { card: "summary_large_image" },
   icons: {
     icon: [
       { url: "/icon.png", sizes: "512x512", type: "image/png" },
