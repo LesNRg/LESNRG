@@ -3,25 +3,50 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ChevronDown } from "lucide-react";
+
+const serviceLinks = [
+  {
+    href: "/services",
+    label: "All Services",
+    desc: "Blower door testing, HERS ratings, energy audits and more",
+  },
+  {
+    href: "/large-building-blower-door-testing",
+    label: "Large Building Testing",
+    desc: "Multi-fan testing for commercial and industrial buildings",
+  },
+  {
+    href: "/special-inspections",
+    label: "Special Inspections",
+    desc: "Air barrier special inspections for 2021 IECC compliance",
+  },
+  {
+    href: "/energy-star-multifamily",
+    label: "Energy Star Certification",
+    desc: "Multifamily New Construction and Zero Energy Ready Home",
+  },
+  {
+    href: "/phius-passive-house-verification",
+    label: "Passive House Verification",
+    desc: "Independent third-party PHIUS+ certification",
+  },
+];
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
   { href: "/why-it-matters", label: "Why It Matters" },
-  { href: "/large-building-blower-door-testing", label: "Large Building Testing" },
-  { href: "/special-inspections", label: "Special Inspections" },
-  { href: "/energy-star-multifamily", label: "Energy Star Certification" },
-  { href: "/phius-passive-house-verification", label: "Passive House Verification" },
   { href: "/thegame", label: "The Game" },
 ];
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [servicesOpen, setServicesOpen] = useState(false);
   const [visible, setVisible] = useState(true);
   const pathname = usePathname();
   const lastScrollY = useRef(0);
+  const servicesRef = useRef<HTMLDivElement>(null);
+  const isServicesActive = serviceLinks.some((l) => l.href === pathname);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,6 +57,7 @@ export default function Navbar() {
       } else if (currentY > lastScrollY.current + 5) {
         setVisible(false);
         setMenuOpen(false);
+        setServicesOpen(false);
       } else if (currentY < lastScrollY.current - 5) {
         setVisible(true);
       }
@@ -40,6 +66,22 @@ export default function Navbar() {
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!servicesOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setServicesOpen(false);
+    };
+    const handleClick = (e: MouseEvent) => {
+      if (!servicesRef.current?.contains(e.target as Node)) setServicesOpen(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      document.removeEventListener("mousedown", handleClick);
+    };
+  }, [servicesOpen]);
 
   useEffect(() => {
     const handleGameStart = () => setVisible(false);
@@ -92,12 +134,76 @@ export default function Navbar() {
           </Link>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex flex-1 items-center justify-evenly ml-8">
+          <div className="hidden md:flex flex-1 items-center justify-end gap-1 ml-8">
+            <Link
+              href="/"
+              className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
+                pathname === "/"
+                  ? "text-[#F5C500] bg-white/8"
+                  : "text-white/60 hover:text-white hover:bg-white/6"
+              }`}
+            >
+              Home
+            </Link>
+
+            {/* Services dropdown */}
+            <div
+              ref={servicesRef}
+              className="relative"
+              onMouseEnter={() => setServicesOpen(true)}
+              onMouseLeave={() => setServicesOpen(false)}
+            >
+              <button
+                onClick={() => setServicesOpen((o) => !o)}
+                aria-expanded={servicesOpen}
+                aria-haspopup="true"
+                className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
+                  isServicesActive
+                    ? "text-[#F5C500] bg-white/8"
+                    : "text-white/60 hover:text-white hover:bg-white/6"
+                }`}
+              >
+                Services
+                <ChevronDown
+                  size={14}
+                  className={`transition-transform duration-200 ${servicesOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+
+              {servicesOpen && (
+                <div className="absolute left-0 top-full w-80 pt-2">
+                  <div className="bg-[#1a1a1a] border border-white/10 rounded-xl shadow-xl shadow-black/40 p-2">
+                    {serviceLinks.map((link) => (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setServicesOpen(false)}
+                        className={`block px-3 py-2.5 rounded-lg transition-colors ${
+                          pathname === link.href
+                            ? "bg-white/8"
+                            : "hover:bg-white/6"
+                        }`}
+                      >
+                        <div
+                          className={`text-sm font-semibold mb-0.5 ${
+                            pathname === link.href ? "text-[#F5C500]" : "text-white"
+                          }`}
+                        >
+                          {link.label}
+                        </div>
+                        <div className="text-white/40 text-xs leading-snug">{link.desc}</div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-center px-2 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-all duration-150 ${
                   pathname === link.href
                     ? "text-[#F5C500] bg-white/8"
                     : "text-white/60 hover:text-white hover:bg-white/6"
@@ -106,7 +212,7 @@ export default function Navbar() {
                 {link.label}
               </Link>
             ))}
-            <Link href="/contact" className="btn-primary text-sm py-2 px-4">
+            <Link href="/contact" className="btn-primary text-sm py-2 px-4 ml-2">
               Contact
             </Link>
           </div>
@@ -124,6 +230,37 @@ export default function Navbar() {
       {/* Mobile Menu */}
       {menuOpen && (
         <div className="md:hidden bg-[#111111] border-t border-white/8 px-5 pb-5">
+          <Link
+            href="/"
+            onClick={() => setMenuOpen(false)}
+            className={`block px-3 py-3 rounded-md text-sm font-medium my-0.5 transition-all ${
+              pathname === "/"
+                ? "text-[#F5C500] bg-white/8"
+                : "text-white/60 hover:text-white hover:bg-white/6"
+            }`}
+          >
+            Home
+          </Link>
+
+          <div className="mt-3 mb-1 px-3 text-white/30 text-[10px] font-bold tracking-[0.14em] uppercase">
+            Services
+          </div>
+          {serviceLinks.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMenuOpen(false)}
+              className={`block px-3 py-3 rounded-md text-sm font-medium my-0.5 transition-all ${
+                pathname === link.href
+                  ? "text-[#F5C500] bg-white/8"
+                  : "text-white/60 hover:text-white hover:bg-white/6"
+              }`}
+            >
+              {link.label}
+            </Link>
+          ))}
+
+          <div className="border-t border-white/8 my-3" />
           {navLinks.map((link) => (
             <Link
               key={link.href}
