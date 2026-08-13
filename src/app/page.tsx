@@ -196,7 +196,7 @@ export default function HomePage() {
       <section className="py-10 bg-[#111111] border-y border-white/8">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-10">
-            <span className="section-label">Specialized Services</span>
+            <span className="section-label">Services</span>
           </div>
           <div className="grid md:grid-cols-3 gap-5">
             {specializedPages.map((page) => (
@@ -222,8 +222,7 @@ export default function HomePage() {
       <section className="py-10 bg-white">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12">
           <div className="mb-12">
-            <span className="section-label">What We Do</span>
-            <h2 className="section-title">Everything We Test, Verify & Certify</h2>
+            <h2 className="section-title">Services</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {services.map((s) => (
