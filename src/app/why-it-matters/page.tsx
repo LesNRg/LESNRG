@@ -6,6 +6,7 @@ import { ArrowRight, CheckCircle } from "lucide-react";
 export const metadata: Metadata = {
   title: "Why Air Leakage Matters | Comfort, Durability & Performance | LES NRG",
   description: "Uncontrolled air infiltration degrades comfort, accelerates building decay, and drives up energy costs. Learn why airtightness is the foundation of a healthy, durable, efficient building.",
+  alternates: { canonical: "/why-it-matters" },
   openGraph: {
     title: "Why Air Leakage Matters | LES NRG",
     description: "Uncontrolled air infiltration degrades comfort, accelerates building decay, and drives up energy costs.",

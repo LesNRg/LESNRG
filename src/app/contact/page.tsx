@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Contact LES NRG | Building Performance Testing | Philadelphia, PA",
   description: "Get in touch with LES NRG for blower door testing, HERS ratings, energy audits, and program certification. Located in Philadelphia, PA, with response within one business day.",
   keywords: "contact blower door tester Philadelphia, building performance testing contact, energy audit Philadelphia, blower door test PA NJ NY DE, LES NRG contact",
+  alternates: { canonical: "/contact" },
   openGraph: {
     title: "Contact LES NRG | Philadelphia, PA",
     description: "Get in touch for blower door testing, HERS ratings, energy audits, and program certification. Response within one business day.",

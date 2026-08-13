@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: "PHIUS Passive House Verification | LES NRG | Philadelphia, PA",
   description: "Independent PHIUS+ passive house verification and certification. Third-party inspections, airtightness testing, and full certification support from design through certificate. Philadelphia, PA.",
   keywords: "PHIUS passive house verification, PHIUS certified verifier, passive house certification Philadelphia, airtightness testing, PHIUS+ 2021, passive house rowhouse, passive house multifamily, high performance building certification",
+  alternates: { canonical: "/phius-passive-house-verification" },
   openGraph: {
     title: "PHIUS Passive House Verification | LES NRG",
     description: "Independent PHIUS+ passive house verification. Third-party inspections, airtightness testing, and full certification support.",

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "Air Barrier Special Inspections Philadelphia | 2021 IECC Compliance | LES NRG",
   description: "LES NRG is Philadelphia's first certified special inspection agency for whole building air barrier testing. New 2021 IECC code adoption requires air barrier special inspections for all commercial construction with permits filed after January 13, 2026. Learn about compliance paths and testing requirements.",
   keywords: "special inspections Philadelphia, air barrier special inspection, 2021 IECC Philadelphia, air barrier testing Philadelphia, special inspection agency Philadelphia, whole building blower door testing, air barrier compliance, commercial air leakage testing, IBC 1705.18, Philadelphia energy code, air barrier continuity inspection, ASTM E3158 Philadelphia",
+  alternates: { canonical: "/special-inspections" },
   openGraph: {
     title: "Air Barrier Special Inspections Philadelphia | LES NRG",
     description: "Philadelphia's first certified special inspection agency for whole building air barrier testing. 2021 IECC compliance for commercial construction.",

@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Energy Star Multifamily Certification | LES NRG | Philadelphia, PA",
   description: "Authorized Energy Star Multifamily New Construction and DOE Zero Energy Ready Home verification. 347+ certified units. NJ and PA rebate programs available. Serving PA, NJ, NY, DE.",
   keywords: "Energy Star multifamily certification, HERS rater, DOE Zero Energy Ready Home, Energy Star MFNC v2, Energy Star new homes, multifamily certification Philadelphia, NJ energy rebates, PA energy rebates, unit compartmentalization testing, RESNET accredited",
+  alternates: { canonical: "/energy-star-multifamily" },
   openGraph: {
     title: "Energy Star Multifamily Certification | LES NRG",
     description: "Authorized Energy Star Multifamily New Construction verification. 347+ certified units. NJ and PA rebate programs available.",
