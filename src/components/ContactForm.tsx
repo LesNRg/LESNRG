@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Send, CheckCircle } from "lucide-react";
+import { sendGAEvent } from "@next/third-parties/google";
+import { track } from "@vercel/analytics";
 
 const services = [
   "Blower Door Testing",
@@ -50,6 +52,8 @@ export default function ContactForm() {
       });
       if (res.ok) {
         setSubmitted(true);
+        sendGAEvent("event", "generate_lead", { service: form.service });
+        track("contact_form_submitted", { service: form.service });
       } else {
         setError(true);
       }
