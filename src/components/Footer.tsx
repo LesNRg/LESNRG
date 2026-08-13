@@ -18,7 +18,6 @@ const footerColumns = [
   {
     heading: "Company",
     links: [
-      { href: "/about", label: "About" },
       { href: "/why-it-matters", label: "Why It Matters" },
       { href: "/contact", label: "Contact" },
     ],

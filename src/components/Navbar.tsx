@@ -35,7 +35,6 @@ const serviceLinks = [
 
 const navLinks = [
   { href: "/why-it-matters", label: "Why It Matters" },
-  { href: "/about", label: "About" },
   { href: "/thegame", label: "The Game" },
 ];
 
