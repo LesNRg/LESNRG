@@ -43,9 +43,13 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function HeroBigFans() {
-  const [items] = useState(() => shuffle(fanItems));
+  const [items, setItems] = useState(fanItems);
   const [current, setCurrent] = useState(0);
   const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    setItems(shuffle(fanItems));
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
