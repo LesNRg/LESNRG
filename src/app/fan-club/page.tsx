@@ -117,7 +117,7 @@ export default function FanPage() {
                   className="absolute top-3 right-3 text-[#6b6b62] opacity-0 group-hover:opacity-100 transition-opacity"
                 />
                 {partner.logo ? (
-                  <div className="relative w-full" style={{ height: "72px" }}>
+                  <div className="relative w-full" style={{ height: "90px" }}>
                     <Image
                       src={partner.logo}
                       alt={partner.name}
@@ -127,8 +127,8 @@ export default function FanPage() {
                     />
                   </div>
                 ) : (
-                  <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-[#F5C500]">
-                    <span className="font-black text-[#111111] text-xl">{initials(partner.name)}</span>
+                  <div className="flex items-center justify-center w-20 h-20 rounded-xl bg-[#F5C500]">
+                    <span className="font-black text-[#111111] text-2xl">{initials(partner.name)}</span>
                   </div>
                 )}
               </a>
