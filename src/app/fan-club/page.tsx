@@ -28,6 +28,7 @@ const partners: Partner[] = [
   // Add partners here. Drop logo files in /public/logos/partners/ and set `logo`.
   // Partners without a logo render as an initials tile.
   { name: "Re:Vision", url: "https://revisionarch.com/", logo: "/logos/partners/revision.png" },
+  { name: "Bright Common", url: "https://www.brightcommon.com/", logo: "/logos/partners/brightcommon.png" },
   { name: "Thriven Design", url: "https://thriven.design/", logo: "/logos/partners/thriven.png" },
   { name: "Scribe Design Build", url: "https://www.scribedesignbuild.com/home", logo: "/logos/partners/scribe.png" },
   { name: "Red Oak Builders", url: "https://www.redoakbuilders.com/", logo: "/logos/partners/redoak.png" },
@@ -41,6 +42,7 @@ const partners: Partner[] = [
   { name: "Habitat for Humanity Philadelphia", url: "https://www.habitatphiladelphia.org/", logo: "/logos/partners/habitat.svg" },
   { name: "Hivemind", url: "https://hivemindphilly.com/", logo: "/logos/partners/hivemind.png" },
   { name: "Philly Green Building", url: "https://www.phillygreenbuilding.com/", logo: "/logos/partners/phillygreen.webp" },
+  { name: "Onion Flats", url: "https://www.onionflats.com/", logo: "/logos/partners/onionflats.webp" },
 ];
 
 function initials(name: string) {
