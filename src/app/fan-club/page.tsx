@@ -39,6 +39,8 @@ const partners: Partner[] = [
   { name: "Bellweather Design-Build", url: "https://bellweatherdesignbuild.com/", logo: "/logos/partners/bellweather.png" },
   { name: "Hanson Fine Building", url: "https://www.hansonfinebuilding.com/", logo: "/logos/partners/hanson.svg" },
   { name: "Habitat for Humanity Philadelphia", url: "https://www.habitatphiladelphia.org/", logo: "/logos/partners/habitat.svg" },
+  { name: "Hivemind", url: "https://hivemindphilly.com/", logo: "/logos/partners/hivemind.png" },
+  { name: "Philly Green Building", url: "https://www.phillygreenbuilding.com/", logo: "/logos/partners/phillygreen.webp" },
 ];
 
 function initials(name: string) {
@@ -131,6 +133,7 @@ export default function FanPage() {
                     <span className="font-black text-[#111111] text-2xl">{initials(partner.name)}</span>
                   </div>
                 )}
+                <span className="mt-4 text-sm font-semibold text-[#111111]">{partner.name}</span>
               </a>
             ))}
           </div>
