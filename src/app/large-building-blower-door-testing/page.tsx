@@ -346,11 +346,13 @@ export default function BlowerDoorTestingPage() {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {[
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/six-fan-array-doorway.jpg", alt: "Six-fan blower door array installed in a double doorway with a technician looking through the panel", position: "object-top" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_1664.JPG", alt: "Large commercial building" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_0813.JPG", alt: "Blower door fan setup" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3195.JPG", alt: "Large building testing" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/blower-door-test-in-progress.jpg", alt: "Whole building blower door test in progress with a six-fan array running in a commercial exit doorway" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3445.JPG", alt: "Commercial air leakage test" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7551.JPG", alt: "Building envelope testing" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_9316.JPG", alt: "Multi-fan array deployment" },
@@ -360,8 +362,8 @@ export default function BlowerDoorTestingPage() {
                   src={photo.src}
                   alt={photo.alt}
                   fill
-                  className="object-cover"
-                  sizes="(max-width: 640px) 50vw, 33vw"
+                  className={`object-cover ${photo.position ?? "object-center"}`}
+                  sizes="(max-width: 640px) 50vw, 25vw"
                 />
               </div>
             ))}
