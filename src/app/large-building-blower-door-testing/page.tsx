@@ -354,7 +354,10 @@ export default function BlowerDoorTestingPage() {
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3195.JPG", alt: "Large building testing" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/blower-door-test-in-progress.jpg", alt: "Whole building blower door test in progress with a six-fan array running in a commercial exit doorway" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_3445.JPG", alt: "Commercial air leakage test" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/leak-detection-freight-elevator.jpg", alt: "LES NRG technician using a smoke pencil to locate air leakage around a freight elevator door" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/roof-penetrations-sealed.jpg", alt: "Commercial roof with vent penetrations sealed for whole building air leakage testing" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_7551.JPG", alt: "Building envelope testing" },
+              { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/fan-case-staged-in-doorway.jpg", alt: "Road case of calibrated blower door fans staged at a building entrance" },
               { src: "/new%20website%20photo/ENEGYSTAR%20AND%20LARGE%20BUILDING/IMG_9316.JPG", alt: "Multi-fan array deployment" },
             ].map((photo) => (
               <div key={photo.src} className="relative rounded-xl overflow-hidden aspect-[4/3]">
