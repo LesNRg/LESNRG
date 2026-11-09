@@ -24,7 +24,6 @@ const credentials = [
   "HERS Certified Rater (RESNET)",
   "ABAA Level I Certified Whole Building Airtightness Technician",
   "LEED AP",
-  "Founding Member, Greater Philadelphia Passive House Association",
   "Master of Construction Management",
 ];
 
