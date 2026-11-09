@@ -8,8 +8,6 @@ export const metadata: Metadata = {
   description:
     "Neil Goldman is a building science consultant with more than 15 years of experience bridging design and construction. Founder of LES NRG, Phius Verifier since 2017, HERS Rater, and LEED AP.",
   alternates: { canonical: "/about" },
-  // DRAFT: keep out of search results until the page is approved.
-  robots: { index: false, follow: false },
   openGraph: {
     title: "About Neil Goldman | LES NRG",
     description:
