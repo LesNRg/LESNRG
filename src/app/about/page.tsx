@@ -140,6 +140,23 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
+
+      {/* Join the team */}
+      <section className="bg-[#111111] py-10">
+        <div className="max-w-3xl mx-auto px-5 text-center">
+          <h2 className="font-black text-white mb-3" style={{ fontSize: "1.5rem", letterSpacing: "-0.02em" }}>
+            Want to Join the Team?
+          </h2>
+          <p className="text-white/50 mb-6">
+            We&apos;re always glad to hear from people who care about building science and doing things right in
+            the field. Send us a message and tell us a little about yourself.
+          </p>
+          <Link href="/contact" className="btn-outline-yellow">
+            Send Us a Message
+            <ArrowRight size={16} />
+          </Link>
+        </div>
+      </section>
     </div>
   );
 }
