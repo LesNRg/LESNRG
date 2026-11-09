@@ -34,17 +34,7 @@ export default function AboutPage() {
       <section className="bg-[#111111] py-12 border-b border-white/8 relative overflow-hidden">
         <div className="absolute top-1/2 right-0 w-[500px] h-[500px] bg-[#F5C500]/5 rounded-full blur-3xl pointer-events-none translate-x-1/3 -translate-y-1/2" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 xl:px-12 relative z-10">
-          <div className="grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-12 items-center">
-            <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden border border-white/10">
-              <Image
-                src="/new%20website%20photo/Neil/IMG_5701.JPG"
-                alt="Neil Goldman on a rooftop job site"
-                fill
-                className="object-cover"
-                priority
-                sizes="(max-width: 768px) 100vw, 40vw"
-              />
-            </div>
+          <div className="grid md:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-12 items-center">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <User size={13} className="text-[#F5C500]" />
@@ -76,7 +66,30 @@ export default function AboutPage() {
                 </p>
               </div>
             </div>
+            <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden border border-white/10">
+              <Image
+                src="/new%20website%20photo/Neil/IMG_5701.JPG"
+                alt="Neil Goldman on a rooftop job site"
+                fill
+                className="object-cover"
+                priority
+                sizes="(max-width: 768px) 100vw, 40vw"
+              />
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Vision */}
+      <section className="bg-white py-12 border-b border-[#111111]/8">
+        <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
+          <span className="section-label">Why We Do This</span>
+          <p className="text-[#111111] text-xl leading-relaxed mt-4">
+            Most people never think about the walls around them, and they shouldn&apos;t have to. A good building
+            just works. It stays warm in the winter and cool in the summer, the air feels fresh, and the energy
+            bill doesn&apos;t sting. We do this work because we like sweating the small stuff on site, so the
+            people inside get a building that takes care of them for decades to come.
+          </p>
         </div>
       </section>
 
